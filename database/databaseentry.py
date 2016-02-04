@@ -52,9 +52,9 @@ class DataBaseEntry:
         self._user_map_collection.insert_one(service.encode)
 
     def find_user(self, email):
-        asked_user = self._general_users_collection.find_one({"email": email})
-        if asked_user:
-            return user.decode(asked_user)
+        asked_user_json = self._general_users_collection.find_one({"email": email})
+        if asked_user_json:
+            return User.decode(asked_user_json)
         else:
             return None
 
@@ -79,10 +79,8 @@ if __name__ == "__main__":
     dbe = DataBaseEntry()
     user = User("mail@m-heerde.de", "1234", "Matthias", "Heerde")
     dbe.insert_user(user)
-
     fitness_user = FitnessUser("mail@m-heerde.de", "05.08.1990", 90, 176)
     dbe.insert_fitness_user(fitness_user)
     print ((dbe.get_user_id("mail@m-heerde.de")))
-
-
     print(dbe.find_user("mail@m-heerde.de"))
+    dbe._fitness_users_collection.drop()

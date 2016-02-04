@@ -76,8 +76,8 @@ class FitnessUser:
 
     @classmethod
     def decode(cls, fitness_user):
-        assert fitness_user['_type'] == 'general_user'
-        return User(fitness_user['general_user_id'], fitness_user['birthday'],
+        assert fitness_user['_type'] == 'fitness_user'
+        return FitnessUser(fitness_user['general_user_id'], fitness_user['birthday'],
                     fitness_user['weight'],
                     fitness_user['height'])
 
