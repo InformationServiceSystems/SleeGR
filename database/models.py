@@ -1,4 +1,3 @@
-
 class User:
     def __init__(self, email, password, first_name=None, last_name=None):
         self._email = email
@@ -34,7 +33,8 @@ class User:
     @classmethod
     def decode(cls, user):
         assert user['_type'] == 'general_user'
-        return User(user['email'], user['password'], user['first_name'], user['last_name'])
+        return User(user['email'], user['password'], user['first_name'],
+                    user['last_name'])
 
     def __str__(self):
         return '%s' % (self._email)
@@ -77,7 +77,8 @@ class FitnessUser:
     @classmethod
     def decode(cls, fitness_user):
         assert fitness_user['_type'] == 'general_user'
-        return User(fitness_user['general_user_id'], fitness_user['birthday'], fitness_user['weight'],
+        return User(fitness_user['general_user_id'], fitness_user['birthday'],
+                    fitness_user['weight'],
                     fitness_user['height'])
 
 
@@ -100,25 +101,48 @@ class Service:
 
 
 class Trainer:
-    def __init__(self, email, service_id):
-        self._email = email
+    def __init__(self, service_id, general_user_id):
+        self._general_user_id = general_user_id
         self._service_id = service_id
         self._user_type = 2
 
     def encode(self):
         return {
             '_type': 'trainer',
+            'general_user_id': self._general_user_id,
             'service_id': self._service_id,
-            'email': self._email,
             'user-type': self._user_type
         }
 
     @classmethod
     def decode(cls, trainer):
         assert trainer['_type'] == 'trainer'
-        return User(trainer['email'], trainer['service_id'])
+        return Trainer(trainer['service_id'],
+                    trainer['general_user_id'])
 
 
 class ServiceUserMap:
-    def __init__(self):
-        pass
+    def __init__(self, service_id, user_id):
+        self._general_service_id = service_id
+        self._general_user_id = user_id
+
+    @property
+    def genera_user_id(self):
+        return self._general_user_id
+
+    @property
+    def general_service_id(self):
+        return self._general_service_id
+
+    def encode(self):
+        return {
+            '_type': 'ServiceUserMap',
+            'general_service_id': self._general_service_id,
+            'general_user_id': self._general_user_id
+        }
+
+    @classmethod
+    def decode(cls, service_json):
+        if service_json['_type'] == 'ServiceUserMap':
+            return ServiceUserMap(service_json['general_service_id'],
+                                  service_json['general_user_id'])
