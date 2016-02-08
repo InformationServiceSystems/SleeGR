@@ -1,9 +1,9 @@
 var application = (function(){
-  var production = false;
+  var production = true;
   var routing = {
     auth: {
       signup: '',
-      signin: ''
+      signin: '/login_rest'
     }
   };
 
@@ -89,14 +89,26 @@ var application = (function(){
     };
 
     function signin(values, success){
-      jQuery.getJSON(routing.auth.signin)
-        .success(function(response){
+      /*jQuery.post(routing.auth.signin, values, function(response){
           if(response.authenticated){
             success();
           }
-        })
+        }, 'json')
         .fail(function(err) {
+            console.log(err);
 
+        });*/
+        jQuery.ajax({
+            contentType: "application/json; charset=utf-8",
+            type: 'POST',
+            url: routing.auth.signin,
+            data: JSON.stringify(values),
+            success: function(response){
+              if(response.authenticated){
+                success();
+              }
+            },
+            dataType: 'json'
         });
     };
 
