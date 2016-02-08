@@ -72,6 +72,13 @@ class DataBaseEntry:
         else:
             return None
 
+    def password_matches_email(self, email, password):
+        asked_user = self.find_user(email)
+        if asked_user is not None:
+            if asked_user['password'] == password:
+                return True
+        return False
+
 
 
 

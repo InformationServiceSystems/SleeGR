@@ -1,4 +1,9 @@
+from decorators import check_json
+
+
 class User:
+
+    @check_json
     def __init__(self, email, password, first_name=None, last_name=None):
         self._email = email
         self._password = password
@@ -31,10 +36,14 @@ class User:
         }
 
     @classmethod
-    def decode(cls, user):
-        assert user['_type'] == 'general_user'
-        return User(user['email'], user['password'], user['first_name'],
-                    user['last_name'])
+    def decode(cls, user_json):
+        assert user_json['_type'] == 'general_user'#
+        if 'first_name' not in user_json:
+            user_json['first_name']= None
+        if 'last_name' not in user_json:
+            user_json['last_name'] = None
+        return User(user_json['email'], user_json['password'], user_json['first_name'],
+                    user_json['last_name'])
 
     def __str__(self):
         return '%s' % (self._email)
