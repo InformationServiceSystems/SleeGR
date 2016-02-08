@@ -1,0 +1,12 @@
+<h1>training</h2>
+
+<h3>Coach: {{ training.coach.name }}</h3>
+
+<table class="table table-striped" style="width: 600px;">
+  <thead>
+    <tr> <th>#</th> <th>Mate</th> <th>Score</th> </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="mate in training.mates"> <th scope="row">{{ $index }}</th> <td>{{ mate.name }}</td> <td>{{ mate.score.success }}/{{ mate.score.sessions }}</td> </tr>
+  </tbody>
+</table>
