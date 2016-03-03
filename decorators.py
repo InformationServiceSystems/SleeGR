@@ -1,9 +1,20 @@
-from functools import wraps
+from exceptions import InputError, error_messages
+from validate_email import validate_email
 
 
-def check_json(f):
-    def d(*args, **kwargs):
-        f(*args)
+def check_user(f):
+    def d(self, email, password, first_name=None, last_name=None):
+        if not email or not validate_email(email):
+            raise InputError(email, [2])
+        if not password:
+            raise InputError('Password', error_messages[3])
+        if first_name:
+            if not first_name.isalpha():
+                raise InputError(first_name, error_messages[4])
+        if last_name:
+            if not last_name.isalpha():
+                raise InputError(last_name, error_messages[4])
+        f(self, email, password, first_name, last_name)
     return d
 
 

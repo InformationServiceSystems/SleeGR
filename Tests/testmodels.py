@@ -1,5 +1,7 @@
 import unittest
-from database.models import User, Trainer, FitnessUser, Service
+
+import names
+from databasemodels.models import User, Trainer, FitnessUser, Service
 
 
 class TestUser(unittest.TestCase):
@@ -30,23 +32,23 @@ class TestUser(unittest.TestCase):
 
     def test_user_decode(self):
         user_json = {
-            '_type': 'general_user',
-            'email': 'test@mail.de',
-            'password': '1234',
-            'first_name': 'Max',
-            'last_name': 'Mustermann'
+            names.type: names.user_type_names.user_general,
+            names.email: 'test@mail.de',
+            names.password: '1234',
+            names.first_name: 'Max',
+            names.last_name: 'Mustermann'
 
         }
 
         user = User.decode(user_json)
 
-        self.assertEqual(user.email, 'test@mail.de',
+        self.assertEqual('test@mail.de', user.email,
                          'wrong email after initialization')
-        self.assertEqual(user.first_name, 'Max',
+        self.assertEqual('Max', user.first_name,
                          'wrong firist name after initialization')
-        self.assertEqual(user.last_name, 'Mustermann',
+        self.assertEqual('Mustermann', user.last_name,
                          'wrong last name after initialization')
-        self.assertEqual(user.password, '1234',
+        self.assertEqual('1234', user.password,
                          'wrong password after initialization')
 
 
@@ -55,7 +57,7 @@ class TestTrainer(unittest.TestCase):
         trainer = Trainer('56b311fb9b1467190d54hce',
                           '56eedfffb9b1467190d54hce')
         trainer_json = trainer.encode()
-        self.assertEqual(trainer_json['_type'], 'trainer',
+        self.assertEqual(names.user_type_names.user_trainer, trainer_json['_type'],
                          'wrong type after encode')
         self.assertEqual(trainer_json['service_id'], trainer._service_id,
                          'wrong service_id after encode')
@@ -65,7 +67,7 @@ class TestTrainer(unittest.TestCase):
 
     def test_trainer_decode(self):
         trainer_json = {
-            '_type': 'trainer',
+            '_type': names.user_type_names.user_trainer,
             'service_id': '1234abc',
             'general_user_id': 'abc123'
         }
@@ -87,7 +89,7 @@ class TestFitnessUser(unittest.TestCase):
                          'wrong _type after encoding')
         self.assertEqual(user_json['user_type'], user._user_type,
                          'wrong user_type after encoding')
-        self.assertEqual(user_json['birthday'], user._birthday,
+        self.assertEqual(user_json[names.birthday], user._birthday,
                          'wrogn birthday after encoding')
         self.assertEqual(user_json['weight'], user._weight,
                          'wrogn weight after encoding')
@@ -106,7 +108,7 @@ class TestFitnessUser(unittest.TestCase):
             'general_user_id': '123abc'
         }
         user = FitnessUser.decode(user_json)
-        self.assertEqual(user._birthday, user_json['birthday'],
+        self.assertEqual(user._birthday, user_json[names.birthday],
                          'wrong birthday after decoding')
         self.assertEqual(user._height, user_json['height'],
                          'wrong height after decoding')
@@ -122,7 +124,7 @@ class TestGeneralService(unittest.TestCase):
     def test_service_encode(self):
         service = Service('test_service', 5)
         service_json = service.encode()
-        self.assertEqual(service_json['_type'], 'service',
+        self.assertEqual('general_service', service_json['_type'],
                          'wrong _type after encoding')
         self.assertEqual(service_json['service_name'], service._service_name,
                          'wrong service_name after encoding')

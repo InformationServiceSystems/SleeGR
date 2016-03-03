@@ -1,2 +1,3 @@
 SECRET_KEY = "SECRET!"
-DEBUG = False
+DEBUG = True
+
