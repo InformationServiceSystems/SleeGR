@@ -65,10 +65,18 @@
         overflow: hidden;
         transition: all .3s cubic-bezier(.55,0,.55,.2);
       }
+
+      .line {
+        fill: none;
+        stroke: #db4437;
+        stroke-width: 1.5px;
+      }
+
     </style>
 </head>
 
 <body>
+  <div id="time-hist"></div>
   <div id="wrapper" ng-controller="navigation">
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
@@ -85,16 +93,16 @@
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <li>
-                    <a href="#" ng-click="render('profile')"><i class="fa fa-dashboard fa-fw"></i> Profile</a>
+                    <a href="#" ng-click="render('profile')"><i class="fa fa-user fa-fw"></i> Profile</a>
                 </li>
                 <li>
-                    <a href="#" ng-click="render('workout')"><i class="fa fa-dashboard fa-fw"></i> Workouts</a>
+                    <a href="#" ng-click="render('workout')"><i class="fa fa-calendar fa-fw"></i> Workouts</a>
                 </li>
                 <li>
-                    <a href="#" ng-click="render('measure')"><i class="fa fa-dashboard fa-fw"></i> Measurement</a>
+                    <a href="#" ng-click="render('measure')"><i class="fa fa-line-chart fa-fw"></i> Measurement</a>
                 </li>
                 <li>
-                    <a href="#" ng-click="render('training')"><i class="fa fa-dashboard fa-fw"></i> Training Group</a>
+                    <a href="#" ng-click="render('training')"><i class="fa fa-comments fa-fw"></i> Training Group</a>
                 </li>
             </ul>
         </div>
@@ -105,9 +113,7 @@
     <div id="page-wrapper">
       <div class="row">
         <div class="col-lg-12">
-          <div>
-            {{ mod | json}}
-          </div>
+          <!--<div>{{ mod | json}}</div>-->
 
           <profile ng-show="mod == 'profile'"></profile>
           <workout ng-show="mod == 'workout'"></workout>
@@ -145,6 +151,9 @@
 <!--<link href="../bower_components/morrisjs/morris.css" rel="stylesheet">-->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css" rel="stylesheet">
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.1/css/bootstrap-slider.min.css" rel="stylesheet">
+
+
 
 
 <!-- Custom Fonts -->
@@ -172,7 +181,9 @@
 
 <!-- Bootstrap Core JavaScript -->
 <!--<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.1/bootstrap-slider.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 
 <!-- Metis Menu Plugin JavaScript -->
 <!--<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>-->
@@ -191,6 +202,10 @@
 <!--<script src="../bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/1.0.8/js/sb-admin-2.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.7.0/math.min.js"></script>
+
+<script src="../client/dashboard/mg-mf.js"></script>
 <script src="../client/js/scope-validator.js"></script>
 <script src="../client/dashboard/app.js"></script>
+
 </html>

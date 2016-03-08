@@ -1,9 +1,9 @@
 var application = (function(){
-  var production = true;
+  var production = false;
   var routing = {
     auth: {
       signup: '',
-      signin: '/login_rest'
+      signin: ''
     }
   };
 
@@ -89,26 +89,14 @@ var application = (function(){
     };
 
     function signin(values, success){
-      /*jQuery.post(routing.auth.signin, values, function(response){
+      jQuery.getJSON(routing.auth.signin)
+        .success(function(response){
           if(response.authenticated){
             success();
           }
-        }, 'json')
+        })
         .fail(function(err) {
-            console.log(err);
 
-        });*/
-        jQuery.ajax({
-            contentType: "application/json; charset=utf-8",
-            type: 'POST',
-            url: routing.auth.signin,
-            data: JSON.stringify(values),
-            success: function(response){
-              if(response.authenticated){
-                success();
-              }
-            },
-            dataType: 'json'
         });
     };
 
@@ -244,6 +232,7 @@ var application = (function(){
       callback: function(){
         console.log('sign in recaptcha solved!');
         signinCaptchaSolved();
+        window.location.assign("/smart-platform/dashboard");
       }
     });
   };
