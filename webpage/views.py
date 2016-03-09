@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from flask import request, session, redirect, url_for, jsonify
 
 import database
@@ -42,13 +42,9 @@ def sign():
     return jsonify(success=False, error_in='request', error_msg='No post request sent')
 
 @app.route('/show-stats/<user_id>/<start_date>/<end_date>/<measurement_type>')
-def show_measurement(user_id, start_date, end_date, workout_type):
+def show_measurement(user_id, start_date, end_date, measurement_type):
     r = csvReader()
-    return r.read_data(user_id, datetime.datetime(start_date), datetime.datetime(end_date), workout_type)
+    start = datetime.strptime(start_date, '%Y-%d-%m')
+    end = datetime.strptime(end_date, '%Y-%d-%m')
+    return r.read_data(user_id, start, end, measurement_type)
 
-
-@app.route('/show-stats', methods=['GET'])
-def show_measurement():
-    if request.method == 'GET':
-        r = csvReader()
-        return r.read_data(request.data['user_id'], datetime(request.data['start_date']), datetime(request.data['end_date']), request.data['workout_type'])

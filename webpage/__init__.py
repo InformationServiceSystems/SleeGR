@@ -5,7 +5,4 @@ app.config.from_object('settings')
 import webpage.views
 
 
-app.run()
-
-
-
+app.run(host='0.0.0.0')
