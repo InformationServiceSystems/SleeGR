@@ -24,7 +24,7 @@ function test(){
   });
 };
 
-test();
+//test();
 
 function interpolateRay(set, funcStr){
   var ray = _.map(set, function(item, index){
