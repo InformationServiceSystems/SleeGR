@@ -1,4 +1,24 @@
-var module = angular.module('iss', []);
+var Service = {
+  get: function(path, io){
+    return new Promise(function(resolve, reject) {
+      var container = io.get();
+      if(container){
+        resolve(container);
+      } else {
+        jQuery.getJSON(path)
+        .then(function(response){
+          io.set(response);
+          resolve(io.get());
+        })
+        .fail(function(err){
+          reject(err);
+        });
+      }
+    });
+  }
+};
+
+var module = angular.module('iss', ['ngMaterial']);
 
 module.controller('navigation', ['$scope', function($scope) {
   $scope.mod = 'profile';
@@ -10,188 +30,155 @@ module.controller('navigation', ['$scope', function($scope) {
 }]);
 
 module.factory('User', function(){
-  var user = {
-    lastname: 'Sponge',
-    firstname: 'Bob',
-    email: 'Sponge.bob@gmail.com',
-    height: 1.75,
-    weight: 65,
-    age: new Date(),
-    gender: 'female'
-  };
-
-  var workouts = [{
-    info: {
-      date: '2016-02-08',
-      time: '14:39'
-    },
-    data: [{
-      value: 44,
-      date: '2016-02-08'
-    },{
-      value: 27,
-      date: '2016-02-09'
-    },{
-      value: 15,
-      date: '2016-02-10'
-    },{
-      value: 9,
-      date: '2016-02-11'
-    },{
-      value: 7,
-      date: '2016-02-12'
-    }]
-  },{
-    info: {
-      date: '2016-02-14',
-      time: '14:39'
-    },
-    data: [{
-      value: 74,
-      date: '2016-02-14'
-    },{
-      value: 27,
-      date: '2016-02-15'
-    },{
-      value: 15,
-      date: '2016-02-16'
-    },{
-      value: 14,
-      date: '2016-02-17'
-    },{
-      value: 13,
-      date: '2016-02-18'
-    }]
-  }];
-
-  var training = {
-    coach: {
-      name: 'Blackbeard'
-    },
-    mates: [
-      {
-        name: 'Paul',
-        score: {
-          sessions: 20,
-          success: 19
-        }
-      },
-      {
-        name: 'John',
-        score: {
-          sessions: 20,
-          success: 13
-        }
-      }
-    ]
-  };
-
-  var measure = {
-    sleep: {
-      data: [
-        { year: '2008', value: 20 },
-        { year: '2009', value: 10 },
-        { year: '2010', value: 5 },
-        { year: '2011', value: 5 },
-        { year: '2012', value: 20 }
-      ]
-    }
-  };
+  var id = 1234;
+  var user;
+  var workouts;
+  var training;
+  var measure;
+  var heart;
+  var csv;
+  var dump;
 
   return {
-    getProfile: function(){
-      return user;
+    getData: function(){
+      return Service.get('/show-stats/1024/2016-01-01/2016-03-03/21', {
+        get: function(){
+          return dump;
+        },
+        set: function(response){
+          function formate(info){
+            return moment(info, "YYYY.DD.MM_HH:mm:ss").toDate();
+          };
+
+          dump = _.map(response, function(item, str){
+            return {
+              date: formate(str),
+              value: parseFloat(item.value)
+            }
+          });
+
+          //console.log(dump);
+          return dump;
+        }
+      });
     },
     getWorkouts: function(){
-      return workouts;
+      return Service.get('user/'+id+'/workouts', {
+        get: function(){
+          return workouts;
+        },
+        set: function(response){
+          workouts = response;
+          return workouts;
+        }
+      });
     },
     getTraining: function(){
-      return training;
+      return Service.get('user/'+id+'/training', {
+        get: function(){
+          return training;
+        },
+        set: function(response){
+          training = response;
+          return training;
+        }
+      });
     },
     getMeasure: function(name){
-      return measure[name];
-    }
-  };
-});
-
-module.directive('profile', function(User) {
-  return {
-    restrict: 'E',
-    templateUrl: '/client/dashboard/profile.tpl.html',
-    controller: function ($scope, $element) {
-      $scope.user = User.getProfile();
-    }
-  };
-});
-
-module.directive('workout', function(User) {
-  return {
-    restrict: 'E',
-    templateUrl: '/client/dashboard/workout.tpl.html',
-    controller: function ($scope, $element) {
-      $scope.workouts =  User.getWorkouts();
-
-      $scope.chart = function(data){
-        if(angular.isString(data[0]['date'])){
-          MG.convert.date(data, 'date', '%Y-%m-%d');
+      //return measure[name];
+      return Service.get('user/'+id+'/measure', {
+        get: function(){
+          return measure;
+        },
+        set: function(response){
+          //console.log(response);
+          measure = response;
+          return measure;
         }
-
-        MG.data_graphic({
-          title: 'workout',
-          description: "workouts of last month",
-          data: data,
-          full_width: true,
-          target: document.getElementById('workout-chart'),
-          x_accessor: 'date',
-          y_accessor: 'value'
-        });
-      };
-
-      $scope.chart($scope.workouts[0]['data']);
-    }
-  };
-});
-
-module.directive('measure', function(User) {
-  return {
-    restrict: 'E',
-    templateUrl: '/client/dashboard/measure.tpl.html',
-    controller: function ($scope, $element) {
-      $scope.measurement = User.getMeasure('sleep');
-
-      var measureChart = new Morris.Bar({
-        // ID of the element in which to draw the chart.
-        element: 'myfirstchart',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data: $scope.measurement.data,
-        // The name of the data record attribute that contains x-values.
-        xkey: 'year',
-        // A list of names of data record attributes that contain y-values.
-        ykeys: ['value'],
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
-        labels: ['Value']
       });
+    },
+    getProfile: function(){
+      return Service.get('user/'+id, {
+        get: function(){
+          return user;
+        },
+        set: function(data){
+          data.profile.age = new Date(data.profile.age)
+          user = data;
+        }
+      });
+    },
+    getHeartbeat: function(){
+      return Service.get('user/'+id+'/heartbeat', {
+        get: function(){
+          return heart;
+        },
+        set: function(data){
+          heart = _.map(data, function(row){
+            row.date = new Date(row.date);
+            return row;
+          });
+        }
+      });
+    },
+    getCsv: function(){
+      return Service.get('user/'+id+'/csv', {
+        get: function(){
+          return csv;
+        },
+        set: function(data){
+          csv = [];
 
-      /*setTimeout(function(){
-        measureChart.setData([
-          { year: '2009', value: 10 },
-          { year: '2010', value: 5 },
-          { year: '2011', value: 5 },
-          { year: '2012', value: 20 }
-        ]);
-      }, 3000);*/
+          _.forEach(data, function(container){
+            csv.push(_.map(container, function(row){
+              row.date = new Date(row.date);
+              return row;
+            }));
+          });
+        }
+      });
     }
   };
 });
 
-module.directive('training', function(User) {
-  return {
-    restrict: 'E',
-    templateUrl: '/client/dashboard/training.tpl.html',
-    controller: function ($scope, $element) {
-      $scope.training = User.getTraining();
+/*function fake_data(length, seconds) {
+    var d = new Date();
+    var v = 100000;
+    var data=[];
+
+    for (var i = 0; i < length; i++){
+        v += (Math.random() - 0.5) * 10000;
+        data.push({date: MG.clone(d), value: v});
+        d = new Date(d.getTime() + seconds * 1000);
     }
-  };
+    console.log(data);
+    return data;
+}
+
+function fake_days(length) {
+    var d = new Date();
+    var v = 100000;
+
+    var data = [];
+    for (var i = 0; i<length; i++) {
+        v += (Math.random() - 0.5) * 10000;
+        data.push({date: MG.clone(d), value: v});
+        d.setDate(d.getDate() + 1);
+    }
+    return data;
+}
+
+var hist1 = fake_data(25, 60).map(function(d){
+    d.value = Math.round(d.value);
+    return d;
 });
+
+MG.data_graphic({
+    title: "Histograms can be time series as well",
+    data: hist1,
+    target: '#time-hist',
+    chart_type: 'histogram',
+    width: 600,
+    height: 200,
+    binned: true,
+});*/
