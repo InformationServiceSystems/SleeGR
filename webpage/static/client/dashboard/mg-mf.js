@@ -75,6 +75,6 @@ function draw(chart){
 };
 
 MG.add_hook('line.after_init', function(chart) {
-    //console.log("chart:", chart);
-    draw(chart);
+  //console.log("chart:", chart);
+  draw(chart);
 });
