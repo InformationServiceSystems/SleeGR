@@ -1,6 +1,6 @@
-<div layout="row">
+<div layout="row" style="height: 400px; width: 900px;">
   <div id="diagramm-data-only" style="height: 400px; width: 750px;"></div>
-  <div style="margin-top: 100px;">
+  <div style="margin-top: 100px; margin-left: 10px;">
     <div layout="row" layout-wrap>
       <div flex="100" flex-gt-sm="50" layout="column">
         <div>
@@ -23,8 +23,15 @@
 </div>
 
 <section layout="row" layout-sm="column" layout-wrap>
-  <md-button ng-click="removePoints(type)" ng-repeat="type in items" class="md-raised md-primary">{{ type }} DAY</md-button>
+  <md-button ng-disabled="true" ng-click="removePoints(type)" ng-repeat="type in items" class="md-raised md-primary">{{ type }} DAY</md-button>
 </section>
+
+<div>
+  <div id="sleep" style="height: 400px; width: 600px;"></div>
+  <div id="heatmap" style="position: relative; top: -400px; z-index: 2;">
+    <canvas width="600" height="400"></canvas>
+  </div>
+</div>
 
 <div style="background-color: #092946;">
   <div id="toolTip" style="color:white"></div>
@@ -82,7 +89,7 @@
                 for (var i = leftBound; i <= rightBound;i++) {
                     data.push({x:i,y:(1/(std*Math.sqrt(Math.PI*2)))*Math.exp(-(Math.pow(i-mean,2)/ (2*variance)))});
                 }
-                console.log(data);
+                //console.log(data);
                 return  data;
             }
 

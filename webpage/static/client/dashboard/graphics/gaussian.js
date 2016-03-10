@@ -48,7 +48,7 @@
                 for (var i = leftBound; i <= rightBound;i++) {
                     data.push({x:i,y:(1/(std*Math.sqrt(Math.PI*2)))*Math.exp(-(Math.pow(i-mean,2)/ (2*variance)))});
                 }
-                console.log(data);
+                //console.log(data);
                 return  data;
             }
 

@@ -1,7 +1,7 @@
 function showPoints(chart){
   var args = chart.args;
   if(args.showPoints) {
-    console.log('show points: ', args.showPointsData);
+    //console.log('show points: ', args.showPointsData);
 
 
     var svg = d3.select(args.target).select('svg');

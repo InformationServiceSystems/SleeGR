@@ -77,10 +77,11 @@ module.factory('User', function(){
           var fncStrs = ['exp(-x/25)*150+55', 'exp(-x/40)*150+50', 'exp(-x/40)*150+60'];
           var step = Math.floor(set.length/fncStrs.length);
           var subsets = _.map(fncStrs, function(filler, index){
-            return _.slice(set, index*step, set.length);
+            //return _.slice(set, index*step, set.length);
+            return _.slice(set, index*step, (index+1)*step);
           });
           var dataset = _.map(fncStrs, function(fnc, index){
-            return interpolateRay(subsets[index], fnc);
+            return interpolateRay(_.slice(set, index*step, set.length), fnc);
           });
 
           var types = _.map(dataset, function(subset, index){
