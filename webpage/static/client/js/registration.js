@@ -28,6 +28,7 @@ var application = (function(){
       }
     };
   };*/
+  var siteKey = '6LdGcxoTAAAAAIcQmDTUHEAY8MPLD0f30r2G-LyB';
 
   var emailTester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-?\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
   function validateEmail(email){
@@ -129,7 +130,7 @@ var application = (function(){
   var regestrationCaptchaId;
   var onloadCallback = function() {
     regestrationCaptchaId = grecaptcha.render('recaptcha', {
-      sitekey : '6LdGcxoTAAAAAIcQmDTUHEAY8MPLD0f30r2G-LyB',
+      sitekey : siteKey,
       callback: function(){
         recaptchaSuccess();
       }
@@ -228,7 +229,7 @@ var application = (function(){
   var signinCaptchaId;
   var signinOnloadCallback = function() {
     signinCaptchaId = grecaptcha.render('recaptcha-signin', {
-      sitekey : '6LcWnRUTAAAAALoF5HxCrB3wDJGubExCKqV6oG2r',
+      sitekey : siteKey,
       callback: function(){
         console.log('sign in recaptcha solved!');
         signinCaptchaSolved();
