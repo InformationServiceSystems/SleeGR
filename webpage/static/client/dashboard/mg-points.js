@@ -15,16 +15,16 @@ function showPoints(chart){
        .enter()
        .append("circle")
        .attr("cx", function(d) {
-          return args.scales.X(d.date);
+         return args.scales.X(d.date);
        })
        .attr("cy", function(d) {
-          return args.scales.Y(d.value);
+         return args.scales.Y(d.value);
        })
-       .attr("r", 2)
-       .attr('class', 'mg-line mg-line'+(index+1))
-       .style("stroke-width", 2)
-       .style("stroke", "red")
+       .attr("r", 1)
+       .attr('class', 'mg-line mg-line'+(index+1)+' mg-line'+(index+1)+'-color mg-points-'+(index+1))
+       //.style("stroke-width", 2)
        .style("fill", "none");
+       //.style("stroke", "red")//#05b378
        //.attr('stroke', '#db4437');
     });
   }

@@ -28,7 +28,12 @@ var application = (function(){
       }
     };
   };*/
+
   var siteKey = '6LdGcxoTAAAAAIcQmDTUHEAY8MPLD0f30r2G-LyB';
+  //console.log(document.location.host, /localhost/.test(document.location.host));
+  if(/localhost/.test(document.location.host)){
+    siteKey = '6LcWnRUTAAAAALoF5HxCrB3wDJGubExCKqV6oG2r';
+  }
 
   var emailTester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-?\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
   function validateEmail(email){
@@ -233,7 +238,7 @@ var application = (function(){
       callback: function(){
         console.log('sign in recaptcha solved!');
         signinCaptchaSolved();
-        window.location.assign("/smart-platform/dashboard");
+        //window.location.assign("dashboard");
       }
     });
   };
@@ -264,6 +269,15 @@ var application = (function(){
     signinCaptchaSolved = function(){
       if(signin.valid() && isHuman()){
         submit.removeAttr('disabled');
+        jQuery.getJSON(path)
+        .then(function(response){
+          io.set(response);
+          resolve(io.get());
+        })
+        .fail(function(err){
+          reject(err);
+        });
+        console.log(signin.values());
       } else {
         submit.attr('disabled', 'true');
       }

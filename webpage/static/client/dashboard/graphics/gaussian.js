@@ -256,4 +256,4 @@
     }
 
     //drawGaussianCurve();
-}());
+});

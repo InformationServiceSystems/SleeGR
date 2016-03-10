@@ -103,10 +103,6 @@
 
 <body>
   <div id="time-hist"></div>
-  <div style="background-color: #092946; display: none;">
-    <div id="toolTip" style="color:white"></div>
-    <svg id="gaussianContainerCruve" width="1000" height="500"></svg>
-  </div>
 
   <div id="wrapper" ng-controller="navigation">
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
@@ -146,11 +142,11 @@
         <div class="col-lg-12">
           <!--<div>{{ mod | json}}</div>-->
 
-          <!--<profile ng-show="mod == 'profile'"></profile>
+          <profile ng-show="mod == 'profile'"></profile>
           <workout ng-show="mod == 'workout'"></workout>
           <measure ng-show="mod == 'measure'"></measure>
-          <training ng-show="mod == 'training'"></training>-->
-          <diagramm></diagram>
+          <training ng-show="mod == 'training'"></training>
+          <!--<diagramm></diagram>-->
         </div>
       </div>
     </div>

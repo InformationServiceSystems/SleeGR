@@ -26,27 +26,25 @@ function test(){
 
 //test();
 
-function interpolateRay(set, funcStr){
-  var ray = _.map(set, function(item, index){
-    return { x: index, date: item.date };
-  });
-
-  var evaluate = createEvaluator(funcStr);
-  var interpolate = createInterpolationOn(evaluate, function(scope, value){
-    return {
-      date: scope.date,
-      value: value
-    };
-  });
-  return interpolate(ray);
-};
-
 module.directive('diagramm', function(User) {
   return {
     restrict: 'E',
     templateUrl: '/client/dashboard/graphics/diagramm/tpl.html',
     controller: function ($scope, $element, $timeout) {
-      console.log('diagramm');
+      $scope.items = [];
+      $scope.selected = [];
+      $scope.toggle = function (item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) list.splice(idx, 1);
+        else list.push(item);
+      };
+      $scope.exists = function (item, list) {
+        return list.indexOf(item) > -1;
+      };
+
+      $scope.removePoints = function(type){
+        d3.select("#diagramm-data-only svg").selectAll(".mg-points-"+(type+1)).remove();
+      };
 
       function plot(options){
         var config = {
@@ -68,24 +66,20 @@ module.directive('diagramm', function(User) {
 
       User.getData()
       .then(function(data){
-        //console.log('data', data, Object.keys(data).length);
-        /*var set = _.slice(data, 1000, 1500);
-        var fncStrs = ['exp(-x/25)*10', 'exp(-x/40)*10+5', 'exp(-x/40)*10-15'];
-        var step = Math.floor(set.length/fncStrs.length);
-        var subsets = _.map(fncStrs, function(filler, index){
-          return _.slice(set, index*step, (index+1)*step);
-        });
-        var dataset = _.map(fncStrs, function(fnc, index){
-          return interpolateRay(subsets[index], fnc);
-        });
+        var options = {
+          data: _.map(data, 'data'),
+          points: _.map(data, 'points'),
+          selectorTypes: _.map(data, 'type')
+        };
 
-        plot({
-          data: dataset,
-          points: subsets
-        });*/
+        plot(options);
 
-        console.log(_.slice(data, 1000, 1500));
-        MG.data_graphic({
+        $scope.items = options.selectorTypes;
+        $scope.$apply();
+
+
+        //console.log(_.slice(data, 1000, 1500));
+        /*MG.data_graphic({
             title: "Another Least Squares Example",
             description: "Least squares effortlessly works with dates or times on axes.",
             data: _.slice(data, 0, 100),
@@ -94,7 +88,7 @@ module.directive('diagramm', function(User) {
             height: 400,
             right: 40,
             least_squares: true,
-            target: '#diagramm-data-only',
+            target: '#diagramm-data-only3',
             //x_accessor: 'date',
             //y_accessor: 'value'
         });
@@ -125,7 +119,7 @@ module.directive('diagramm', function(User) {
             target: '#diagramm-data-only2',
             //x_accessor: 'date',
             //y_accessor: 'value'
-        });
+        });*/
       })
       .catch(function(err){
         console.log(err);

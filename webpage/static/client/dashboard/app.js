@@ -18,6 +18,22 @@ var Service = {
   }
 };
 
+function interpolateRay(set, funcStr){
+  var ray = _.map(set, function(item, index){
+    return { x: index, date: item.date };
+  });
+
+  var evaluate = createEvaluator(funcStr);
+  var interpolate = createInterpolationOn(evaluate, function(scope, value){
+    return {
+      date: scope.date,
+      value: value
+    };
+  });
+  return interpolate(ray);
+};
+
+
 var module = angular.module('iss', ['ngMaterial']);
 
 module.controller('navigation', ['$scope', function($scope) {
@@ -57,7 +73,30 @@ module.factory('User', function(){
             }
           });
 
-          //console.log(dump);
+          var set = _.slice(dump, 1000, 1500);
+          var fncStrs = ['exp(-x/25)*150+55', 'exp(-x/40)*150+50', 'exp(-x/40)*150+60'];
+          var step = Math.floor(set.length/fncStrs.length);
+          var subsets = _.map(fncStrs, function(filler, index){
+            return _.slice(set, index*step, set.length);
+          });
+          var dataset = _.map(fncStrs, function(fnc, index){
+            return interpolateRay(subsets[index], fnc);
+          });
+
+          var types = _.map(dataset, function(subset, index){
+            return {
+              type: index,
+              data: subset,
+              points: subsets[index]
+            }
+          });
+
+          /*dump = {
+            data: dataset,
+            points: subsets
+          };*/
+          dump = types;
+
           return dump;
         }
       });
