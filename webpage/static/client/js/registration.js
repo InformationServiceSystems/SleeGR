@@ -129,7 +129,7 @@ var application = (function(){
   var regestrationCaptchaId;
   var onloadCallback = function() {
     regestrationCaptchaId = grecaptcha.render('recaptcha', {
-      sitekey : '6LcWnRUTAAAAALoF5HxCrB3wDJGubExCKqV6oG2r',
+      sitekey : '6LdGcxoTAAAAAIcQmDTUHEAY8MPLD0f30r2G-LyB',
       callback: function(){
         recaptchaSuccess();
       }
