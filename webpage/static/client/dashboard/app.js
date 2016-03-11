@@ -73,7 +73,7 @@ module.controller('navigation', ['$scope', function($scope) {
 }]);
 
 module.factory('User', function(){
-  var id = 1234;
+  var id = 1024;
   var user;
   var workouts;
   var training;
