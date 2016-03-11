@@ -33,6 +33,33 @@ function interpolateRay(set, funcStr){
   return interpolate(ray);
 };
 
+function formate(info){
+  return moment(info, "YYYY.MM.DD_HH:mm:ss").toDate();
+};
+
+var DaysSeries = function(response){
+  this.init(response);
+};
+
+DaysSeries.prototype.init = function(unstructured){
+  this.structured = _.map(unstructured, function(item, str){
+    return {
+      date: formate(str),
+      value: parseFloat(item.value)
+    }
+  });
+
+  this.days = _.groupBy(this.structured, function(point){
+    return moment(point.date).format("YYYY.MM.DD");
+  });
+};
+
+DaysSeries.prototype.selectDays = function(dayKeys){
+  var that = this;
+  return _.reduce(dayKeys, function(allDays, key){
+    return allDays.concat(that.days[key]);
+  }, []);
+};
 
 var module = angular.module('iss', ['ngMaterial']);
 
@@ -56,8 +83,30 @@ module.factory('User', function(){
   var dump;
 
   return {
-    getData: function(){
-      return Service.get('/show-stats/1024/2016-01-01/2016-03-03/21', {
+    getDataset: function(start, end, sensor){
+      var data;
+      var path = '/show-stats/'+id+'/'+start+'/'+end+'/'+sensor;
+
+      return new Promise(function(resolve, reject) {
+        var container;
+        if(container){
+          resolve(container);
+        } else {
+          jQuery.getJSON(path)
+          .then(function(response){
+            data = new DaysSeries(response);
+            //console.log(data.structured);
+            //console.log(data.days);
+            resolve(data);
+          })
+          .fail(function(err){
+            console.log(err);
+            reject(err);
+          });
+        }
+      });
+
+      /*return Service.get('/show-stats/1024/2016-01-01/2016-03-03/21', {
         get: function(){
           return dump;
         },
@@ -92,15 +141,11 @@ module.factory('User', function(){
             }
           });
 
-          /*dump = {
-            data: dataset,
-            points: subsets
-          };*/
           dump = types;
 
           return dump;
         }
-      });
+      });*/
     },
     getWorkouts: function(){
       return Service.get('user/'+id+'/workouts', {

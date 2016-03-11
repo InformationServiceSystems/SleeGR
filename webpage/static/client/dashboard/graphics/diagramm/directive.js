@@ -31,15 +31,16 @@ module.directive('diagramm', function(User) {
     restrict: 'E',
     templateUrl: '/client/dashboard/graphics/diagramm/tpl.html',
     controller: function ($scope, $element, $timeout) {
-      $scope.items = [];
-      $scope.selected = [];
+
 
       $scope.removePoints = function(type){
-        d3.select("#diagramm-data-only svg").selectAll(".mg-points-"+(type+1)).remove();
+        d3.select("#diagramm-data-only-showcase svg").selectAll(".mg-points-"+(type+1)).remove();
       };
 
+
       $scope.plotPoints = function(index){
-        var svg = d3.select('#diagramm-data-only').select('svg');
+        //console.log('plotPoints', index, $scope.cacheOptions.points[index], d3.select('#diagramm-data-only-showcase').select('svg'));
+        var svg = d3.select('#diagramm-data-only-showcase').select('svg');
         svg.selectAll("circle"+index)
          .data($scope.cacheOptions.points[index])
          .enter()
@@ -56,23 +57,12 @@ module.directive('diagramm', function(User) {
          .style("fill", "none");
       };
 
-      $scope.toggle = function (item, list) {
-        var idx = list.indexOf(item);
-        if (idx > -1) {
-          $scope.removePoints(item);
-          list.splice(idx, 1);
-        } else {
-          $scope.plotPoints(item);
-          list.push(item);
-        }
-      };
-
       $scope.exists = function (item, list) {
         return list.indexOf(item) > -1;
       };
 
       function plot(options){
-        var config = {
+        /*var config = {
           title:'Diagramm',
           interpolate: 'basic',
           chart_type: 'line',
@@ -84,9 +74,20 @@ module.directive('diagramm', function(User) {
           data: options.data,
           showPoints: true,
           showPointsData: options.points
+        };*/
+
+        var config = {
+          title:'Diagramm',
+          interpolate: 'basic',
+          chart_type: 'point',
+          width: 600,
+          height: 400,
+          right: 40,
+          target: '#diagramm-data-only',
+          area: false,
+          data: options.data
         };
 
-        $scope.graph = config;
         MG.data_graphic(config);
       };
 
@@ -128,18 +129,37 @@ module.directive('diagramm', function(User) {
         }
       };
 
-      User.getData()
-      .then(function(data){
-        //console.log(data);
-        var options = {
-          data: _.map(data, 'data'),
-          points: _.map(data, 'points'),
-          selectorTypes: _.map(data, 'type')
-        };
+      $scope.items = [];
+      $scope.selected = [];
+      $scope.toggle = function (item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+          $scope.removePoints(item);
+          list.splice(idx, 1);
+        } else {
+          $scope.plotPoints(item);
+          list.push(item);
+        }
+      };
 
-        $scope.cacheOptions = options;
+      $scope.startDate = moment("2016-01-01", "YYYY-MM-DD").toDate();
+      $scope.endDate = moment("2016-03-03", "YYYY-MM-DD").toDate();
 
-        plot(options);
+      function formateDateToUrlSnipetAsString(date){
+        return moment(date).format("YYYY-MM-DD");
+      };
+
+      $scope.series;
+      $scope.days;
+
+      $scope.draw = function(){
+        plot({
+          data: $scope.displayedPoints,
+          points: $scope.displayedPoints,
+          //selectorTypes: _.map(data, 'type')
+        });
+
+        //showcase state
 
         function random(max){
           return Math.floor(max*Math.random());
@@ -163,58 +183,163 @@ module.directive('diagramm', function(User) {
           }
         });
         plotSleep(sleep);
+      };
 
-        $scope.items = options.selectorTypes;
-        $scope.selected = angular.copy(options.selectorTypes);
-        $scope.$apply();
+      $scope.setDays = function(days){
+        $scope.days = days;
+        $scope.displayedPoints = $scope.series.selectDays($scope.days);
+        $scope.draw();
+      };
 
+      $scope.disabledDay = function(dateKey){
+        return _.includes($scope.days, dateKey) === false;
+      };
 
-        //console.log(_.slice(data, 1000, 1500));
-        /*MG.data_graphic({
-            title: "Another Least Squares Example",
-            description: "Least squares effortlessly works with dates or times on axes.",
-            data: _.slice(data, 0, 100),
-            chart_type: 'point',
+      $scope.toggleDay = function(dateKey){
+        if(_.includes($scope.days, dateKey)){
+          $scope.days = _.remove($scope.days, function(value){
+            return value !== dateKey;
+          });
+        } else {
+          $scope.days.push(dateKey);
+        }
+        $scope.setDays($scope.days);
+      };
+
+      $scope.switchDay = function(dateKey){
+        $scope.setDays([dateKey]);
+      };
+
+      $scope.showAllDays = function(){
+        $scope.setDays(_.keys($scope.series.days));
+      };
+
+      $scope.raised = function(dateKey){
+        if(_.includes($scope.days, dateKey)){
+          return 'md-raised';
+        }
+        return '';
+      };
+
+      $scope.getData = function(){
+        var start = formateDateToUrlSnipetAsString($scope.startDate);
+        var end   = formateDateToUrlSnipetAsString($scope.endDate);
+        //console.log(start, end);
+
+        User.getDataset(start, end, 21)
+        .then(function(series){
+          $scope.series = series;
+          //$scope.setDays(['2016.02.05', '2016.02.27']);
+
+          //$scope.setDays(_.keys($scope.series.days));
+
+          var lastDayKey = _.last(_.keys($scope.series.days));
+          $scope.setDays([lastDayKey]);
+
+          $scope.draw();
+          $scope.$apply();
+
+          //showcase
+          var data = $scope.series.selectDays(_.keys($scope.series.days));
+          var set = _.slice(data, 1000, 1500);
+          var fncStrs = ['exp(-x/25)*150+55', 'exp(-x/40)*150+50', 'exp(-x/40)*150+60'];
+          var step = Math.floor(set.length/fncStrs.length);
+          var subsets = _.map(fncStrs, function(filler, index){
+            //return _.slice(set, index*step, set.length);
+            return _.slice(set, index*step, (index+1)*step);
+          });
+          var dataset = _.map(fncStrs, function(fnc, index){
+            return interpolateRay(_.slice(set, index*step, set.length), fnc);
+          });
+
+          var types = _.map(dataset, function(subset, index){
+            return {
+              type: index,
+              data: subset,
+              points: subsets[index]
+            }
+          });
+
+          var showOptions = {
+            data: _.map(types, 'data'),
+            points: _.map(types, 'points'),
+            selectorTypes: _.map(types, 'type')
+          };
+
+          $scope.cacheOptions = showOptions;
+
+          var config = {
+            title:'OLD Diagramm Prototype',
+            interpolate: 'basic',
+            chart_type: 'line',
             width: 600,
             height: 400,
             right: 40,
-            least_squares: true,
-            target: '#diagramm-data-only3',
-            //x_accessor: 'date',
-            //y_accessor: 'value'
+            target: '#diagramm-data-only-showcase',
+            area: false,
+            data: showOptions.data,
+            showPoints: true,
+            showPointsData: showOptions.points
+          };
+
+          $scope.graph = config;
+          MG.data_graphic(config);
+
+          $scope.items = showOptions.selectorTypes;
+          $scope.selected = angular.copy(showOptions.selectorTypes);
+          $scope.$apply();
+
+          //test
+
+          //console.log(_.slice(data, 1000, 1500));
+          /*MG.data_graphic({
+              title: "Another Least Squares Example",
+              description: "Least squares effortlessly works with dates or times on axes.",
+              data: _.slice(data, 0, 100),
+              chart_type: 'point',
+              width: 600,
+              height: 400,
+              right: 40,
+              least_squares: true,
+              target: '#diagramm-data-only3',
+              //x_accessor: 'date',
+              //y_accessor: 'value'
+          });
+
+          MG.data_graphic({
+              title: "Another Least Squares Example",
+              description: "Least squares effortlessly works with dates or times on axes.",
+              data: _.slice(data, 0, 300),
+              chart_type: 'point',
+              width: 600,
+              height: 400,
+              right: 40,
+              least_squares: true,
+              target: '#diagramm-data-only1',
+              //x_accessor: 'date',
+              //y_accessor: 'value'
+          });
+
+          MG.data_graphic({
+              title: "Another Least Squares Example",
+              description: "Least squares effortlessly works with dates or times on axes.",
+              data: _.slice(data, 200, 300),
+              chart_type: 'point',
+              width: 600,
+              height: 400,
+              right: 40,
+              least_squares: true,
+              target: '#diagramm-data-only2',
+              //x_accessor: 'date',
+              //y_accessor: 'value'
+          });*/
+        })
+        .catch(function(err){
+          console.log(err);
         });
+      }
 
-        MG.data_graphic({
-            title: "Another Least Squares Example",
-            description: "Least squares effortlessly works with dates or times on axes.",
-            data: _.slice(data, 0, 300),
-            chart_type: 'point',
-            width: 600,
-            height: 400,
-            right: 40,
-            least_squares: true,
-            target: '#diagramm-data-only1',
-            //x_accessor: 'date',
-            //y_accessor: 'value'
-        });
-
-        MG.data_graphic({
-            title: "Another Least Squares Example",
-            description: "Least squares effortlessly works with dates or times on axes.",
-            data: _.slice(data, 200, 300),
-            chart_type: 'point',
-            width: 600,
-            height: 400,
-            right: 40,
-            least_squares: true,
-            target: '#diagramm-data-only2',
-            //x_accessor: 'date',
-            //y_accessor: 'value'
-        });*/
-      })
-      .catch(function(err){
-        console.log(err);
-      });
+      $scope.getData();
     }
   };
 });
