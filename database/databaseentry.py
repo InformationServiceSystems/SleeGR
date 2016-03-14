@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-from database.models import User, FitnessUser, Service, Trainer, ServiceUserMap
+from databasemodels.models import User, FitnessUser, Service, Trainer, ServiceUserMap
 
 
 class DataBaseEntry:

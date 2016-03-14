@@ -3,7 +3,7 @@ import names
 
 class DbExtended:
     def __init__(self, database):
-        self.db_base  = database
+        self.db_base = database
 
 
     def get_user_id(self, email):
