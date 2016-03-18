@@ -108,7 +108,8 @@ measurement_to_valuenumb = {
     38: 1,
     13: 3
 }
-
+"""
 s = csvReader()
 e = s.ReadSleepData('test@test.com', datetime(2016, 1,1), datetime(2016, 3, 31))
 print(e)
+"""
