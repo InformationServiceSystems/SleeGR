@@ -108,9 +108,5 @@ measurement_to_valuenumb = {
     13: 3
 }
 
-s = csvReader()
 
-s.ReadSleepData('4', datetime(2016, 2, 1), datetime(2016, 2, 1))
-j = s.heart_rate_sepecial('1024', datetime(2016, 3, 8), datetime(2016, 3, 8))
-print(j)
 
