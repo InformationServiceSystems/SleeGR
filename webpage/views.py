@@ -58,6 +58,10 @@ def show_measurement(user_id, start_date, end_date, measurement_type):
 
 @app.route('/sleep_data/<user_id>/<start_date>/<end_date>')
 def sleep_data(user_id, start_date, end_date):
+    print(session["email"])
+    user_id = session['email']
+
+
     print(type(start_date))
     print('step1')
     r = csvReader()
