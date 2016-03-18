@@ -40,7 +40,7 @@ class DbInserts:
         Insert a service into collection service_user_map
         :param service: Instance of of ServiceUserMap
         """
-        self.db_base._user_map_collection.insert_one(service.encode)
+        self.db_base._user_map_collection.insert_one(service.encode())
 
     def find_user(self, email):
         asked_user_json = self.db_base._general_users_collection.find_one({names.email: email})
