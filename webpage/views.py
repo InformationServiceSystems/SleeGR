@@ -51,7 +51,7 @@ def show_measurement(user_id, start_date, end_date, measurement_type):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
-        return json.dumps(r.heart_rate_sepecial(start, end))
+        return json.dumps(r.heart_rate_sepecial(user_id, start, end))
     else:
         return json.dumps(r.read_data(user_id, start, end, measurement_type))
 
