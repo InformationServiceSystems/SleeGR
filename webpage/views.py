@@ -55,7 +55,7 @@ def show_measurement(user_id, start_date, end_date, measurement_type):
     else:
         return json.dumps(r.read_data(user_id, start, end, measurement_type))
 
-
+@login_required
 @app.route('/sleep_data/<user_id>/<start_date>/<end_date>')
 def sleep_data(user_id, start_date, end_date):
     print(session["email"])
