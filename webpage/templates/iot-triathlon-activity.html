@@ -107,31 +107,7 @@
 <script type="text/javascript">
     var user_id = '', begin_date = '', end_date = '';
     charts_createGaussian('http://46.101.214.58:5555/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id, begin_date, end_date, 'chartdiv4');
-    charts_createHeatmap("http://46.101.214.58:5555/sleepPoints", user_id, begin_date, end_date, 'chartdiv7');
-    function compare(path) {
-        
-        datasetActComp = loadJSONData(path)
-        fillDoubleLineChart("chartdiv3", datasetActComp, "date", "value1", "value2", "Daily Movement", "Your activitiy", "Peer Activity", "Activity Level", "YYYY-MM-DD HH:NN", "mm")
-    }
-    dataset = loadJSONData('/getHeartRates')
-    fillDoubleOverlay("chartdiv1", dataset, "Morning/Evening HRM", "BPM", "date", "value1", "value2", "MY titke", "My title", " morning  [[value1]]", " evening [[value2]]");
-
-    dataset2 =loadJSONData('/getSleepRates')
-    fillDoubleOverlay("chartdiv2", dataset2, "Sleep/Deep Sleep Durations", "hours", "date", "value1", "value2", "MY titke", "My title", " Sleep  [[value1]]", "Deep Sleep [[value2]]");
-
-
-    dataset5 = loadJSONData('/getVO2MaxRates')
-    fillDoubleLineChart("chartdiv5", dataset5, "date", "value1", "value2", "Daily VO2max estimation", "VO2max", "Top  VO2max estimation", " VO2max estimation", 'YYYY-MM-DD', 'DD')
-    //fillDoubleOverlay("chartdiv5", dataset5, "Daily/Weekly Estimated V02Max Values", "units", "date", "value1", "value2", "MY titke", "My title", " V02Max day  [[value1]]", "V02Max weekly [[value2]]");
-    dataset3 = loadJSONData('/getDailyActivityLevel')
-
-    fillDoubleLineChart("chartdiv3", dataset3,"date", "value1", "value2", "Daily Movement", "Your activitiy", "Average Activity","Activity Level", "YYYY-MM-DD HH:NN", "mm")
-     
-    dataset4 = loadJSONData('/getRawHeartRates')
-    
-    
-
-    fillDoubleLineChart("chartdiv4", dataset4, "date", "value1", "value2", "Daily HRM", "Your activitiy", "Average Activity", "HRM", 'YYYY-MM-DD HH:NN:SS', 'ss')
+    charts_createHeatmap('http://46.101.214.58:5555/sleep_data', 0, '2016-01-01', '2016-03-31', 'chartdiv7');
 </script>
 
 {% endblock %}
