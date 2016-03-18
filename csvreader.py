@@ -11,8 +11,8 @@ class csvReader:
         :param date: format: datetime
         :param user_id: int
         '''
-        #self.folder_path = "/home/matthias/Dokumente/UdS/iss/data"
-        self.folder_path = "/root/data"
+        self.folder_path = "/home/matthias/Dokumente/UdS/iss/data"
+        #self.folder_path = "/root/data"
 
     def read_data(self, user_id, start_date, end_date, measurement_type):
         ret_json = {}
@@ -40,6 +40,7 @@ class csvReader:
 
     def ReadSleepData(self, user_id, start_date, end_date):
         filename = ('%s/%s/sleep-export.csv' % (self.folder_path, user_id,))
+        print(filename)
         ret_list = []
         with open(filename, newline='') as csvfile:
             file_reader = csv.reader(csvfile, delimiter=',')
@@ -69,7 +70,7 @@ class csvReader:
                 continue
             new_json = {}
             new_json['user_id'] = user_id
-            new_json['date'] = day.strftime('%m/%d/%Y')
+            new_json['date'] = day.strftime('%d.%m.%Y')
             if fkt_json is None:
                     new_json['a'] = 0
                     new_json['b'] = 0
@@ -84,7 +85,7 @@ class csvReader:
             for measurement in heart_rate_json:
                 if counter >= 300:
                     break
-                datapoints.append({'x': counter, 'y':heart_rate_json[measurement]['value']})
+                datapoints.append({'x': counter * 3, 'y':heart_rate_json[measurement]['value']})
                 counter += 1
             new_json['datapoints'] = datapoints
             ret_list.append(new_json)
@@ -108,8 +109,9 @@ measurement_to_valuenumb = {
     38: 1,
     13: 3
 }
-"""
+
 s = csvReader()
-e = s.ReadSleepData('test@test.com', datetime(2016, 1,1), datetime(2016, 3, 31))
-print(e)
-"""
+#e = s.ReadSleepData('test@test.com', datetime(2016, 1,1), datetime(2016, 3, 31))
+e = s.heart_rate_sepecial('test@test.com', datetime(2016, 1,1), datetime(2016, 3, 31))
+for ee in e:
+    print(ee)
