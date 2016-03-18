@@ -82,7 +82,7 @@ def gaussian(user_id, start_date, end_date):
     lst.append({'user_id':1, 'avg':0.5 , 'std':1.4})
     return json.dumps(lst)
 
-@app.route('/gaussianPoints<user_id>/<start_date>/<end_date>')
+@app.route('/gaussianPoints/<user_id>/<start_date>/<end_date>')
 def gaussianPoints(user_id, start_date, end_date):
     lst = []
     lst.append({'user_id':1, 'x':0.7 , 'y':3, 'date': '02.03.2016'})
