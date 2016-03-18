@@ -48,8 +48,8 @@ def sign():
 @app.route('/show-stats/<user_id>/<start_date>/<end_date>/<measurement_type>')
 def show_measurement(user_id, start_date, end_date, measurement_type):
     r = csvReader()
-    start = datetime.strptime(start_date, '%Y-%d-%m')
-    end = datetime.strptime(end_date, '%Y-%d-%m')
+    start = datetime.strptime(start_date, '%d.%m.%Y')
+    end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
         return json.dumps(r.heart_rate_sepecial(start, end))
     else:
