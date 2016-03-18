@@ -106,8 +106,8 @@
 <script type="text/javascript" src="{{url_for('static', filename= 'charts.js')}}"></script>
 <script type="text/javascript">
     var user_id = '', begin_date = '', end_date = '';
-    charts_createGaussian('http://46.101.214.58:5555/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id, begin_date, end_date, 'chartdiv4');
-    charts_createHeatmap('http://46.101.214.58:5555/sleep_data', 0, '2016-01-01', '2016-03-31', 'chartdiv7');
+    charts_createGaussian('http://46.101.169.112:5000/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id, begin_date, end_date, 'chartdiv4');
+    charts_createHeatmap('http://46.101.169.112:5000/sleep_data', 0, '2016-01-01', '2016-03-31', 'chartdiv7');
 </script>
 
 {% endblock %}
