@@ -22,7 +22,6 @@ def index():
 @app.route('/loginn', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        print('HI')
         email = request.values['email']
         password = request.values['password']
         if db_extended.password_matches_email(email, password):
