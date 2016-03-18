@@ -56,7 +56,8 @@ class csvReader:
                 if wake_up.date() >= start_date.date() and wake_up.date() <= end_date.date():
                     duration = wake_up - drop_off
                     deep_sleep = float(row[12])
-                    ret_list.append({'user_id': user_id, 'wake_up': wake_up, 'duration': duration, 'deep_sleep': deep_sleep})
+                    hours = int(duration.seconds) / 3600
+                    ret_list.append({'user_id': user_id, 'date': str(wake_up.date()), 'x': float(duration.seconds / 3600), 'y': deep_sleep})
         return ret_list
 
     def heart_rate_sepecial(self,user_id, start_date, end_date):
@@ -108,5 +109,6 @@ measurement_to_valuenumb = {
     13: 3
 }
 
-
-
+s = csvReader()
+e = s.ReadSleepData('test@test.com', datetime(2016, 1,1), datetime(2016, 3, 31))
+print(e)

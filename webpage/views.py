@@ -55,7 +55,7 @@ def show_measurement(user_id, start_date, end_date, measurement_type):
     else:
         return json.dumps(r.read_data(user_id, start, end, measurement_type))
 
-@app.route('/sleep_data/<user_id>/>start_date>/<end_date>')
+@app.route('/sleep_data/<user_id>/>start_date>/<end_date>                   ')
 def sleep_data(user_id, start_date, end_date):
     r = csvReader()
     start = datetime.strptime(start_date, '%Y-%d-%m')
