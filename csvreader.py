@@ -55,7 +55,7 @@ class csvReader:
                 wake_up.date()
                 if wake_up.date() >= start_date.date() and wake_up.date() <= end_date.date():
                     duration = wake_up - drop_off
-                    deep_sleep = float(row[12])
+                    deep_sleep = float(row[12]) * 100
                     hours = int(duration.seconds) / 3600
                     ret_list.append({'user_id': user_id, 'date': str(wake_up.date()), 'x': float(duration.seconds / 3600), 'y': deep_sleep})
         return ret_list
