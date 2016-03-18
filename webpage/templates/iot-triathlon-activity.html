@@ -103,7 +103,7 @@
 
   {% block JS %} {{super() }}
 <script src="{{url_for('static', filename= 'iss-ui.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename= '../static/charts.js')}}"></script>
+<script type="text/javascript" src="./static/charts.js"></script>
 <script type="text/javascript">
     var user_id = '', begin_date = '', end_date = '';
     charts_createGaussian('http://46.101.169.112:5000/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id, begin_date, end_date, 'chartdiv4');
