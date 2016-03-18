@@ -207,7 +207,7 @@ function log(fun_name, msg){
 	function name: format_url
 */
 function format_url(root, user_id, begin_date, end_date){
-	var url = encodeURI(root  /*+ '/' + user_id + '/' + begin_date + '/' + end_date*/);
+	var url = encodeURI(root  + '/' + user_id + '/' + begin_date + '/' + end_date);
 	log('format_url', url);
 	return url;
 }
