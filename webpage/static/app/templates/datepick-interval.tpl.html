@@ -1,0 +1,4 @@
+<form name="datepickIntervalForm" layout="row" layout-sm="column" layout-align="center center">
+    <md-datepicker flex-sm="100" name="startDateField" ng-model="start" md-placeholder="Enter date" required md-min-date="min" md-max-date="end" ng-change="update()"></md-datepicker>
+    <md-datepicker flex-sm="100" name="endDateField" ng-model="end" md-placeholder="Enter date" required md-min-date="start" md-max-date="max" ng-change="update()"></md-datepicker>
+</form>

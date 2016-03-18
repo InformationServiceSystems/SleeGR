@@ -1,0 +1,22 @@
+{% extends "iot-base-2.html" %}
+<html>
+
+ {% block head %} {{super() }} {% endblock %}
+
+
+{% block header %} {{super() }} {% endblock %}
+
+{% block sidemenu %} {{super() }} {% endblock %}
+
+{% block servicelinks %} {{super() }}<li><a href="/profileTriathlon"><i class="fa fa-circle-o"></i> Profile</a></li>
+<li><a href="/athleteActivitiesTriathlon"><i class="fa fa-circle-o"></i> My activities</a></li>
+<li><a href="/athleteActivitiesTriathlon"><i class="fa fa-circle-o"></i> Workout!</a></li>
+<li><a href="/athleteActivitiesTriathlon"><i class="fa fa-circle-o"></i> My calendar</a></li>
+ {% endblock %}
+
+
+  {% block JS %} {{super() }} {% endblock %}
+
+</html>
+
+

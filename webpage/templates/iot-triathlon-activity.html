@@ -1,0 +1,236 @@
+{% extends "iot-base-2-am.html" %}
+{% block header %} {{super() }}
+
+{% endblock %}
+
+
+
+
+{% block sidemenu %} {{super() }} {% endblock %}
+
+{% block servicelinks %} {{super() }}
+
+ {% endblock %}
+{% block maincontent %} 
+
+    <!-- /.col (LEFT) -->
+    
+    <!-- /.col (RIGHT) -->
+<div class="row">
+    
+        <!-- AREA CHART -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">HeartBeat Measures</h3>
+
+                <div class="box-tools pull-right">
+                    
+                    <button type="button" class="btn btn-info fc-state-active">Daily</button>
+                    <button type="button" class="btn btn-info">Weekly</button>
+                    <button type="button" class="btn btn-info">Monthly</button>
+                   
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body chart-responsive">
+
+                <div id="chartdiv1" style="width:100%; height:400px;"></div>
+
+
+            </div>
+        </div>
+        <!-- /.box-body -->
+    
+
+
+</div>
+
+
+
+<div class="row">
+   
+        <!-- AREA CHART -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Daily Sleep/Deep Sleep Duration</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body chart-responsive">
+
+                <div id="chartdiv2" style="width:100%; height:400px;"></div>
+
+
+            </div>
+        </div>
+        <!-- /.box-body -->
+    
+
+
+</div>
+
+
+<div class="row">
+    
+        <!-- AREA CHART -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title" >Daily Activity Measurements</h3>
+
+                <div class="box-tools pull-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-info">Compare</button>
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="javascript:compare('/getDailyActivityLevelComparison/1')">Chris</a></li>
+                            <li><a href="javascript:compare('/getDailyActivityLevelComparison/2')">Paul</a></li>
+                            <li><a href="javascript:compare('/getDailyActivityLevelComparison/3')">Christopher</a></li>
+                            <li><a href="javascript:compare('/getDailyActivityLevelComparison/4')">Janik</a></li>
+                            <li><a href="javascript:compare('/getDailyActivityLevelComparison/5')">Jacob</a></li>
+                            
+                            <li class="divider"></li>
+                            <li><a href="#">Average</a></li>
+                        </ul>
+
+
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+
+                    </div>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body chart-responsive">
+
+      
+          <div id="chartdiv3" style="width:100%; height:400px;" ></div>
+</div>
+</div>
+
+
+</div>
+        <!-- /.box-body -->
+   
+
+
+
+<div class="row">
+   
+        <!-- AREA CHART -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">VO2max estimation</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body chart-responsive">
+
+                <div id="chartdiv5" style="width:100%; height:400px;"></div>
+
+
+            </div>
+        </div>
+        <!-- /.box-body -->
+    
+
+
+</div>
+
+<div class="row">
+  
+        <!-- AREA CHART -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Daily Heart Rate</h3>
+
+                <div class="box-tools pull-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-info">Compare</button>
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a onclick="jsfunction()" href="#">Athlete 1</a></li>
+                            <li><a href="#">Athlete 2</a></li>
+                            <li><a href="#">Athlete 3</a></li>
+                            <li><a href="#">Athlete 4</a></li>
+                            <li><a href="#">Athlete 5</a></li>
+
+                            <li class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+
+
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+
+                    </div>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body chart-responsive">
+
+                <div id="chartdiv4" style="width:100%; height:400px;"></div>
+
+
+            </div>
+        </div>
+        <!-- /.box-body -->
+   
+
+
+</div>
+{% endblock %}
+
+  {% block JS %} {{super() }}
+<script src="{{url_for('static', filename= 'iss-ui.js')}}"></script>
+<script type="text/javascript">
+    
+    function compare(path) {
+        
+        datasetActComp = loadJSONData(path)
+        fillDoubleLineChart("chartdiv3", datasetActComp, "date", "value1", "value2", "Daily Movement", "Your activitiy", "Peer Activity", "Activity Level", "YYYY-MM-DD HH:NN", "mm")
+    }
+    dataset = loadJSONData('/getHeartRates')
+    fillDoubleOverlay("chartdiv1", dataset, "Morning/Evening HRM", "BPM", "date", "value1", "value2", "MY titke", "My title", " morning  [[value1]]", " evening [[value2]]");
+
+    dataset2 =loadJSONData('/getSleepRates')
+    fillDoubleOverlay("chartdiv2", dataset2, "Sleep/Deep Sleep Durations", "hours", "date", "value1", "value2", "MY titke", "My title", " Sleep  [[value1]]", "Deep Sleep [[value2]]");
+
+
+    dataset5 = loadJSONData('/getVO2MaxRates')
+    fillDoubleLineChart("chartdiv5", dataset5, "date", "value1", "value2", "Daily VO2max estimation", "VO2max", "Top  VO2max estimation", " VO2max estimation", 'YYYY-MM-DD', 'DD')
+    //fillDoubleOverlay("chartdiv5", dataset5, "Daily/Weekly Estimated V02Max Values", "units", "date", "value1", "value2", "MY titke", "My title", " V02Max day  [[value1]]", "V02Max weekly [[value2]]");
+    dataset3 = loadJSONData('/getDailyActivityLevel')
+
+    fillDoubleLineChart("chartdiv3", dataset3,"date", "value1", "value2", "Daily Movement", "Your activitiy", "Average Activity","Activity Level", "YYYY-MM-DD HH:NN", "mm")
+     
+    dataset4 = loadJSONData('/getRawHeartRates')
+    
+    
+
+    fillDoubleLineChart("chartdiv4", dataset4, "date", "value1", "value2", "Daily HRM", "Your activitiy", "Average Activity", "HRM", 'YYYY-MM-DD HH:NN:SS', 'ss')
+</script>
+
+{% endblock %}
+
+</html>

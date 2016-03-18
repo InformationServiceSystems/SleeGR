@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import os
-from flask import Flask, request, redirect, url_for, json, jsonify, session
+from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template
 
 
 import database
@@ -28,7 +28,7 @@ def login():
                                                       'password']):
             session['email'] = json_email_password['email']
             return jsonify(success=True)
-    return jsonify(success=False)
+    return redirect(url_for('static', filename='iot-login.html'))
 
 @app.route('/sign_rest', methods=['POST'])
 def sign():
