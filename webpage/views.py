@@ -19,16 +19,16 @@ db_inserts, db_extended = database.init()
 def index():
     return redirect(url_for('static', filename='index.html'))
 
-@app.route('/login_rest', methods=['POST', 'GET'])
+@app.route('/loginn', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        json_email_password = request.get_json()
-        if db_extended.password_matches_email(json_email_password['email'],
-                                                  json_email_password[
-                                                      'password']):
-            session['email'] = json_email_password['email']
-            return jsonify(success=True)
-    return redirect(url_for('static', filename='iot-login.html'))
+        print('HI')
+        email = request.values['email']
+        password = request.values['password']
+        if db_extended.password_matches_email(email, password):
+            session['email'] = email
+            return render_template('iot-triathlon-activity.html')
+    return app.send_static_file('iot-login.html')
 
 @app.route('/sign_rest', methods=['POST'])
 def sign():
