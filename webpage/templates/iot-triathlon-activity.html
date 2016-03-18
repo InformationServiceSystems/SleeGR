@@ -105,7 +105,7 @@
 <script src="{{url_for('static', filename= 'iss-ui.js')}}"></script>
 <script type="text/javascript" src="./static/charts.js"></script>
 <script type="text/javascript">
-    var user_id = '0', begin_date = '2016-01-01', end_date = '2016-31-03';
+    var user_id = 'test@test.com', begin_date = '2016-01-01', end_date = '2016-31-03';
     charts_createGaussian('http://46.101.169.112:5000/gaussianPoints', 'http://46.101.169.112:5000/gaussian', user_id, begin_date, end_date, 'chartdiv4');
     charts_createHeatmap('http://46.101.169.112:5000/sleep_data', user_id, begin_date, end_date, 'chartdiv7');
 </script>
