@@ -1,4 +1,5 @@
 from datetime import datetime
+from statistics import mean, variance
 
 import os
 from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template
@@ -58,21 +59,26 @@ def show_measurement(user_id, start_date, end_date, measurement_type):
 @login_required
 @app.route('/sleep_data/<user_id>/<start_date>/<end_date>')
 def sleep_data(user_id, start_date, end_date):
-    print(session["email"])
     user_id = session['email']
-
-
-    print(type(start_date))
-    print('step1')
     r = csvReader()
-    print('step2')
     start = datetime.strptime(start_date, '%Y-%d-%m')
-    print(start)
     end = datetime.strptime(end_date, '%Y-%d-%m')
-    print(end)
-    print('step3')
     return json.dumps(r.ReadSleepData(user_id, start,end))
 
+@app.route('/sleep_data_gaussian_/<user_id>/<start_date>/<end_date>')
+def sleep_data_cgaussian(user_id, start_date, end_date):
+    r = csvReader()
+    start = datetime.strptime(start_date, '%Y-%d-%m')
+    end = datetime.strptime(end_date, '%Y-%d-%m')
+    sleep_data = r.ReadSleepData(user_id, start,end)
+    average_list = []
+    var_list = []
+    for data in sleep_data:
+        average_list.append(data['x'])
+        var_list.append(data['y'])
+    mean_duration = mean(average_list)
+    variance_deepsleep = variance(var_list)
+    return json.dumps({'user_id':user_id, 'avg':mean_duration, 'std':variance_deepsleep})
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
