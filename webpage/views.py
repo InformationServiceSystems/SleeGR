@@ -65,7 +65,7 @@ def sleep_data(user_id, start_date, end_date):
     end = datetime.strptime(end_date, '%Y-%d-%m')
     return json.dumps(r.ReadSleepData(user_id, start,end))
 
-@app.route('/sleep_data_gaussian_/<user_id>/<start_date>/<end_date>')
+@app.route('/sleep_data_gaussian/<user_id>/<start_date>/<end_date>')
 def sleep_data_cgaussian(user_id, start_date, end_date):
     r = csvReader()
     start = datetime.strptime(start_date, '%Y-%d-%m')
