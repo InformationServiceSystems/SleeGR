@@ -203,11 +203,12 @@ function draw_chart(serieses, html_id) {
 function charts_createMultiChart(rooturl_points, show_type1, show_type2, show_data, user_id, begin_date, end_date, html_id) {
     log('charts_createMultiChart', 'start');
     var serieses = '';
+    var url = format_url(rooturl_points, user_id, begin_date, end_date);
     if (show_type1) {
-        serieses += getDataofType(rooturl_points + '/son', show_data, '#80bfff', begin_date, end_date);
+        serieses += getDataofType(url , show_data, '#80bfff', begin_date, end_date);
     }
     if (show_type2) {
-        serieses += getDataofType(rooturl_points + '/son2', show_data, '#ffa64d', begin_date, end_date);
+        serieses += getDataofType(url , show_data, '#ffa64d', begin_date, end_date);
     }
     draw_chart(serieses, html_id);
 }//charts_createMultiChart
@@ -216,7 +217,7 @@ function getDataofType(url, show_data, color, begin_date, end_date) {
     var serieses = '';
     var date_from = toDate(begin_date);
     var date_to = toDate(end_date);
-
+    
     for (var i = 0; i < points.length; i++) {
         var cur_date = toDate(points[i].date);
         if (cur_date >= date_from && cur_date <= date_to) {
@@ -228,6 +229,7 @@ function getDataofType(url, show_data, color, begin_date, end_date) {
             }
         }//if
     }//for 
+    
     return serieses;
 }//getDataofType
 
@@ -249,12 +251,15 @@ function createLine(a, b, c, date) {
 function createPoints(original_points, date) {
     log('createPoints', points);
     var points = [];
+    if(original_points.length !== undefined)
+    {
     for (var i = 0; i < original_points.length; i++) {
         points.push([original_points[i].x, original_points[i].y]);
 
     }
+    }
     glb_points[date] = points;
-
+    
 }
 
 function getScatterPoints(date, color) {

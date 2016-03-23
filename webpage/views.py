@@ -12,6 +12,9 @@ from webpage import app
 import names
 from csvreader import csvReader
 from decorators import login_required
+from flask.ext.cors import CORS
+
+
 
 db_inserts, db_extended = database.init()
 
@@ -46,8 +49,8 @@ def sign():
     return jsonify(success=False, error_in='request', error_msg='No post request sent')
 
 
-@app.route('/show-stats/<user_id>/<start_date>/<end_date>/<measurement_type>')
-def show_measurement(user_id, start_date, end_date, measurement_type):
+@app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
+def show_measurement(measurement_type, user_id, start_date, end_date):
     r = csvReader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -56,20 +59,32 @@ def show_measurement(user_id, start_date, end_date, measurement_type):
     else:
         return json.dumps(r.read_data(user_id, start, end, measurement_type))
 
-@login_required
-@app.route('/sleep_data/<user_id>/<start_date>/<end_date>')
-def sleep_data(user_id, start_date, end_date):
-    user_id = session['email']
-    r = csvReader()
-    start = datetime.strptime(start_date, '%Y-%d-%m')
-    end = datetime.strptime(end_date, '%Y-%d-%m')
-    return json.dumps(r.ReadSleepData(user_id, start,end))
 
-@app.route('/sleep_data_gaussian/<user_id>/<start_date>/<end_date>')
-def sleep_data_gaussian(user_id, start_date, end_date):
+@app.route('/sleepPoints/<user_id>/<start_date>/<end_date>')
+def sleep_data(user_id, start_date, end_date):
+    user_id = "test@test.com"
     r = csvReader()
-    start = datetime.strptime(start_date, '%Y-%d-%m')
-    end = datetime.strptime(end_date, '%Y-%d-%m')
+    start = datetime.strptime(start_date, '%d.%m.%Y')
+    end = datetime.strptime(end_date, '%d.%m.%Y')
+    ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    return ret
+
+
+@app.route('/gaussianPoints/<user_id>/<start_date>/<end_date>')
+def gaussianPoints(user_id, start_date, end_date):
+    lst = []
+    lst.append({'user_id':1, 'x':0.7 , 'y':3, 'date': '02.03.2016'})
+    lst.append({'user_id':1, 'x':0.9 , 'y':2, 'date': '03.03.2016'})
+    lst.append({'user_id':1, 'x':0.1 , 'y':1, 'date': '04.03.2016'})
+    lst.append({'user_id':1, 'x':0.2 , 'y':4, 'date': '05.03.2016'})
+    return json.dumps(lst)
+
+@app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
+def sleep_data_gaussian(user_id, start_date, end_date):
+    user_id = 'test@test.com'
+    r = csvReader()
+    start = datetime.strptime(start_date, '%d.%m.%Y')
+    end = datetime.strptime(end_date, '%d.%m.%Y')
     sleep_data = r.ReadSleepData(user_id, start,end)
     average_list = []
     var_list = []
@@ -78,7 +93,8 @@ def sleep_data_gaussian(user_id, start_date, end_date):
         var_list.append(data['y'])
     mean_duration = mean(average_list)
     variance_deepsleep = variance(var_list)
-    return json.dumps({'user_id':user_id, 'avg':mean_duration, 'std':variance_deepsleep})
+    #return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':variance_deepsleep}])
+    return json.dumps([{"avg": 0.5, "std":1.4, "user_id":1}])
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
@@ -92,7 +108,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 """
 
 
-
+'''
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
 def gaussian(user_id, start_date, end_date):
     lst = []
@@ -107,27 +123,11 @@ def gaussianPoints(user_id, start_date, end_date):
     lst.append({'user_id':1, 'x':0.1 , 'y':1, 'date': '04.03.2016'})
     lst.append({'user_id':1, 'x':0.2 , 'y':4, 'date': '05.03.2016'})
     return json.dumps(lst)
+'''
 
 
 
 
-@app.route('/sleepPoints')
-def sleepPoints():
-    lst = []
-    lst.append({'user_id':1, 'x':7 , 'y':45})
-    lst.append({'user_id':1, 'x':8.5 , 'y':35})
-    lst.append({'user_id':1, 'x':8.3 , 'y':32})
-    lst.append({'user_id':1, 'x':7.4 , 'y':39})
-    lst.append({'user_id':1, 'x':3 , 'y':23})
-    lst.append({'user_id':1, 'x':9 , 'y':43})
-    lst.append({'user_id':1, 'x':10.2 , 'y':29})
-    lst.append({'user_id':1, 'x':11 , 'y':17})
-    lst.append({'user_id':1, 'x':6.4 , 'y':26})
-    lst.append({'user_id':1, 'x':7.1 , 'y':43})
-    lst.append({'user_id':1, 'x':9.4 , 'y':44})
-    lst.append({'user_id':1, 'x':11.2 , 'y':26})
-    lst.append({'user_id':1, 'x':5.5 , 'y':31})
-    return json.dumps(lst)
 
 @app.route('/son')
 def typeACurve():

@@ -115,10 +115,7 @@ class csvReader:
         return ret_list
 
 
-"""
-a = csvReader()
-print(a.read_data(datetime.datetime(year=2016, day=5, month=2), datetime.datetime(year=2016, day=5, month=2), 1234,21))
-"""
+
 measurement_to_valuenumb = {
     21: 1,
     1: 3,
@@ -135,7 +132,6 @@ measurement_to_valuenumb = {
 }
 
 s = csvReader()
-# e = s.ReadSleepData('test@test.com', datetime(2016, 1,1), datetime(2016, 3, 31))
 e = s.heart_rate_sepecial('test@test.com', datetime(2016, 1, 1),
                           datetime(2016, 3, 31))
 for ee in e:
