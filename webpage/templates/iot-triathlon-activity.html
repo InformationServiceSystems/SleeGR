@@ -28,18 +28,18 @@
 
             <div class="box-tools pull-right">
                 <div class="btn-group">
-                    <div id="user-choice">
-                        <!-- <div id="checkboxes"></div><button onclick="handle_select()">Select</button> -->
+                    <div>
+
                         <label for="from">From</label>
-                        <input type="text" id="from" name="from" />
+                        <input type="text" id="scattered_from" name="from"/>
                         <label for="to">To</label>
-                        <input type="text" id="to" name="to" />  
+                        <input type="text" id="scattered_to" name="to"/>
 
-                        <input type="checkbox" id="chk_type1" value="son" checked="true" onclick="update_chart()" /> <label for="from">Show Type 1</label> 
-                        <input type="checkbox" id="chk_type2" value="son2" checked="true" onclick="update_chart()" /> <label for="from">Show Type 2</label> 
-                        <input type="checkbox" id="chk_data" value="dataSelected" checked="true" onclick="update_chart()" /> <label for="from">Show Data Points</label> 
+                        <input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="from">Show Type 1</label>
+                        <input type="checkbox" id="chk_type2"  value="son2" checked="true" /> <label for="from">Show Type 2</label>
+                        <input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="from">Show Data Points</label>
 
-                       
+
                     </div>
 
                 </div>
@@ -74,8 +74,14 @@
             </div>
             <div class="box-body chart-responsive">
 
-                <div id="chartdiv7" style="width:100%; height:500px;"></div>
 
+
+                <label for="from">From</label>
+                <input type="text" id="heatmap_from" name="from"/>
+                <label for="to">To</label>
+                <input type="text" id="heatmap_to" name="to"/>  </br>
+
+                <div id="chartdiv7" style="width:100%; height:500px;"></div>
 
             </div>
         </div>
@@ -128,8 +134,11 @@
                 </div>
             </div>
             <div class="box-body chart-responsive">
-
-                <div id="chartdiv4" style="width:100%; height:500px;"></div>
+                <label for="from">From</label>
+			    <input type="text" id="gaussian_from" name="from"/>
+			    <label for="to">To</label>
+			    <input type="text" id="gaussian_to" name="to"/>  </br>
+			    <div id="chartdiv4" style="width:100%; height:500px;" ></div>
 
 
             </div>
@@ -143,7 +152,10 @@
 
     {% block JS %} {{super() }}
     <script src="{{url_for('static', filename= 'iss-ui.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename= 'charts.js')}}"></script>
+    <script type="text/javascript" src="../static/charts.js"></script>
+
+
+
      <script type="text/javascript" src="http://momentjs.com/downloads/moment.js"></script>
      <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -151,81 +163,142 @@
 
   <link rel="stylesheet" href="{{url_for('static', filename= 'jquery-ui.css')}}">
     <script type="text/javascript">
-        // on ready function
-        $(function () {
-            $("#from").datepicker({
-                defaultDate: "+1w",
-                changeMonth: true,
-                numberOfMonths: 1,
-                dateFormat: 'dd.mm.yy',
-                onClose: function (selectedDate) {
-                    $("#to").datepicker("option", "minDate", selectedDate);
-                },
-                onSelect: function (date) {
-                    update_chart();
-                }
-            });
-            $("#to").datepicker({
-                defaultDate: "+1w",
-                changeMonth: true,
-                numberOfMonths: 1,
-                dateFormat: 'dd.mm.yy',
-                onClose: function (selectedDate) {
-                    $("#from").datepicker("option", "maxDate", selectedDate);
-                },
-                onSelect: function (date) {
-                    update_chart();
-                }
-            });
-
-            $("#from").datepicker('setDate', new Date());
-            $("#to").datepicker('setDate', new Date());
-            $('#chk_type1').attr("checked", true);
-            $('#chk_type2').attr("checked", true);
-            $('#chk_data').attr("checked", true);
-            update_chart();
-
-        });
-        function update_chart() {
-            var date_from = $("#from").val();
-            var date_to = $("#to").val();
-            var show_type1 = $("#chk_type1").is(':checked');
-            var show_type2 = $("#chk_type2").is(':checked');
-            var show_data = $("#chk_data").is(':checked');
-            charts_createMultiChart("http://46.101.169.112:5000/show_stats/21", show_type1, show_type2, show_data, user_id, date_from, date_to, 'chartdiv1');
-        }
-        var user_id = "test@test.com", begin_date = "01.01.2016", end_date = "31.03.2016"
-        charts_createGaussian("http://46.101.169.112:5000/gaussian", "http://46.101.169.112:5000/sleepPoints", user_id, begin_date, end_date, 'chartdiv4');
-        charts_createHeatmap("http://46.101.169.112:5000/sleepPoints", user_id, begin_date, end_date, 'chartdiv7');
-
-        
-        
-        /*
-        function compare(path) {
-
-            datasetActComp = loadJSONData(path)
-            fillDoubleLineChart("chartdiv3", datasetActComp, "date", "value1", "value2", "Daily Movement", "Your activitiy", "Peer Activity", "Activity Level", "YYYY-MM-DD HH:NN", "mm")
-        }
-        
-        dataset = loadJSONData('/getHeartRates')
-        fillDoubleOverlay("chartdiv1", dataset, "Morning/Evening HRM", "BPM", "date", "value1", "value2", "MY titke", "My title", " morning  [[value1]]", " evening [[value2]]");
-
-        dataset2 = loadJSONData('/getSleepRates')
-        fillDoubleOverlay("chartdiv2", dataset2, "Sleep/Deep Sleep Durations", "hours", "date", "value1", "value2", "MY titke", "My title", " Sleep  [[value1]]", "Deep Sleep [[value2]]");
+       		var multichart_id = '#chartdiv1';
 
 
-        dataset5 = loadJSONData('/getVO2MaxRates')
-        fillDoubleLineChart("chartdiv5", dataset5, "date", "value1", "value2", "Daily VO2max estimation", "VO2max", "Top  VO2max estimation", " VO2max estimation", 'YYYY-MM-DD', 'DD')
-        //fillDoubleOverlay("chartdiv5", dataset5, "Daily/Weekly Estimated V02Max Values", "units", "date", "value1", "value2", "MY titke", "My title", " V02Max day  [[value1]]", "V02Max weekly [[value2]]");
-        dataset3 = loadJSONData('/getDailyActivityLevel')
+			function update_mutlichart(){
+				var user_id	= 'test@test.com';
+				var date_from 	= $("#scattered_from").val();
+				var date_to 	= $("#scattered_to").val();
+				var show_type1 	= $("#chk_type1").is(':checked');
+				var show_type2 	= $("#chk_type2").is(':checked');
+				var show_data 	= $("#chk_data").is(':checked');
 
-        fillDoubleLineChart("chartdiv3", dataset3, "date", "value1", "value2", "Daily Movement", "Your activitiy", "Average Activity", "Activity Level", "YYYY-MM-DD HH:NN", "mm")
+				// http://46.101.169.112:5000/show_stats/21/test@test.com/1.12.2015/31.03.2016
+				// charts_createMultiChart("http://46.101.214.58:5555", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
+				charts_createMultiChart("http://46.101.169.112:5000/show_stats/21", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
 
-        dataset4 = loadJSONData('/getRawHeartRates')
+			}
+			function update_heatmap(){
+				var user_id	= 'test@test.com';
+				var date_from 	= $("#heatmap_from").val();
+				var date_to 	= $("#heatmap_to").val();
+				//charts_createHeatmap("http://46.101.214.58:5555/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
+				charts_createHeatmap("http://46.101.169.112:5000/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
+			}
+
+			function update_gaussian(){
+				var user_id	= 'test@test.com';
+				var date_from 	= $("#gaussian_from").val();
+				var date_to 	= $("#gaussian_to").val();
+				//charts_createGaussian('http://46.101.214.58:5555/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id,  date_from, date_to , 'chartdiv4');
+				charts_createGaussian('http://46.101.169.112:5000/gaussianPoints', 'http://46.101.169.112:5000/gaussian', user_id,  date_from, date_to , 'chartdiv4');
+			}
+			function apply_picker(from, to, action){
+				$( from ).datepicker({
+					defaultDate: "+1w",
+					changeMonth: true,
+					numberOfMonths: 1,
+					dateFormat: 'dd.mm.yy',
+					onClose: function( selectedDate ) {
+						$( to ).datepicker( "option", "minDate", selectedDate );
+					},
+					onSelect: function(date) {
+						action();
+					}
+				});
+				$( to ).datepicker({
+					defaultDate: "+1w",
+					changeMonth: true,
+					numberOfMonths: 1,
+					dateFormat: 'dd.mm.yy',
+					onClose: function( selectedDate ) {
+						$( from ).datepicker( "option", "maxDate", selectedDate );
+					},
+					onSelect: function(date) {
+						action();
+
+					}
+				});
+				var before =  new Date();
+				var today =  new Date();
+				before.setDate(before.getDate() - 30);
+
+				$(from).datepicker('setDate', before);
+				$(to).datepicker('setDate', today);
+			}//apply_picker
+
+			function select_all(){
+				$('#chk_type1').attr("checked",true);
+				$('#chk_type2').attr("checked",true);
+				$('#chk_data').attr("checked",true);
+			}
+
+			// on ready function
+			$(function() {
+				select_all();
+				apply_picker("#scattered_from", "#scattered_to",  update_mutlichart);
+				apply_picker("#heatmap_from", "#heatmap_to", update_heatmap);
+				apply_picker("#gaussian_from", "#gaussian_to", update_gaussian);
 
 
 
-        fillDoubleLineChart("chartdiv4", dataset4, "date", "value1", "value2", "Daily HRM", "Your activitiy", "Average Activity", "HRM", 'YYYY-MM-DD HH:NN:SS', 'ss')*/
+
+				update_mutlichart();
+				update_heatmap();
+				update_gaussian();
+
+
+			function select_type(checkbox, container, showdata , type){
+				var checked = $(checkbox).is(':checked');
+				var chart = $(container).highcharts();
+				var series = chart.series;
+				for(var i=0; i<series.length; i++){
+					if(series[i].options.grp == type && series[i].options.selected){
+						if(checked)
+							series[i].show();
+						else
+							series[i].hide();
+
+						if(!showdata && series[i].type == 'scatter')
+							series[i].hide();
+					}// if group matches
+				}// for
+
+			}
+			$('#chk_type1').click(function() {
+				var show_data = $("#chk_data").is(':checked');
+				select_type('#chk_type1', multichart_id, show_data, 'type1');}
+			);
+
+			$('#chk_type2').click(function() {
+				var show_data = $("#chk_data").is(':checked');
+				select_type('#chk_type2', multichart_id, show_data, 'type2');}
+			);
+
+			$('#chk_data').click(function() {
+				var chart = $(multichart_id).highcharts();
+				var series = chart.series;
+				for(var i=0; i<series.length; i++){
+					if(series[i].options.type == 'scatter'){
+						var linkedto = chart.get(series[i].options.linkedTo);
+						if(linkedto != null){
+							if($("#chk_data").is(':checked') && linkedto.visible){
+								series[i].show();
+							}
+							else{
+								series[i].hide();
+							}
+						}
+					}
+				}
+
+
+			});
+
+		});
+
+
     </script>
     {% endblock %}
 
