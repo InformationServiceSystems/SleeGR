@@ -77,6 +77,7 @@ def gaussianPoints(user_id, start_date, end_date):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     sleep_data = r.ReadSleepData(user_id, start,end)
+    print(sleep_data)
     return json.dumps(sleep_data)
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
@@ -86,14 +87,19 @@ def sleep_data_gaussian(user_id, start_date, end_date):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     sleep_data = r.ReadSleepData(user_id, start,end)
-    average_list = [8.0, 9.0]
-    var_list = [8.0, 9.0 ]
+    average_list = []
+    var_list = []
     for data in sleep_data:
         average_list.append(data['x'])
         var_list.append(data['y'])
-    mean_duration = mean(average_list)
-    variance_duration = variance(average_list)
-    return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':variance_duration}])
+    if len(average_list) > 1 and len(var_list) > 1:
+        mean_duration = mean(average_list)
+        variance_duration = variance(average_list)
+        print({'user_id':user_id, 'avg':mean_duration, 'std':variance_duration})
+        return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':variance_duration}])
+    else:
+        print("no data")
+        return json.dumps([{'user_id' : user_id, 'avg': 1, 'std': 1}])
     #return json.dumps([{"avg": 0.5, "std":1.4, "user_id":1}])
 
 

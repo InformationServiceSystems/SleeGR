@@ -77,7 +77,7 @@ class csvReader:
                         duration = wake_up - drop_off
                         deep_sleep = float(row[12]) * 100
                         ret_list.append(
-                            {'user_id': user_id, 'date': str(wake_up.date()),
+                            {'user_id': user_id, 'date': (wake_up.date().strftime('%d.%m.%Y')),
                              'x': float(duration.seconds / 3600),
                              'y': deep_sleep})
         return ret_list
@@ -107,12 +107,15 @@ class csvReader:
                 if counter > 100:
                     break
                 #if counter % 10 < 0:
-                #     continue 
+                #     continue
                 datapoints.append({'x': counter * 3,
                                    'y':float( heart_rate_json[measurement]['value'])})
                 counter = counter + 1
             new_json['data_points'] = datapoints
-            ret_list.append(new_json)
+            if not datapoints:
+                pass
+            else:
+                ret_list.append(new_json)
         return ret_list
 
 
