@@ -72,12 +72,12 @@ def sleep_data(user_id, start_date, end_date):
 
 @app.route('/gaussianPoints/<user_id>/<start_date>/<end_date>')
 def gaussianPoints(user_id, start_date, end_date):
-    lst = []
-    lst.append({'user_id':1, 'x':0.7 , 'y':3, 'date': '02.03.2016'})
-    lst.append({'user_id':1, 'x':0.9 , 'y':2, 'date': '03.03.2016'})
-    lst.append({'user_id':1, 'x':0.1 , 'y':1, 'date': '04.03.2016'})
-    lst.append({'user_id':1, 'x':0.2 , 'y':4, 'date': '05.03.2016'})
-    return json.dumps(lst)
+    user_id = 'test@test.com'
+    r = csvReader()
+    start = datetime.strptime(start_date, '%d.%m.%Y')
+    end = datetime.strptime(end_date, '%d.%m.%Y')
+    sleep_data = r.ReadSleepData(user_id, start,end)
+    return json.dumps(sleep_data)
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
 def sleep_data_gaussian(user_id, start_date, end_date):
@@ -86,15 +86,15 @@ def sleep_data_gaussian(user_id, start_date, end_date):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     sleep_data = r.ReadSleepData(user_id, start,end)
-    average_list = []
-    var_list = []
+    average_list = [8.0, 9.0]
+    var_list = [8.0, 9.0 ]
     for data in sleep_data:
         average_list.append(data['x'])
         var_list.append(data['y'])
     mean_duration = mean(average_list)
-    variance_deepsleep = variance(var_list)
-    #return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':variance_deepsleep}])
-    return json.dumps([{"avg": 0.5, "std":1.4, "user_id":1}])
+    variance_duration = variance(average_list)
+    return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':variance_duration}])
+    #return json.dumps([{"avg": 0.5, "std":1.4, "user_id":1}])
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
@@ -109,11 +109,11 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 '''
-@app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
-def gaussian(user_id, start_date, end_date):
-    lst = []
-    lst.append({'user_id':1, 'avg':0.5 , 'std':1.4})
-    return json.dumps(lst)
+#@app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
+#def gaussian(user_id, start_date, end_date):
+#    lst = []
+#    lst.append({'user_id':1, 'avg':0.5 , 'std':1.4})
+#    return json.dumps(lst)
 
 @app.route('/gaussianPoints/<user_id>/<start_date>/<end_date>')
 def gaussianPoints(user_id, start_date, end_date):

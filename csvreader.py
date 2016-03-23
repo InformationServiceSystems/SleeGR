@@ -93,24 +93,25 @@ class csvReader:
             new_json = {}
             new_json['user_id'] = user_id
             new_json['date'] = day.strftime('%d.%m.%Y')
-            if fkt_json is None:
-                new_json['a'] = 0
-                new_json['b'] = 0
-                new_json['c'] = 0
-            else:
-                for key in fkt_json:
-                    new_json['a'] = fkt_json[key]['value']['value_1']
-                    new_json['b'] = fkt_json[key]['value']['value_2']
-                    new_json['c'] = fkt_json[key]['value']['value_3']
+            #if fkt_json is None:
+            new_json['a'] = 1
+            new_json['b'] = 1
+            new_json['c'] = 1
+            for key in fkt_json:
+                new_json['a'] = float(fkt_json[key]['value']['value_1'])
+                new_json['b'] = float(fkt_json[key]['value']['value_2'])
+                new_json['c'] = float(fkt_json[key]['value']['value_3'])
             datapoints = []
             counter = 0
             for measurement in heart_rate_json:
-                if counter >= 300:
+                if counter > 100:
                     break
+                #if counter % 10 < 0:
+                #     continue 
                 datapoints.append({'x': counter * 3,
-                                   'y': heart_rate_json[measurement]['value']})
-                counter += 1
-            new_json['datapoints'] = datapoints
+                                   'y':float( heart_rate_json[measurement]['value'])})
+                counter = counter + 1
+            new_json['data_points'] = datapoints
             ret_list.append(new_json)
         return ret_list
 
