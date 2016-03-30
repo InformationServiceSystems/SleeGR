@@ -4,6 +4,9 @@ from dateutil import rrule
 from datetime import datetime
 
 
+from sleegr_reader import read_hr_data
+
+
 class csvReader:
     def __init__(self):
         '''
@@ -76,7 +79,8 @@ class csvReader:
                     if wake_up.date() <= end_date.date():
                         duration = wake_up - drop_off
                         deep_sleep = float(row[12]) * 100
-                        ret_list.append(
+                        if deep_sleep > 0:
+                            ret_list.append(
                             {'user_id': user_id, 'date': (wake_up.date().strftime('%d.%m.%Y')),
                              'x': float(duration.seconds / 3600),
                              'y': deep_sleep})
@@ -84,11 +88,13 @@ class csvReader:
 
     def heart_rate_sepecial(self, user_id, start_date, end_date):
         ret_list = []
+        file_name = ('%s/%s/' % (
+                self.folder_path, user_id))
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
-            heart_rate_json = self.read_data(user_id, day, day, '21')
+            tpl_lst = read_hr_data(file_name, day)
             fkt_json = self.read_data(user_id, day, day, '32')
-            if heart_rate_json is None:
+            if  not tpl_lst:
                 continue
             new_json = {}
             new_json['user_id'] = user_id
@@ -103,14 +109,11 @@ class csvReader:
                 new_json['c'] = float(fkt_json[key]['value']['value_3'])
             datapoints = []
             counter = 0
-            for measurement in heart_rate_json:
-                if counter > 100:
-                    break
+            for measurement in tpl_lst:
                 #if counter % 10 < 0:
                 #     continue
-                datapoints.append({'x': counter * 3,
-                                   'y':float( heart_rate_json[measurement]['value'])})
-                counter = counter + 1
+                datapoints.append({'x': measurement[0],
+                                   'y':measurement[1]})
             new_json['data_points'] = datapoints
             if not datapoints:
                 pass
@@ -135,8 +138,10 @@ measurement_to_valuenumb = {
     13: 3
 }
 
-s = csvReader()
-e = s.heart_rate_sepecial('test@test.com', datetime(2016, 1, 1),
-                          datetime(2016, 3, 31))
-for ee in e:
-    print(ee)
+
+if __name__ == '__main__':
+    s = csvReader()
+    e = s.heart_rate_sepecial('test@test.com', datetime(2016, 1, 1),
+                              datetime(2016, 3, 31))
+    for ee in e:
+        print(ee)

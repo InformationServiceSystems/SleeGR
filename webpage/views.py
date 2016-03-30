@@ -1,8 +1,9 @@
 from datetime import datetime
 from statistics import mean, variance
+import math
 
 import os
-from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template
+from flask import request, redirect, url_for, json, jsonify, session, render_template
 
 
 import database
@@ -11,8 +12,9 @@ from exceptions import InputError
 from webpage import app
 import names
 from csvreader import csvReader
-from decorators import login_required
-from flask.ext.cors import CORS
+
+
+
 
 
 
@@ -21,16 +23,16 @@ db_inserts, db_extended = database.init()
 
 @app.route('/')
 def index():
-    return redirect(url_for('static', filename='index.html'))
+    return app.send_static_file('index.html')
 
-@app.route('/loginn', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         email = request.values['email']
         password = request.values['password']
         if db_extended.password_matches_email(email, password):
             session['email'] = email
-            return render_template('iot-triathlon-activity.html')
+            return redirect(url_for("dashboard"))
     return app.send_static_file('iot-login.html')
 
 @app.route('/sign_rest', methods=['POST'])
@@ -48,6 +50,9 @@ def sign():
         return jsonify(success=True)
     return jsonify(success=False, error_in='request', error_msg='No post request sent')
 
+@app.route('/dashboard')
+def dashboard():
+    return render_template('iot-triathlon-activity.html')
 
 @app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
 def show_measurement(measurement_type, user_id, start_date, end_date):
@@ -77,7 +82,6 @@ def gaussianPoints(user_id, start_date, end_date):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     sleep_data = r.ReadSleepData(user_id, start,end)
-    print(sleep_data)
     return json.dumps(sleep_data)
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
@@ -95,12 +99,9 @@ def sleep_data_gaussian(user_id, start_date, end_date):
     if len(average_list) > 1 and len(var_list) > 1:
         mean_duration = mean(average_list)
         variance_duration = variance(average_list)
-        print({'user_id':user_id, 'avg':mean_duration, 'std':variance_duration})
-        return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':variance_duration}])
+        return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':math.sqrt(variance_duration)}])
     else:
-        print("no data")
-        return json.dumps([{'user_id' : user_id, 'avg': 1, 'std': 1}])
-    #return json.dumps([{"avg": 0.5, "std":1.4, "user_id":1}])
+        return json.dumps([{'user_id' : user_id, 'avg': -1000, 'std': 1}])
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
