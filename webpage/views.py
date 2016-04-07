@@ -12,6 +12,7 @@ from exceptions import InputError
 from webpage import app
 import names
 from csvreader import csvReader
+from decorators import login_required
 
 
 
@@ -27,11 +28,18 @@ def index():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    error = None
+    if request.args.get('next'):
+        session['next'] = request.args.get('next', None)
     if request.method == 'POST':
         email = request.values['email']
         password = request.values['password']
         if db_extended.password_matches_email(email, password):
             session['email'] = email
+            if 'next' in session:
+                next = session.get('next')
+                session.pop('next')
+                return redirect(next)
             return redirect(url_for("dashboard"))
     return app.send_static_file('iot-login.html')
 
@@ -50,10 +58,6 @@ def sign():
         return jsonify(success=True)
     return jsonify(success=False, error_in='request', error_msg='No post request sent')
 
-@app.route('/dashboard')
-def dashboard():
-    return render_template('iot-triathlon-activity.html')
-
 @app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
 def show_measurement(measurement_type, user_id, start_date, end_date):
     r = csvReader()
@@ -63,6 +67,11 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
         return json.dumps(r.heart_rate_sepecial(user_id, start, end))
     else:
         return json.dumps(r.read_data(user_id, start, end, measurement_type))
+
+@app.route('/dashboard')
+#@login_required
+def dashboard():
+    return render_template('iot-triathlon-activity.html')
 
 
 @app.route('/sleepPoints/<user_id>/<start_date>/<end_date>')
@@ -207,6 +216,14 @@ def getRealtimeHRM():
 @app.route('/sendPost',  methods=["POST"])
 def sendPost():
     return jsonify(request.get_json(force = True))
+
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':

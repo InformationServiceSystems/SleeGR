@@ -1,0 +1,11 @@
+- All files of the pyhton-server are in the folder „iot-final“
+- to run the server pthon 3 is required
+- Also included is a requirements doc it should contain all names of the necessary python-libs
+- You need to install a mongodb (https://docs.mongodb.org/manual/installation/)
+- The path for the csv-files can be changed in the file  „csvreader“. Currently it is "/root/data"
+	the name of the variable is „self.folder_path“
+
+- the server tries to connect to the mongodb on port 27017 on localhost. This can be changed in database/database.
+-you also may wnat to change the debug-mode. To to so just change it in settings.py
+
+- to start the server run webpage/__init__.py

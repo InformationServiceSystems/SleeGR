@@ -27,13 +27,10 @@ function charts_createRanking(root, team_id, begin_date, end_date, html_id){
 			return value;
 	}
 
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", url_data, true);
-	xhr.onload = function (e) {
-		if (xhr.readyState === 4) {
-			if (xhr.status === 200) {
-				var points = eval(xhr.responseText);
-					for(var i=0; i<points.length; i++){
+	$.ajax({url:  url_data, success: function(result){
+		var points = eval(result);
+		console.log('data from  %s len: %d',  url_data, points.length);
+		for(var i=0; i<points.length; i++){
 						var series_id 	= points[i]['athlete_id'];
 						var series 	= new Object();
 						series.name	= points[i]['last_name'] + ',' + points[i]['name'];
@@ -55,14 +52,17 @@ function charts_createRanking(root, team_id, begin_date, end_date, html_id){
 						}
 						series.type = 'column';
 						serieses.push(series);
-					}
-					for(cat in categories){
-						average_data.push([categories[cat].id , categories[cat].sum/categories[cat].count]);
-					}
+		}
+		for(cat in categories){
+			average_data.push([categories[cat].id , categories[cat].sum/categories[cat].count]);
+		}
+		console.log('update');
 					var series 	= new Object();
 					series.name	= 'average';
 					series.data 	= average_data;
 					series.type 	= 'line';
+					series.color	= '#FF0000';
+					series.lineWidth = 5;
 					serieses.push(series);
 
 					$(html_id).highcharts({
@@ -90,13 +90,7 @@ function charts_createRanking(root, team_id, begin_date, end_date, html_id){
 							},
 							plotOptions: {column: { pointPadding: 0, borderWidth: 0, stacking: false }},
 				       			series: serieses});
-				}else {logerr('charts_createRanking', xhr.statusText);}
-			}
-	};// function
-	xhr.onerror = function (e) {
-		 logerr('charts_createRanking', xhr.statusText);
-	};
-	xhr.send(null);
+	}});
 
 }//charts_createRanking
 
@@ -129,7 +123,7 @@ function create_gaussian(settings, points, html_id){
 				value: NormalDensityZx(i, glb_mean, glb_dev)
 			};
 		if (verticals.indexOf( Math.round( i * 10 ) / 10 ) !== -1 ) {
-			dp.vertical	= y_values[index];
+			dp.vertical	= y_values[index]/100;
 			dp.date		= dates[index];
 			index		+= 1;
 		}
@@ -184,35 +178,14 @@ function charts_createGaussian(rooturl_points, rooturl_settings, user_id, begin_
 		var url_points 		= format_url(rooturl_points, user_id, begin_date, end_date);
 		var url_settings 	= format_url(rooturl_settings, user_id, begin_date, end_date);
 
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url_settings, true);
-		xhr.onload = function (e) {
-			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					var settings = eval(xhr.responseText);
-					var xhr_points = new XMLHttpRequest();
-					xhr_points.open("GET", url_points, true);
-					xhr_points.onload = function (e) {
-						if (xhr_points.readyState === 4) {
-							if (xhr_points.status === 200) {
-								log('charts_createGaussian', 'SERVER RESPONSE OK!');
-								var points = eval(xhr_points.responseText);
-								create_gaussian(settings, points, html_id);
-							}
-						}
-					}//function
-					xhr_points.onerror = function (e) {
-						  logerr('charts_createGaussian', xhr_points.statusText);
-					};
-					xhr_points.send(null);
-				}// if 200
-				else {logerr('charts_createGaussian', xhr.statusText);}
-			}// if 4
-		}//function
-		xhr.onerror = function (e) {
-		  logerr('charts_createGaussian', xhr.statusText);
-		};
-		xhr.send(null);
+		$.ajax({url:  url_settings , success: function(setting_result){
+				var settings = eval(setting_result);
+				$.ajax({url:  url_points, success: function(points_result){
+					var points = eval(points_result);
+					console.log('data from  %s len: %d', url_points , points.length);
+					create_gaussian(settings, points, html_id);
+				}});
+		}});
 	}
 	catch(e){logerr('charts_createGaussian', e);}
 
@@ -320,173 +293,21 @@ function  create_heatmap(points, html_id){
 }
 
 function  charts_createHeatmap(rooturl_points, user_id, begin_date, end_date, html_id){
-	log('charts_createHeatmap', 'start');
 	var url_points 	= format_url(rooturl_points, user_id, begin_date, end_date);
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", url_points, true);
-	xhr.onload = function (e) {
-			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					log('charts_createHeatmap', 'SERVER RESPONSE OK! ');
-					var points = eval(xhr.responseText);
-					create_heatmap(points, html_id);
-				}else {logerr(xhr.statusText);}
-			}
-	};// function
-	xhr.onerror = function (e) {
-		 logerr('charts_createHeatmap', xhr.statusText);
-	};
-	xhr.send(null);
+
+	$.ajax({url: url_points, success: function(result){
+		var points = eval(result);
+		console.log('data from  %s len: %d', url_points , points.length);
+		create_heatmap(points, html_id);
+	 }});
 
 }//charts_createHeatmap
-/*
-		function name: draw_chart
-*/
-function draw_chart(serieses, html_id){
-	var code = " $(function () { \
-	    		 $(html_id).highcharts({ \
-				title: { text: 'Scatter plot with regression line'},\
-				series: ["+serieses+"]});});";
-	eval(code);
-}
-
-/*
-		function name: charts_createMultiChart
-*/
-function charts_createMultiChart(rooturl_points, show_type1, show_type2, show_data, user_id, begin_date, end_date, html_id, data_select_id){
-	log('charts_createMultiChart', 'start');
-	var type1_url = format_url(rooturl_points , user_id, begin_date, end_date);
-	var type2_url = format_url(rooturl_points , user_id, begin_date, end_date);
-	var serieses = '';
-	try{
-		var xhr_type1 = new XMLHttpRequest();
-		xhr_type1.open("GET", type1_url, true);
-		xhr_type1.onload = function (e) {
-			if (xhr_type1.readyState === 4) {
-				if (xhr_type1.status === 200) {
-					var type1_data = eval(xhr_type1.responseText);
-					serieses += getDataofType(type1_data, show_data, '#80bfff', user_id,  'type1', show_data, data_select_id);
 
 
-					var xhr_type2 = new XMLHttpRequest();
-					xhr_type2.open("GET", type2_url, true);
-					xhr_type2.onload = function (e) {
-						if (xhr_type2.readyState === 4) {
-							if (xhr_type2.status === 200) {
-								log('charts_createMultiChart', 'SERVER RESPONSE OK!');
-								var type2_data = eval(xhr_type2.responseText);
-								serieses += getDataofType(type2_data, show_data, '#ffa64d', user_id,  'type2', show_data, data_select_id);
-								draw_chart(serieses, html_id);
-							}
-						}
-					}//function
-					xhr_type2.onerror = function (e) {
-						  logerr('charts_createMultiChart', xhr_points.statusText);
-					};
-					xhr_type2.send(null);
-				}// if 200
-				else {logerr('charts_createMultiChart', xhr_type1.statusText);}
-			}// if 4
-		}//function
-		xhr_type1.onerror = function (e) {
-		  logerr('charts_createMultiChart', xhr.statusText);
-		};
-		xhr_type1.send(null);
-	}catch(e){
-		logerr('charts_createMultiChart', e);
-	}
-
-}//charts_createMultiChart
-function getDataofType(points, show_data, color, user_id,  type, visible, data_select_id){
-	var serieses		= '';
-	for(var i=0; i<points.length; i++){
-		if(typeof points[i].a != 'undefined' && typeof points[i].b != 'undefined' && typeof points[i].c != 'undefined'){
-			createLine(points[i].a, points[i].b, points[i].c, points[i].date);
-			serieses += getLine(points[i].date, color, type, visible, data_select_id) + ',';
-		}
-		if(typeof points[i].data_points != 'undefined' ){
-			createPoints(points[i].data_points, points[i].date);
-			serieses += getScatterPoints(points[i].date, color, type, show_data) + ',';
-		}
-	}//for
-	return serieses;
-}//getDataofType
 
 
-var glb_points		=  new Object();
-var glb_lines		=  new Object();
-function createLine(a, b, c, date){
-	var points	= [];
-	for (var x = 0; x <= 300; x++) {
-		var y = Math.exp(-x / a) * b + c;
-		points.push([x, y]);
-	}
-	glb_lines[date] = points;
-}
-
-function createPoints(original_points, date){
-
-	if(typeof original_points == 'undefined'){
-		log('undefined skip');
-		return;
-	}
-	log('createPoints', original_points);
-	var points = [];
-	for(var i=0; i<original_points.length; i++){
-		points.push([original_points[i].x, original_points[i].y]);
-
-	}
-	glb_points[date] = points;
-
-}
-
-function getScatterPoints(date, color, type, visible){
-	var str = "{ 	type: 'scatter',\
-			grp: '"+type+"',\
-			selected: '"+visible+"',\
-			linkedTo: '" + date + '_' + type +"',\
-            		name: 'Observations_" + date + "' ,\
-			data: glb_points['" + date + "'],\
-			showInLegend: false,\
-			visible: " + visible + ", \
-			marker: {radius: 4,   symbol: 'circle'} }";
-	return str;
-}
 
 
-function getLine(date, color, type, visible, data_select_id){
-	var str = "{ 	type: 'line',\
-			grp: '"+type+"',\
-			selected: '"+visible+"',\
-			id: '" + date + '_' + type + "',\
-			name: '" + date + "',\
-			visible: " + visible + ", \
-			data: glb_lines['" + date + "'],\
-			marker: {enabled: false},\
-			states: {hover: {lineWidth: 0}},\
-			enableMouseTracking: false,\
-			events: {\
-				legendItemClick: function (event) {\
-					if(this.visible){\
-						this.hide();\
-						this.linkedSeries[0].hide();\
-						this.options.selected = false;\
-						this.linkedSeries[0].options.selected = false;\
-					}else{\
-						this.show();\
-						this.options.selected = true;\
-						this.linkedSeries[0].options.selected = true;\
-						if($('"+data_select_id+"').is(':checked'))\
-							this.linkedSeries[0].show();\
-						else\
-							this.linkedSeries[0].hide();\
-					}\
-					return false;\
-                    		}\
-			}\
-		    }";
-	return str;
-}
 /**************************************************************************************************
 
 					Internal Functions
@@ -524,7 +345,7 @@ function toDate(str){
 function format_url(root, user_id, begin_date, end_date){
 	var url =  encodeURI(root);
 	if(glb_usedate){
-		var url = encodeURI(root  +   '/' + user_id + '/' + begin_date + '/' + end_date);	
+		var url = encodeURI(root  +   '/' + user_id + '/' + begin_date + '/' + end_date);
 		log('format_url', url);
 	}
 	return url;
@@ -565,7 +386,7 @@ function NormalDensityZx( x, Mean, StdDev ) {
 }
 /*
 	function name:	NormalDensityZx
-	Description:	Calculates Q(x), the right tail area under the Standard Normal Curve. 
+	Description:	Calculates Q(x), the right tail area under the Standard Normal Curve.
 */
 function StandardNormalQx( x ) {
     if ( x === 0 ) // no approximation necessary for 0
@@ -590,15 +411,227 @@ function StandardNormalQx( x ) {
 }
 /*
 	function name:	StandardNormalPx
-	Description:	Calculates P(x), the left tail area under the Standard Normal Curve, which is 1 - Q(x). 
+	Description:	Calculates P(x), the left tail area under the Standard Normal Curve, which is 1 - Q(x).
 */
 function StandardNormalPx( x ) {
     return 1 - StandardNormalQx( x );
 }
 /*
 	function name:	StandardNormalAx
-	Description:	Calculates A(x), the area under the Standard Normal Curve between +x and -x. 
+	Description:	Calculates A(x), the area under the Standard Normal Curve between +x and -x.
 */
 function StandardNormalAx( x ) {
     return 1 - ( 2 * StandardNormalQx( Math.abs( x ) ) );
+}
+
+
+
+/********************************************************************************************************
+			MULTI CHART
+
+********************************************************************************************************/
+
+function generateColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+function checkBoxSetVisible(chxId, dataId, containerId){
+	var checked 	= $(chxId).is(':checked');
+	var showData 	= $(dataId).is(':checked');
+	var value 	= $(chxId).val();
+	setTypeVisible(containerId, value, checked, showData);
+}
+
+
+function newRandomColor() {
+        var color = [];
+        color.push((Math.random() * 255).toFixed());
+        color.push((Math.random() * 255).toFixed());
+        color.push((Math.random() * 255).toFixed());
+        color.push((Math.random()).toFixed(2));
+        var color = 'rgba(' + color.join(',') + ')';
+        return color;
+}
+
+
+function charts_createMultiChart(rooturl_points, show_type1, show_type2, show_data, user_id, begin_date, end_date, html_id, data_select_id, only_5mins){
+	var type1_url = format_url(rooturl_points , user_id, begin_date, end_date);
+	var type2_url = format_url(rooturl_points , user_id, begin_date, end_date);
+	var serieses = [];
+
+	$.ajax({url: type1_url, success: function(result_type1){
+			var points1 = eval(result_type1);
+			addSerieses(points1, show_data, 'Type1', true, data_select_id, serieses, 'circle', only_5mins);
+			console.log('data from  %s len: %d', type1_url, points1.length);
+			// the following commented lines are for getting type2 uncomment to get the results
+			//$.ajax({url: type2_url, success: function(result_type2){
+			//    	var points2 = eval(result_type2);
+			//	console.log('data from  %s len: %d', type2_url, points2.length);
+			//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
+				draw_chart(serieses, html_id, only_5mins);
+ 			//}});
+        }});
+
+}//charts_createMultiChart
+
+
+function draw_chart(serieses, html_id, only_5mins){
+   	 $(html_id).highcharts({
+		title: {
+			text: 'Line and Scatter Plot of Cool Down'
+		},
+		xAxis: {
+			labels: {
+				formatter: function(){
+					if(only_5mins)
+						return this.value;
+
+					var hours = this.value/(60*60);
+					return hours.toFixed(2) + 'h';
+				}
+			},
+			//tickInterval: 1.5
+		},
+		plotOptions: {
+			line: {
+                		marker: {
+                   			enabled: false
+                		}
+            		}
+        	},
+		series: serieses
+	});
+}
+function addSerieses(points, show_data,  type, visible, data_select_id, serieses,  point_symbol, only_5mins){
+	var max_x 	= only_5mins? 300: 12000; // 12K
+	var step	= only_5mins? 1: 10;
+
+	for(var i=0; i<points.length; i++){
+		try{
+
+			var a 		= points[i].a;
+			var b 		= points[i].b;
+			var c 		= points[i].c;
+			var dataPoints	= points[i].data_points;
+			var date	= points[i].date;
+
+			var line_data 		= getLineData(a, b, c, max_x, step);
+			var scatter_data 	= getScatterData(dataPoints,  only_5mins);
+
+			var scatter_name	= 'scatter ' + type + ' ' + date;
+			var line_name		= 'line ' + type + ' ' + date;
+			var color		=  newRandomColor();
+
+			var id 			= type + '_' + i;
+
+			var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data);
+			var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol);
+
+			serieses.push(lineSeries);
+			serieses.push(scatterSeries);
+
+		}catch(e){
+			console.error(e);
+		}// catch
+
+	}//for
+}
+function getLineData(a, b, c, max_x, step){
+	var series_data	= [];
+	for (var x = 0; x <= max_x; x+= step) {
+		var y = Math.exp(-x / a) * b + c;
+		series_data.push([x, y]);
+	}
+	return series_data;
+}
+function getScatterData(points, only_5mins){
+	var series_data = [];
+	for(var i=0; i< points.length; i++){
+		if(only_5mins){
+			if(points[i].x <= 300){
+				series_data.push([points[i].x, points[i].y]);
+			}
+		}else{
+			series_data.push([points[i].x, points[i].y]);
+		}
+
+	}
+	return series_data;
+}
+function createScatterSeries(name, color, type, visible, linkedId, data, point_symbol){
+	var series = new Object();
+	series.type 		= 'scatter';
+	series.grp		= String(type);
+	series.selected		= visible;
+	series.visible		= visible;
+	series.linkedTo 	= linkedId;
+	series.name		= name;
+	series.data 		= data;
+	series.showInLegend 	= false;
+	series.color		= color;
+	series.marker		= {radius: 2,  symbol: point_symbol};
+
+	return series;
+
+}
+function createLineSeries(color, type, visible, data_select_id, id, name, data){
+	var series 			= new Object();
+	series.id			= id;
+	series.type			= 'line';
+	series.grp			= String(type);
+	series.selected 		= visible;
+	series.visible	 		= visible;
+	series.name			= name;
+	series.data			= data;
+	series.color			= color;
+	series.events 			= new Object();
+	series.events.legendItemClick 	= function (event) {
+						this.options.selected = !this.visible;
+
+						this.linkedSeries[0].options.selected = !this.visible;
+
+
+						this.setVisible(!this.visible, false);
+
+						this.linkedSeries[0].setVisible($(data_select_id).is(':checked') && this.visible, false);
+
+
+						this.chart.redraw();
+						return false;
+                    			}
+	return series;
+}
+
+
+function setTypeVisible(htmlId, type, visible, showdata){
+
+	var chart = $(htmlId).highcharts();
+	var series = chart.series;
+	for(var i=0; i<series.length; i++){
+		if(series[i].options.grp == type && series[i].options.selected){
+			if(series[i].options.type == 'scatter')
+				series[i].setVisible(showdata && visible, false);
+			else
+				series[i].setVisible(visible, false);
+
+		}// if group matches
+	}// for
+	chart.redraw();
+}
+
+function setScatterVisible(htmlId, visible){
+	var chart = $(htmlId).highcharts();
+	var series = chart.series;
+	for(var i=0; i<series.length; i++){
+		if(series[i].options.type == 'scatter'){
+			var linkedto = chart.get(series[i].options.linkedTo);
+			series[i].setVisible((visible && linkedto.visible), false);
+		}// if group matches
+	}// for
+	chart.redraw();
 }
