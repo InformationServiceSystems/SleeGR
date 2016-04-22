@@ -58,6 +58,22 @@ def sign():
         return jsonify(success=True)
     return jsonify(success=False, error_in='request', error_msg='No post request sent')
 
+
+@app.route('/registration', methods=['POST'])
+def registration():
+    if request.method == 'POST':
+        email = request.values['email']
+        password = request.values['password']
+        if db_extended.password_matches_email(email, password):
+            session['email'] = email
+            if 'next' in session:
+                next = session.get('next')
+                session.pop('next')
+                return redirect(next)
+            return redirect(url_for("dashboard"))
+    return app.send_static_file('iot-register.html')
+
+
 @app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
 def show_measurement(measurement_type, user_id, start_date, end_date):
     r = csvReader()
