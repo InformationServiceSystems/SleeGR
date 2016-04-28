@@ -19,7 +19,7 @@ def check_user(f):
         if not password:
             raise InputError('Password', error_messages[3])
         if first_name:
-            if not first_name.isalpha():
+            if not all(x.isalpha() or x.isspace() for x in first_name):
                 raise InputError(first_name, error_messages[4])
         if last_name:
             if not last_name.isalpha():

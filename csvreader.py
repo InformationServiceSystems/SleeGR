@@ -109,8 +109,9 @@ class csvReader:
             datapoints = []
             counter = 0
             for measurement in tpl_lst:
-                #if counter % 10 < 0:
-                #     continue
+                counter += 1
+                if counter % 10 != 0:
+                     continue
                 datapoints.append({'x': measurement[0],
                                    'y':measurement[1]})
             new_json['data_points'] = datapoints

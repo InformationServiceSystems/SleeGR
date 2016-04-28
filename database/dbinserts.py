@@ -49,3 +49,5 @@ class DbInserts:
         else:
             return None
 
+    def insert_fitness(self, user, json):
+        self.db_base._db[user].insert_one(json)

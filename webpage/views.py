@@ -59,22 +59,35 @@ def sign():
     return jsonify(success=False, error_in='request', error_msg='No post request sent')
 
 
-@app.route('/registration', methods=['POST'])
+@app.route('/registration', methods=['POST', 'GET'])
 def registration():
     if request.method == 'POST':
         email = request.values['email']
         password = request.values['password']
-        if db_extended.password_matches_email(email, password):
-            session['email'] = email
-            if 'next' in session:
-                next = session.get('next')
-                session.pop('next')
-                return redirect(next)
-            return redirect(url_for("dashboard"))
+        fullname = request.values['name']
+        import re
+        name_list = re.split(' ', fullname)
+        firstname = ''
+        lastname = ''
+        if len(name_list) == 0:
+            lastname = None
+            firstname = None
+        elif len(name_list) == 1:
+            firstname = None
+            lastname = name_list[1]
+        else:
+            lastname = name_list[-1]
+            del(name_list[-1])
+            firstname = ''
+            firstname = ' '.join(name_list)
+        new_user = User(email, password, first_name=firstname, last_name=lastname)
+        db_inserts.insert_user(new_user)
+        return redirect(url_for("login"))
     return app.send_static_file('iot-register.html')
 
 
 @app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
+@login_required
 def show_measurement(measurement_type, user_id, start_date, end_date):
     r = csvReader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
@@ -85,14 +98,15 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
         return json.dumps(r.read_data(user_id, start, end, measurement_type))
 
 @app.route('/dashboard')
-#@login_required
+@login_required
 def dashboard():
     return render_template('iot-triathlon-activity.html')
 
 
 @app.route('/sleepPoints/<user_id>/<start_date>/<end_date>')
+@login_required
 def sleep_data(user_id, start_date, end_date):
-    user_id = "test@test.com"
+    user_id = session['email']
     r = csvReader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -101,8 +115,9 @@ def sleep_data(user_id, start_date, end_date):
 
 
 @app.route('/gaussianPoints/<user_id>/<start_date>/<end_date>')
+@login_required
 def gaussianPoints(user_id, start_date, end_date):
-    user_id = 'test@test.com'
+    user_id = session['email']
     r = csvReader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -110,8 +125,9 @@ def gaussianPoints(user_id, start_date, end_date):
     return json.dumps(sleep_data)
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
+@login_required
 def sleep_data_gaussian(user_id, start_date, end_date):
-    user_id = 'test@test.com'
+    user_id = session['email']
     r = csvReader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')

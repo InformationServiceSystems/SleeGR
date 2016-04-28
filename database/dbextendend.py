@@ -31,3 +31,6 @@ class DbExtended:
         if self.db_base._general_users_collection.find_one({names.email: email}) is not None:
             return True
         return False
+
+    def find_fitness_value(self, user, measurement_type, date):
+        self.db_base._db[user].find_one()
