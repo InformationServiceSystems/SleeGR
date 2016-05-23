@@ -49,5 +49,15 @@ class DbInserts:
         else:
             return None
 
+    def insert_heart_rate_data(self, json):
+        self.db_base._db['heart_rate'].insert_one(json)
+
+    def insert_sleep_data(self, json):
+        self.db_base._db['sleep_data'].insert_one(json)
+
+    def inser_fitness_data(self, measurement_type, json):
+        self.db_base._db[str(measurement_type)].insert_one(json)
+
+
     def insert_fitness(self, user, json):
         self.db_base._db[user].insert_one(json)

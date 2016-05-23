@@ -7,7 +7,7 @@ Created on Nov 9, 2015
 import csv
 import collections
 from datetime import timedelta,datetime
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 from math import sqrt
 
 def SensorDataToCSV(records, fname):

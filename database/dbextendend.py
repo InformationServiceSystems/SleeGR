@@ -34,3 +34,16 @@ class DbExtended:
 
     def find_fitness_value(self, user, measurement_type, date):
         self.db_base._db[user].find_one()
+
+
+#new
+    def find_heart_rate_data(self, date, user):
+        return self.db_base._db['heart_rate'].find({'date' : date, 'user_id' : user})
+
+    def find_sleep_data(self, date, user):
+        pass
+        #self.db_base._db['sleep_data'].insert_one(json)
+
+    def find_fitness_data(self, measurement_type, date, user):
+        pass
+        #self.db_base._db[str(measurement_type)].insert_one(json)

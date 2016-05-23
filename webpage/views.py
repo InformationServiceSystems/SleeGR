@@ -78,7 +78,6 @@ def registration():
         else:
             lastname = name_list[-1]
             del(name_list[-1])
-            firstname = ''
             firstname = ' '.join(name_list)
         new_user = User(email, password, first_name=firstname, last_name=lastname)
         db_inserts.insert_user(new_user)

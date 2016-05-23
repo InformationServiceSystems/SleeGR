@@ -13,8 +13,8 @@ class csvReader:
         :param date: format: datetime
         :param user_id: int
         '''
-        #self.folder_path = "/home/matthias/Dokumente/UdS/iss/data"
-        self.folder_path = "/root/data"
+        self.folder_path = "/home/matthias/data"
+        #self.folder_path = "/root/data"
 
     def read_data(self, user_id, start_date, end_date, measurement_type):
         ret_json = {}
@@ -31,6 +31,7 @@ class csvReader:
                                   'value_3']
                     csv_reader = csv.DictReader(csv_file,
                                                 fieldnames=fieldnames)
+                    #ret_json['user_id'] = user_id
                     for row in csv_reader:
                         if measurement_to_valuenumb[
                             int(row['measurement_type'])] == 1:
@@ -93,7 +94,7 @@ class csvReader:
                                until=end_date):
             tpl_lst = read_hr_data(file_name, day)
             fkt_json = self.read_data(user_id, day, day, '32')
-            if  not tpl_lst:
+            if not tpl_lst:
                 continue
             new_json = {}
             new_json['user_id'] = user_id
