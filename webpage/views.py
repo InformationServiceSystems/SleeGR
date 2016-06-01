@@ -13,6 +13,7 @@ from webpage import app
 import names
 from csvreader import csvReader
 from decorators import login_required
+from csv_2_mongo import csv_2_reader
 
 
 
@@ -74,7 +75,10 @@ def registration():
             firstname = None
         elif len(name_list) == 1:
             firstname = None
-            lastname = name_list[1]
+            if not name_list[0]:
+                lastname = name_list[0]
+            else:
+                lastname = None
         else:
             lastname = name_list[-1]
             del(name_list[-1])
@@ -89,12 +93,15 @@ def registration():
 @login_required
 def show_measurement(measurement_type, user_id, start_date, end_date):
     r = csvReader()
+    rr = csv_2_reader()
+
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
-        return json.dumps(r.heart_rate_sepecial(user_id, start, end))
+        return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
     else:
-        return json.dumps(r.read_data(user_id, start, end, measurement_type))
+        return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
+
 
 @app.route('/dashboard')
 @login_required
@@ -107,9 +114,11 @@ def dashboard():
 def sleep_data(user_id, start_date, end_date):
     user_id = session['email']
     r = csvReader()
+    rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
     return ret
 
 
@@ -118,19 +127,23 @@ def sleep_data(user_id, start_date, end_date):
 def gaussianPoints(user_id, start_date, end_date):
     user_id = session['email']
     r = csvReader()
+    rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    sleep_data = r.ReadSleepData(user_id, start,end)
-    return json.dumps(sleep_data)
+    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
+    return ret
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
 @login_required
 def sleep_data_gaussian(user_id, start_date, end_date):
     user_id = session['email']
     r = csvReader()
+    rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    sleep_data = r.ReadSleepData(user_id, start,end)
+    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    sleep_data = (rr.search_data_bulk(user_id, start,end, 777))
     average_list = []
     var_list = []
     for data in sleep_data:

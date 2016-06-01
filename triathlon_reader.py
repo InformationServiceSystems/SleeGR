@@ -7,8 +7,9 @@ Created on Nov 9, 2015
 import csv
 import collections
 from datetime import timedelta,datetime
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from math import sqrt
+import functools
 
 def SensorDataToCSV(records, fname):
     with open(fname, 'w') as csvfile:
@@ -104,9 +105,9 @@ class CSVTriathlonReader:
         # select only records longer than 2 h, less than 16h
         targets = [ item for item in self.sleepRawData if item.Length > 2 and item.Length < 16 and item.TimeStamp >= start_date and item.TimeStamp <= end_date ];
         # compute average deep sleep percentage for imputation
-        deep_sleep_avg = reduce(lambda x,y: x + y, [item.DeepSleep for item in targets])
+        deep_sleep_avg = functools.reduce(lambda x,y: x + y, [item.DeepSleep for item in targets])
         deep_sleep_avg /= len(targets)
-        sleep_length_avg = reduce(lambda x,y: x + y, [item.Length for item in targets])
+        sleep_length_avg = functools.reduce(lambda x,y: x + y, [item.Length for item in targets])
         sleep_length_avg /= len(targets)
         # create time series
         
@@ -128,7 +129,7 @@ class CSVTriathlonReader:
             deepSleepDict[(item.TimeStamp-delta).strftime('%Y.%m.%d')] = [item.DeepSleep if item.DeepSleep > 0 else deep_sleep_avg, item.Length]
         
         return deepSleepDict, deep_sleep_avg, sleep_length_avg
-
+    """
     # useful for debugging
     def PlotValues(self,data,sensorType):
         
@@ -144,7 +145,7 @@ class CSVTriathlonReader:
         # Plot the data as a red line with round markers
         graph.plot(x,y,'r-o')
         
-        plt.show()
+        plt.show()"""
 
     def GetDailyIdleHRValues(self, datapath, user, start_date, end_date, impute_missing=True):
         """
@@ -188,7 +189,7 @@ class CSVTriathlonReader:
                 #self.PlotValues(values, 21)
                 #values = values[-len(values)/2:];
                 #self.PlotValues(values, 21)
-                selectedMorning = reduce(lambda x, y: min(x,y), [item.ValX for item in values]);
+                selectedMorning = functools.reduce(lambda x, y: min(x,y), [item.ValX for item in values]);
                 morningValues[day.strftime('%Y.%m.%d')] = selectedMorning;
                 #morningValues[day.strftime('%Y.%m.%d')] = selectedMorning / len(values);
             
@@ -197,7 +198,7 @@ class CSVTriathlonReader:
                 #latestMeasurement = values[-1].TimeStamp;
                 #values = [ item for item in values if item.TimeStamp > latestMeasurement - timedelta(minutes = 3) and item.TimeStamp <= latestMeasurement]
                 #values = values[-len(values)/2:];
-                selectedEvening = reduce(lambda x, y: min(x,y), [item.ValX for item in values]);
+                selectedEvening = functools.reduce(lambda x, y: min(x,y), [item.ValX for item in values]);
                 eveningValues[day.strftime('%Y.%m.%d')] = selectedEvening;
                 #eveningValues[day.strftime('%Y.%m.%d')] = selectedEvening / len(values);
             
@@ -205,8 +206,8 @@ class CSVTriathlonReader:
             eveningStart += timedelta(days=1)
         
         # compute imputation values
-        imp_morning = reduce(lambda x, y: x + y, [item[1] for item in morningValues.items()]) / len(morningValues.items())
-        imp_evening = reduce(lambda x, y: x + y, [item[1] for item in eveningValues.items()]) / len(eveningValues.items())
+        imp_morning = functools.reduce(lambda x, y: x + y, [item[1] for item in morningValues.items()]) / len(morningValues.items())
+        imp_evening = functools.reduce(lambda x, y: x + y, [item[1] for item in eveningValues.items()]) / len(eveningValues.items())
                 
         for day in self.daterange(start_date, end_date):
             if day.strftime('%Y.%m.%d') in morningValues:
@@ -246,7 +247,7 @@ class CSVTriathlonReader:
             # select only records longer than 2 h
             targets = [ item for item in self.sleepRawData if item.Length > 2 and item.Length < 16 ];
             # compute average deep sleep percentage for imputation
-            target_impute = reduce(lambda x,y: x + y, [item.DeepSleep for item in targets])
+            target_impute = functools.reduce(lambda x,y: x + y, [item.DeepSleep for item in targets])
             target_impute /= len(targets)
             # create time series
             
