@@ -1,5 +1,6 @@
 from database.database import DbBase
 import names
+from datetime import datetime
 
 class DbExtended:
     def __init__(self, database):
@@ -38,12 +39,17 @@ class DbExtended:
 
 #new
     def find_heart_rate_data(self, date, user):
-        return self.db_base._db['heart_rate'].find({'date' : date, 'user_id' : user})
+        datum = date.strftime('%d.%m.%Y')
+        return self.db_base._db['heart_rate'].find_one({'user_id': user, 'date': datum})
 
     def find_sleep_data(self, date, user):
-        pass
-        #self.db_base._db['sleep_data'].insert_one(json)
+        datum = date.strftime('%d.%m.%Y')
+        return self.db_base._db['sleep_data'].find_one({'user_id': user, 'date': datum})
 
     def find_fitness_data(self, measurement_type, date, user):
-        pass
-        #self.db_base._db[str(measurement_type)].insert_one(json)
+        datum = date.strftime('%d.%m.%Y')
+        return self.db_base._db[str(measurement_type)].find_one({'user_id': user, 'date': datum,
+                                                          'measurement_type': measurement_type})
+
+
+
