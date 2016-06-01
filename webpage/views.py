@@ -98,9 +98,11 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
-        return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
+        #return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
+        return json.dumps(r.heart_rate_sepecial(user_id, start, end))
     else:
-        return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
+        #return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
+        return json.dumps(r.read_data(user_id, start, end,  measurement_type))
 
 
 @app.route('/dashboard')
@@ -118,8 +120,8 @@ def sleep_data(user_id, start_date, end_date):
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
-    ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
+    ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    #ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
     return ret
 
 
@@ -131,8 +133,8 @@ def gaussianPoints(user_id, start_date, end_date):
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
-    ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
+    ret = json.dumps(r.ReadSleepData(user_id, start,end))
+    #ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
     return ret
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
@@ -143,8 +145,8 @@ def sleep_data_gaussian(user_id, start_date, end_date):
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
-    sleep_data = (rr.search_data_bulk(user_id, start,end, 777))
+    sleep_data = r.ReadSleepData(user_id, start,end)
+    #sleep_data = rr.search_data_bulk(user_id, start,end, 777)
     average_list = []
     var_list = []
     for data in sleep_data:
