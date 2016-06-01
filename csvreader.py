@@ -13,8 +13,8 @@ class csvReader:
         :param date: format: datetime
         :param user_id: int
         '''
-        self.folder_path = "/home/matthias/data"
-        #self.folder_path = "/root/data"
+        #self.folder_path = "/home/matthias/data"
+        self.folder_path = "/root/data"
 
     def read_data(self, user_id, start_date, end_date, measurement_type):
         ret_json = {}
