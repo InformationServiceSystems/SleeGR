@@ -27,17 +27,18 @@
             <h3 class="box-title">Workout Cooldown</h3>
 
             <div class="box-tools pull-right">
+
                 <div class="btn-group">
                     <div>
 
-                        <label for="scattered_from">From</label>
+                        <label for="from">From</label>
                         <input type="text" id="scattered_from" name="from"/>
-                        <label for="scattered_to">To</label>
+                        <label for="to">To</label>
                         <input type="text" id="scattered_to" name="to"/>
 
-                        <input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="chk_type1">Show Type 1</label>
-                        <input type="checkbox" id="chk_type2"  value="son2" checked="true" /> <label for="chk_type2">Show Type 2</label>
-                        <input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="chk_data">Show Data Points</label>
+                        <input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="from">Show Type 1</label>
+                        <input type="checkbox" id="chk_type2"  value="son2" checked="true" /> <label for="from">Show Type 2</label>
+                        <input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="from">Show Data Points</label>
 
 
                     </div>
@@ -51,7 +52,13 @@
             <div id="chartdiv1" style="width:100%; height:500px;"></div>
 
 
+	<div id="dialog" title="First 5 minutes cooldown" style="min-width: 1350px; height: 500px; margin: 0 auto">
+
+	</div>
         </div>
+	<p><a href="#" id="dialog-link" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-newwin"></span>Show first 5 minutes</a></p>
+
+	
     </div>
 
     <!-- /.box-body -->
@@ -76,9 +83,9 @@
 
 
 
-                <label for="heatmap_from">From</label>
+                <label for="from">From</label>
                 <input type="text" id="heatmap_from" name="from"/>
-                <label for="heatmap_to">To</label>
+                <label for="to">To</label>
                 <input type="text" id="heatmap_to" name="to"/>  </br>
 
                 <div id="chartdiv7" style="width:100%; height:500px;"></div>
@@ -134,9 +141,9 @@
                 </div>
             </div>
             <div class="box-body chart-responsive">
-                <label for="gaussian_from">From</label>
+                <label for="from">From</label>
 			    <input type="text" id="gaussian_from" name="from"/>
-			    <label for="gaussian_to">To</label>
+			    <label for="to">To</label>
 			    <input type="text" id="gaussian_to" name="to"/>  </br>
 			    <div id="chartdiv4" style="width:100%; height:500px;" ></div>
 
@@ -162,6 +169,40 @@
 <script src="{{url_for('static', filename= 'jquery-ui.js')}}"></script>
 
   <link rel="stylesheet" href="{{url_for('static', filename= 'jquery-ui.css')}}">
+		<style>
+			#dialog-link {
+				padding: .4em 1em .4em 20px;
+				text-decoration: none;
+				position: relative;
+			}
+			#dialog-link span.ui-icon {
+				margin: 0 5px 0 0;
+				position: absolute;
+				left: .2em;
+				top: 50%;
+				margin-top: -8px;
+			}
+			#icons {
+				margin: 0;
+				padding: 0;
+			}
+			#icons li {
+				margin: 2px;
+				position: relative;
+				padding: 4px 0;
+				cursor: pointer;
+				float: left;
+				list-style: none;
+			}
+			#icons span.ui-icon {
+				float: left;
+				margin: 0 4px;
+			}
+			.fakewindowcontain .ui-widget-overlay {
+				position: absolute;
+			}
+			
+		</style>
     <script type="text/javascript">
        		var multichart_id = '#chartdiv1';
 
@@ -177,6 +218,7 @@
 				// http://46.101.169.112:5000/show_stats/21/test@test.com/1.12.2015/31.03.2016
 				// charts_createMultiChart("http://46.101.214.58:5555", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
 				charts_createMultiChart("http://web01.iss.uni-saarland.de/show_stats/21", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
+				charts_createMultiChart("http://web01.iss.uni-saarland.de/show_stats/21", show_type1, show_type2, show_data, user_id, date_from, date_to, "#dialog", "#chk_data", true);
 
 			}
 			function update_heatmap(){
@@ -300,6 +342,117 @@
 
 
     </script>
+    <script type="text/javascript">
+
+			$( "#accordion" ).accordion();
+
+
+
+			var availableTags = [
+				"ActionScript",
+				"AppleScript",
+				"Asp",
+				"BASIC",
+				"C",
+				"C++",
+				"Clojure",
+				"COBOL",
+				"ColdFusion",
+				"Erlang",
+				"Fortran",
+				"Groovy",
+				"Haskell",
+				"Java",
+				"JavaScript",
+				"Lisp",
+				"Perl",
+				"PHP",
+				"Python",
+				"Ruby",
+				"Scala",
+				"Scheme"
+			];
+			$( "#autocomplete" ).autocomplete({
+				source: availableTags
+			});
+
+
+
+			$( "#button" ).button();
+			$( "#radioset" ).buttonset();
+
+
+
+			$( "#tabs" ).tabs();
+
+
+
+			$( "#dialog" ).dialog({
+				autoOpen: false,
+				width: 1400,
+				height: 750,
+				buttons: [
+					{
+						text: "Ok",
+						click: function() {
+							$( this ).dialog( "close" );
+						}
+					}
+				]
+			});
+
+			// Link to open the dialog
+			$( "#dialog-link" ).click(function( event ) {
+				$( "#dialog" ).dialog( "open" );
+				event.preventDefault();
+			});
+
+
+
+			$( "#datepicker" ).datepicker({
+				inline: true
+			});
+
+
+
+			$( "#slider" ).slider({
+				range: true,
+				values: [ 17, 67 ]
+			});
+
+
+
+			$( "#progressbar" ).progressbar({
+				value: 20
+			});
+
+
+
+			$( "#spinner" ).spinner();
+
+
+
+			$( "#menu" ).menu();
+
+
+
+			$( "#tooltip" ).tooltip();
+
+
+
+			$( "#selectmenu" ).selectmenu();
+
+
+			// Hover states on the static widgets
+			$( "#dialog-link, #icons li" ).hover(
+					function() {
+						$( this ).addClass( "ui-state-hover" );
+					},
+					function() {
+						$( this ).removeClass( "ui-state-hover" );
+					}
+			);
+     </script>
     {% endblock %}
 
     </html>
