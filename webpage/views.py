@@ -106,7 +106,8 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('iot-triathlon-activity.html')
+    print(session['email'])
+    return render_template('iot-triathlon-activity.html', user=session['email'])
 
 
 @app.route('/sleepPoints/<user_id>/<start_date>/<end_date>')
@@ -263,9 +264,9 @@ def sendPost():
 
 
 
-@app.route('/logout')
+@app.route('/signout')
 @login_required
-def logout():
+def signout():
     session.clear()
     return redirect(url_for('login'))
 

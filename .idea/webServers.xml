@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="56e6dcd8-c55b-461d-af65-6becd2300db1" name="strato_iot" url="http://81.169.137.80">
+        <fileTransfer host="81.169.137.80" port="22" rootFolder="/home/matthias" accessType="SFTP" password="df9bdf98df99df9edf9fdf9cdfcbdfd0" username="matthias">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
