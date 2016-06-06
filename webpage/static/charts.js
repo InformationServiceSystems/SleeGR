@@ -304,6 +304,113 @@ function  charts_createHeatmap(rooturl_points, user_id, begin_date, end_date, ht
 }//charts_createHeatmap
 
 
+//##########################################################Only Testing#############################################################################
+/*
+	function name: charts_createLinearCurve
+ */
+
+function charts_getCorrelations(rooturl, show_data, user_id, html_id, picker_id, testJSON){
+	var series = [];
+	var testData = jQuery.parseJSON(testJSON);
+	var title = $(picker_id).val();
+	for (var i = 0; i<testData.length; i++){
+		if(testData[i].title === title){
+			var xLabel = testData[i].xlabel;
+			var ylabel = testData[i].ylabel;
+			series = get_linear_series(testData[i], true, series, 'circle', title);
+
+			draw_linearChart(title, xLabel, ylabel, html_id, series);
+
+			//TODO get data from REST server and format url
+			return;
+		}
+	}
+
+}
+
+function get_linear_series(data, visible, series, point_symbol, title){
+	var point1 = [];
+	point1.push(data.x0);
+	point1.push(data.y0);
+	var point2 = [];
+	point2.push(data.x1);
+	point2.push(data.y1);
+	var color		=  'rgba(0, 0, 0, 1)';
+	var id 			= title;
+	var data_points = data.data;
+
+
+	var series = linearSeriesFactory(point1, point2, color, data_points, point_symbol, id);
+
+	return series;
+	//TODO create line and scatter data an push it to series variable
+}
+
+function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id){
+	var lineData = [];
+	lineData = getTwoDotLinePoints(point1, point2, 0.1);
+	var scatter = createScatterSeries("scatter " + id, color, "scatter", true, id, data_points, point_symbol);
+	var line = createlinearLineSeries(color, "line", id, "line " + id, lineData);
+	var serieses = [];
+	serieses.push(line);
+	serieses.push(scatter);
+	return serieses;
+
+}
+
+function getTwoDotLinePoints(point1, point2, step){
+	var m = (point2[1]-point1[1])/(point2[0]-point1[0]);
+	var n = point1[1] - m*point1[0];
+	var points = [];
+	for (var x = 0; x <= point2[0]; x+= step) {
+		var y =m*x+n;
+		points.push([x, y]);
+	}
+	return points;
+}
+
+function createlinearLineSeries(color, type, id, name, data){
+	var series 			= new Object();
+	series.id			= id;
+	series.type			= type;
+	series.grp			= String(type);
+	series.visible		= true;
+	series.showInLegend = false;
+	series.name			= name;
+	series.data			= data;
+	series.color		= color;
+	return series;
+}
+
+function draw_linearChart(title, xAxis, yAxis, html_id, serieses){
+	$(html_id).highcharts({
+		title: {
+			text: title
+		},
+		xAxis: {
+			title: {
+				text: xAxis
+			}
+		},
+		yAxis: {
+			title: {
+				text: yAxis
+			}
+		},
+		plotOptions: {
+			line: {
+				marker: {
+					enabled: false
+				}
+			}
+		},
+		series: serieses
+	});
+}
+
+//#######################################################################################################################################################################
+
+
 
 
 
@@ -453,8 +560,9 @@ function newRandomColor() {
         color.push((Math.random() * 255).toFixed());
         color.push((Math.random() * 255).toFixed());
         color.push((Math.random() * 255).toFixed());
-        color.push((Math.random()).toFixed(2));
-        var color = 'rgba(' + color.join(',') + ')';
+        //color.push((Math.random()).toFixed(2));
+		color.push(1);
+	var color = 'rgba(' + color.join(',') + ')';
         return color;
 }
 
