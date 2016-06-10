@@ -595,6 +595,9 @@ function draw_chart(serieses, html_id, only_5mins){
 			text: 'Line and Scatter Plot of Cool Down'
 		},
 		xAxis: {
+			title: {
+				text: 'time'
+			},
 			labels: {
 				formatter: function(){
 					if(only_5mins)
@@ -606,6 +609,11 @@ function draw_chart(serieses, html_id, only_5mins){
 			},
 			//tickInterval: 1.5
 		},
+		 yAxis: {
+			 title:{
+				 text: 'heartrate'
+			 }
+		 },
 		plotOptions: {
 			line: {
                 		marker: {
