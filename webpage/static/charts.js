@@ -569,15 +569,14 @@ function newRandomColor() {
 }
 
 
-function charts_createMultiChart(rooturl_points, show_type1, show_type2, show_data, user_id, begin_date, end_date, html_id, data_select_id, only_5mins){
-	var type1_url = format_url(rooturl_points , user_id, begin_date, end_date);
-	var type2_url = format_url(rooturl_points , user_id, begin_date, end_date);
+function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id, begin_date, end_date, html_id, data_select_id, only_5mins){
+	var url = format_url(rooturl_points , user_id, begin_date, end_date);
 	var serieses = [];
 
-	$.ajax({url: type1_url, success: function(result_type1){
-			var points1 = eval(result_type1);
+	$.ajax({url: url, success: function(result){
+			var points1 = eval(result);
 			addSerieses(points1, show_data, 'Type1', true, data_select_id, serieses, 'circle', only_5mins);
-			console.log('data from  %s len: %d', type1_url, points1.length);
+			console.log('data from  %s len: %d', url, points1.length);
 			// the following commented lines are for getting type2 uncomment to get the results
 			//$.ajax({url: type2_url, success: function(result_type2){
 			//    	var points2 = eval(result_type2);
