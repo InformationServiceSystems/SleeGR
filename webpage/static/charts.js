@@ -569,7 +569,7 @@ function newRandomColor() {
 }
 
 
-function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id, begin_date, end_date, html_id, data_select_id, only_5mins){
+function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id, begin_date, end_date, html_id, table_id, data_select_id, only_5mins){
 	var url = format_url(rooturl_points , user_id, begin_date, end_date);
 	var serieses = [];
 
@@ -583,6 +583,7 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 			//	console.log('data from  %s len: %d', type2_url, points2.length);
 			//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
 				draw_chart(serieses, html_id, only_5mins);
+		fadeInHtmlTable(points1, table_id);
  			//}});
         }});
 
@@ -632,25 +633,28 @@ function addSerieses(points, show_data,  type, visible, data_select_id, serieses
 		try{
 
 			var a 		= points[i].a;
-			var b 		= points[i].b;
+			var t 		= points[i].t;
 			var c 		= points[i].c;
-			var dataPoints	= points[i].data_points;
-			var date	= points[i].date;
+			if(!(a==null)&&!(t==null)&&!(c==null)){
+				var dataPoints	= points[i].data_points;
+				var date	= points[i].date;
 
-			var line_data 		= getLineData(a, b, c, max_x, step);
-			var scatter_data 	= getScatterData(dataPoints,  only_5mins);
+				var line_data 		= getLineData(a, t, c, max_x, step);
+				var scatter_data 	= getScatterData(dataPoints,  only_5mins);
 
-			var scatter_name	= 'scatter ' + type + ' ' + date;
-			var line_name		= 'line ' + type + ' ' + date;
-			var color		=  newRandomColor();
+				var scatter_name	= 'scatter ' + type + ' ' + date;
+				var line_name		= 'line ' + type + ' ' + date;
+				var color		=  newRandomColor();
 
-			var id 			= type + '_' + i;
+				var id 			= type + '_' + i;
 
-			var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data);
-			var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol);
+				var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data);
+				var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol);
 
-			serieses.push(lineSeries);
-			serieses.push(scatterSeries);
+				serieses.push(lineSeries);
+				serieses.push(scatterSeries);
+			}
+
 
 		}catch(e){
 			console.error(e);
@@ -658,10 +662,11 @@ function addSerieses(points, show_data,  type, visible, data_select_id, serieses
 
 	}//for
 }
-function getLineData(a, b, c, max_x, step){
+function getLineData(a, t, c, max_x, step){
 	var series_data	= [];
+	var start_HR = 180;
 	for (var x = 0; x <= max_x; x+= step) {
-		var y = Math.exp(-x / a) * b + c;
+		var y = (start_HR-c)*Math.exp(-(x-t)/a) + c;
 		series_data.push([x, y]);
 	}
 	return series_data;
@@ -751,4 +756,41 @@ function setScatterVisible(htmlId, visible){
 		}// if group matches
 	}// for
 	chart.redraw();
+}
+
+function fadeInHtmlTable (points, table_div){
+	if(table_div!=null){
+		var content = "";
+		content+= "<thead>" +
+			"<tr>" +
+			"<th>Date</th>" +
+			"<th>a</th>" +
+			"<th>T</th>" +
+			"<th>c</th>" +
+			"</tr>" +
+			"</thead>" +
+			"<tbody>";
+		if(points.length != 0){
+			try{
+				for (var i = 0; i<points.length; i++){
+					if(!(points[i].a==null)&&!(points[i].t==null)&&!(points[i].c==null)){
+						content+="<tr>";
+						content+="<td>"+points[i].date+"</td>";
+						content+="<td>"+points[i].a+"</td>";
+						content+="<td>"+points[i].t+"</td>";
+						content+="<td>"+points[i].c+"</td>";
+						content+="</tr>";
+					}
+				}
+			}
+			catch(e){
+				console.error(e);
+			}// catch
+
+		}
+		content+="</tbody>";
+		$(table_div).html(content);
+		//document.getElementById(table_div).innerHTML = content;
+	}
+
 }
