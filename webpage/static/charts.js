@@ -7,6 +7,14 @@ var glb_mean 		= 0;
 var glb_dev  		= 0;
 var glb_usedate 	= true;
 var enable_logging 	= false;
+var weekday = new Array(7);
+weekday[0]=  "Sunday";
+weekday[1] = "Monday";
+weekday[2] = "Tuesday";
+weekday[3] = "Wednesday";
+weekday[4] = "Thursday";
+weekday[5] = "Friday";
+weekday[6] = "Saturday";
 /*
 		function name: charts_createRanking
 */
@@ -309,26 +317,23 @@ function  charts_createHeatmap(rooturl_points, user_id, begin_date, end_date, ht
 	function name: charts_createLinearCurve
  */
 
-function charts_getCorrelations(rooturl, show_data, user_id, html_id, picker_id, testJSON){
+function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay, testJSON){
+	var url = encodeURI(rooturl+"/"+user_id+"/"+xLabel+"/"+yLabel+"/"+nextDay);
 	var series = [];
-	var testData = jQuery.parseJSON(testJSON);
-	var title = $(picker_id).val();
-	for (var i = 0; i<testData.length; i++){
-		if(testData[i].title === title){
-			var xLabel = testData[i].xlabel;
-			var ylabel = testData[i].ylabel;
-			series = get_linear_series(testData[i], true, series, 'circle', title);
+	$.ajax({url: url, success: function(result){
+		var points1 = eval(result);
+		console.log(result);
+		series = get_linear_series(points1, true, series, 'circle', title);
+		draw_linearChart(title, xLabel, yLabel, html_id, series);
 
-			draw_linearChart(title, xLabel, ylabel, html_id, series);
+		//TODO get data from REST server and format url
+		return;
 
-			//TODO get data from REST server and format url
-			return;
-		}
-	}
+	}});
 
 }
 
-function get_linear_series(data, visible, series, point_symbol, title){
+function get_linear_series(data, visible, point_symbol, title){
 	var point1 = [];
 	point1.push(data.x0);
 	point1.push(data.y0);
@@ -583,7 +588,7 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 			//	console.log('data from  %s len: %d', type2_url, points2.length);
 			//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
 				draw_chart(serieses, html_id, only_5mins);
-		fadeInHtmlTable(points1, table_id);
+				fadeInHtmlTable(points1, table_id);
  			//}});
         }});
 
@@ -638,17 +643,20 @@ function addSerieses(points, show_data,  type, visible, data_select_id, serieses
 			if(!(a==null)&&!(t==null)&&!(c==null)){
 				var dataPoints	= points[i].data_points;
 				var date	= points[i].date;
+				var tempDate = date.split(".");
+				var dateObj = new Date (tempDate[2],tempDate[1]-1,tempDate[0],0,0,0);
 
 				var line_data 		= getLineData(a, t, c, max_x, step);
 				var scatter_data 	= getScatterData(dataPoints,  only_5mins);
 
-				var scatter_name	= 'scatter ' + type + ' ' + date;
-				var line_name		= 'line ' + type + ' ' + date;
+				var scatter_name	= weekday[dateObj.getDay()] + ' ' + date;
+				var line_name		= weekday[dateObj.getDay()] + ' ' + date;
+				var legend		= 'maximum: ' + line_data[0][1] + ', minimum: ' + line_data[line_data.length-1][1] + ', current: ';
 				var color		=  newRandomColor();
 
 				var id 			= type + '_' + i;
 
-				var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data);
+				var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data, legend);
 				var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol);
 
 				serieses.push(lineSeries);
@@ -666,7 +674,7 @@ function getLineData(a, t, c, max_x, step){
 	var series_data	= [];
 	var start_HR = 180;
 	for (var x = 0; x <= max_x; x+= step) {
-		var y = (start_HR-c)*Math.exp(-(x-t)/a) + c;
+		var y = Math.round(((start_HR-c)*Math.exp(-(x-t)/a) + c)*100)/100;
 		series_data.push([x, y]);
 	}
 	return series_data;
@@ -701,7 +709,9 @@ function createScatterSeries(name, color, type, visible, linkedId, data, point_s
 	return series;
 
 }
-function createLineSeries(color, type, visible, data_select_id, id, name, data){
+function createLineSeries(color, type, visible, data_select_id, id, name, data, legend){
+	var tooltip = new Object();
+	tooltip.valuePrefix = legend;
 	var series 			= new Object();
 	series.id			= id;
 	series.type			= 'line';
@@ -711,6 +721,7 @@ function createLineSeries(color, type, visible, data_select_id, id, name, data){
 	series.name			= name;
 	series.data			= data;
 	series.color			= color;
+	series.tooltip = tooltip;
 	series.events 			= new Object();
 	series.events.legendItemClick 	= function (event) {
 						this.options.selected = !this.visible;
@@ -776,9 +787,9 @@ function fadeInHtmlTable (points, table_div){
 					if(!(points[i].a==null)&&!(points[i].t==null)&&!(points[i].c==null)){
 						content+="<tr>";
 						content+="<td>"+points[i].date+"</td>";
-						content+="<td>"+points[i].a+"</td>";
-						content+="<td>"+points[i].t+"</td>";
-						content+="<td>"+points[i].c+"</td>";
+						content+="<td>"+Math.round(points[i].a*100)/100+"</td>";
+						content+="<td>"+Math.round(points[i].t*100)/100+"</td>";
+						content+="<td>"+Math.round(points[i].c*100)/100+"</td>";
 						content+="</tr>";
 					}
 				}
