@@ -174,10 +174,10 @@
 					<div class="btn-group">
 						<div>
 
-							<label for="selectmenu">Select Correlation</label>
-							<select id="selectmenu" onchange="update_correlations()">
-
-							</select>
+							<label for="xLabel">From </label>
+							<select id="xLabel" onchange="fillInYlabels()"></select>
+							<label for="yLabel">To </label>
+							<select id="yLabel" onchange="update_correlations()"></select>
 						</div>
 
 					</div>
@@ -281,14 +281,14 @@
 		 */
 		function update_correlations(){
 			var nextDay;
-			var currentTitle = $('#selectmenu').val();
-			var xLabel = currentTitle.split(" -> ")[0];
-			var yLabel = currentTitle.split(" -> ")[1];
+			var xLabel = $('#xLabel').val();
+			var yLabel = $('#yLabel').val();
 			for (var i = 0; i<linearData.length; i++){
 				if (linearData[i].x_label==xLabel&&linearData[i].y_label==yLabel){
 					nextDay=linearData[i].next_day;
 				}
 			}
+			var currentTitle = xLabel + ' -> ' + yLabel;
 			xLabel=xLabel.split(" ").join("_");
 			yLabel=yLabel.split(" ").join("_");
 			charts_getCorrelations("http://81.169.137.80:5000", true, user_id, "#testdiv1", currentTitle, xLabel, yLabel, nextDay, testData);
@@ -406,6 +406,38 @@
 			return titles;
 		}
 
+		function fillInXlabels (){
+			var selection = document.getElementById('xLabel');
+			var temp = "";
+			var xLabels = [];
+			for (var i = 0; i<linearData.length; i++){
+				if (!(contains(xLabels, linearData[i].x_label))){
+					xLabels.push(linearData[i].x_label);
+					temp += "<option>" + linearData[i].x_label + "</option>";
+				}
+			}
+			selection.innerHTML = temp;
+		}
+		function fillInYlabels(){
+			var selection = document.getElementById('yLabel');
+			var currXlabel = $('#xLabel').val();
+			var temp = "";
+			for (var i = 0; i<linearData.length; i++){
+				if (linearData[i].x_label==currXlabel){
+					temp += "<option>" + linearData[i].y_label + "</option>";
+				}
+			}
+			selection.innerHTML = temp;
+			update_correlations();
+		}
+		function contains(a, obj) {
+			for (var i = 0; i < a.length; i++) {
+				if (a[i] == obj) {
+					return true;
+				}
+			}
+			return false;
+		}
 		function fillOptions(){
 			var selection = document.getElementById('selectmenu');
 			var titles = getCorrTitles();
@@ -425,7 +457,9 @@
 			//apply_picker("#heatmap_from", "#heatmap_to", update_heatmap);
 			//apply_picker("#gaussian_from", "#gaussian_to", update_gaussian);
 			linearData = jQuery.parseJSON(correlations);
-			fillOptions();
+			//fillOptions();
+			fillInXlabels();
+			fillInYlabels();
 			set_default_picker();
 
 			//Date range picker
