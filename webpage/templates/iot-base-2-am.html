@@ -62,7 +62,7 @@
 
 
             <!-- Logo -->
-            <a href="../iot-index.html" class="logo">
+            <a href="/dashboard" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
                 <span class="logo-mini"><b>A</b>PG</span>
                 <!-- logo for regular state and mobile devices -->
@@ -110,7 +110,7 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                        <a href="/profile" class="btn btn-default btn-flat">Profile</a>
                                     </div>
                                     <div class="pull-right">
                                         <a href="/signout" class="btn btn-default btn-flat">Sign out</a>
@@ -155,7 +155,7 @@
                         <ul class="treeview-menu">
 
                             {% block servicelinks%}
-                            <li><a href="/profileTriathlon"><i class="fa fa-circle-o"></i> Profile</a></li>
+                            <li><a href="/profile"><i class="fa fa-circle-o"></i> Profile</a></li>
                             <li><a href="/athleteActivitiesTriathlon"><i class="fa fa-circle-o"></i> My activities</a></li>
                             <li><a href="/workout"><i class="fa fa-circle-o"></i> Workout!</a></li>
                             <li><a href="#"><i class="fa fa-circle-o"></i> My calendar</a></li>
@@ -189,6 +189,12 @@
                 {% block maincontent %} {% endblock %}
             </section><!-- /.content -->
         </div><!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0
+            </div>
+            <strong>Copyright &copy; 2016 <a href="http://iss.uni-saarland.de/en/" target="_blank">Information and Service Systems</a>.</strong> All rights reserved.
+        </footer>
 
 
 
