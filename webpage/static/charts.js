@@ -774,9 +774,9 @@ function fadeInHtmlTable (points, table_div){
 		content+= "<thead>" +
 			"<tr>" +
 			"<th>Date</th>" +
-			"<th>a</th>" +
-			"<th>T</th>" +
-			"<th>c</th>" +
+			"<th>a: curveture</th>" +
+			"<th>T: timeshift</th>" +
+			"<th>c: avg HR at rest</th>" +
 			"</tr>" +
 			"</thead>" +
 			"<tbody>";
