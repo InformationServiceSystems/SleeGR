@@ -1,10 +1,12 @@
 from datetime import datetime
 from statistics import mean, variance
+import re
 import math
 
 import os
 from flask import request, redirect, url_for, json, jsonify, session, render_template
 
+from linear_datascience import Comp1D
 
 import database
 from databasemodels.models import User
@@ -15,17 +17,13 @@ from csvreader import csvReader
 from decorators import login_required
 from csv_2_mongo import csv_2_reader
 
-
-
-
-
-
 db_inserts, db_extended = database.init()
 
 
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return 'Under construction'
+
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -43,6 +41,7 @@ def login():
                 return redirect(next)
             return redirect(url_for("dashboard"))
     return app.send_static_file('iot-login.html')
+
 
 @app.route('/sign_rest', methods=['POST'])
 def sign():
@@ -81,7 +80,7 @@ def registration():
                 lastname = None
         else:
             lastname = name_list[-1]
-            del(name_list[-1])
+            del (name_list[-1])
             firstname = ' '.join(name_list)
         new_user = User(email, password, first_name=firstname, last_name=lastname)
         db_inserts.insert_user(new_user)
@@ -98,16 +97,34 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
-        return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
+        # return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
+        return json.dumps(r.heart_rate_sepecial(user_id, start, end))
     else:
-        return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
+        # return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
+        return json.dumps(r.read_data(user_id, start, end, measurement_type))
 
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
     print(session['email'])
-    return render_template('iot-triathlon-activity.html', user=session['email'])
+    to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
+            '{"x_label": "Sleep length", "y_label": "Load", "next_day": false},' \
+            '{"x_label": "Sleep start", "y_label": "Load", "next_day": false},' \
+            '{"x_label": "Sleep end", "y_label": "Load", "next_day": false},' \
+            '{"x_label": "Sleep length", "y_label": "Deep sleep", "next_day": false},' \
+            '{"x_label": "Deep sleep", "y_label": "Load", "next_day": false},' \
+            '{"x_label": "Load", "y_label": "Deep sleep", "next_day": true},' \
+            '{"x_label": "Load", "y_label": "Activity A", "next_day": false},' \
+            '{"x_label": "Load", "y_label": "Activity G", "next_day": false},' \
+            '{"x_label": "RPE", "y_label": "Deep sleep", "next_day": true},' \
+            '{"x_label": "RPE", "y_label": "Load", "next_day": false},' \
+            '{"x_label": "DALDA", "y_label": "Deep sleep", "next_day": true},' \
+            '{"x_label": "Sleep end", "y_label": "RPE", "next_day": false},' \
+            '{"x_label": "Sleep length", "y_label": "RPE", "next_day": false}]'
+    print(to_reply)
+    print(type(to_reply))
+    return render_template('iot-triathlon-activity.html', user=session['email'], correlations_list=to_reply)
 
 
 @app.route('/sleepPoints/<user_id>/<start_date>/<end_date>')
@@ -118,8 +135,8 @@ def sleep_data(user_id, start_date, end_date):
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
-    ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
+    ret = json.dumps(r.ReadSleepData(user_id, start, end))
+    # ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
     return ret
 
 
@@ -131,9 +148,10 @@ def gaussianPoints(user_id, start_date, end_date):
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
-    ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
+    ret = json.dumps(r.ReadSleepData(user_id, start, end))
+    # ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
     return ret
+
 
 @app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
 @login_required
@@ -143,8 +161,8 @@ def sleep_data_gaussian(user_id, start_date, end_date):
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
-    #ret = json.dumps(r.ReadSleepData(user_id, start,end))
-    sleep_data = (rr.search_data_bulk(user_id, start,end, 777))
+    sleep_data = r.ReadSleepData(user_id, start, end)
+    # sleep_data = rr.search_data_bulk(user_id, start,end, 777)
     average_list = []
     var_list = []
     for data in sleep_data:
@@ -153,13 +171,27 @@ def sleep_data_gaussian(user_id, start_date, end_date):
     if len(average_list) > 1 and len(var_list) > 1:
         mean_duration = mean(average_list)
         variance_duration = variance(average_list)
-        return json.dumps([{'user_id':user_id, 'avg':mean_duration, 'std':math.sqrt(variance_duration)}])
+        return json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}])
     else:
-        return json.dumps([{'user_id' : user_id, 'avg': -1000, 'std': 1}])
+        return json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}])
+
+
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('iot-triathlon-profile.html', user=session['email'])
+
+
+@app.route('/correlation/<user_id>/<x_label>/<y_label>/<next_day>')
+def correlations(user_id, x_label, y_label, next_day):
+    cr = csvReader()
+    x_label = re.sub('_', ' ', x_label)
+    y_label = re.sub('_', ' ', y_label)
+    return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
-ALLOWED_EXTENSIONS = set(['bin','dat','csv','txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 """
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -167,7 +199,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
 app.config['CORS_HEADERS'] = 'Content-Type'
 """
-
 
 '''
 #@app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
@@ -187,39 +218,54 @@ def gaussianPoints(user_id, start_date, end_date):
 '''
 
 
-
-
-
 @app.route('/son')
 def typeACurve():
     lst = []
-    lst.append({'user_id':1,'date':'03/14/2016', 'a':0.5 , 'b':1.4, 'c': 3, 'data_points':[{'x':4, 'y':10}, {'x':6, 'y':8}, {'x':11, 'y':13}]})
-    lst.append({'user_id':1,'date':'03/15/2016', 'a':0.7 , 'b':1.2, 'c': 4, 'data_points':[{'x':6, 'y':12}, {'x':7, 'y':7}, {'x':13, 'y':17}]})
-    lst.append({'user_id':1,'date':'03/16/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}, {'x':22, 'y':22},    {'x':30, 'y':5},{'x':33, 'y':8},{'x':56, 'y':10}]})
-    lst.append({'user_id':1,'date':'03/17/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/11/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/12/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/10/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/09/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/08/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/07/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/06/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
-    lst.append({'user_id':1,'date':'03/05/2016', 'a':0.8 , 'b':1.1, 'c': 1, 'data_points':[{'x':3, 'y':3}, {'x':3, 'y':1}, {'x':12, 'y':18}]})
+    lst.append({'user_id': 1, 'date': '03/14/2016', 'a': 0.5, 'b': 1.4, 'c': 3,
+                'data_points': [{'x': 4, 'y': 10}, {'x': 6, 'y': 8}, {'x': 11, 'y': 13}]})
+    lst.append({'user_id': 1, 'date': '03/15/2016', 'a': 0.7, 'b': 1.2, 'c': 4,
+                'data_points': [{'x': 6, 'y': 12}, {'x': 7, 'y': 7}, {'x': 13, 'y': 17}]})
+    lst.append({'user_id': 1, 'date': '03/16/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}, {'x': 22, 'y': 22},
+                                {'x': 30, 'y': 5}, {'x': 33, 'y': 8}, {'x': 56, 'y': 10}]})
+    lst.append({'user_id': 1, 'date': '03/17/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/11/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/12/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/10/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/09/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/08/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/07/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/06/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
+    lst.append({'user_id': 1, 'date': '03/05/2016', 'a': 0.8, 'b': 1.1, 'c': 1,
+                'data_points': [{'x': 3, 'y': 3}, {'x': 3, 'y': 1}, {'x': 12, 'y': 18}]})
     return json.dumps(lst)
+
 
 @app.route('/son2')
 def typeBCurve():
     lst = []
-    lst.append({'user_id':1,'date':'03/14/2016', 'a':0.2 , 'b':1.5, 'c': 3, 'data_points':[{'x':3, 'y':1}, {'x':9, 'y':8}, {'x':19, 'y':2}]})
-    lst.append({'user_id':1,'date':'03/15/2016', 'a':0.1 , 'b':1.3, 'c': 2, 'data_points':[{'x':1, 'y':4}, {'x':8, 'y':7}, {'x':17, 'y':3}]})
-    lst.append({'user_id':1,'date':'03/16/2016', 'a':0.4 , 'b':1.2, 'c': 2, 'data_points':[{'x':2, 'y':3}, {'x':1, 'y':1}, {'x':13, 'y':45}]})
+    lst.append({'user_id': 1, 'date': '03/14/2016', 'a': 0.2, 'b': 1.5, 'c': 3,
+                'data_points': [{'x': 3, 'y': 1}, {'x': 9, 'y': 8}, {'x': 19, 'y': 2}]})
+    lst.append({'user_id': 1, 'date': '03/15/2016', 'a': 0.1, 'b': 1.3, 'c': 2,
+                'data_points': [{'x': 1, 'y': 4}, {'x': 8, 'y': 7}, {'x': 17, 'y': 3}]})
+    lst.append({'user_id': 1, 'date': '03/16/2016', 'a': 0.4, 'b': 1.2, 'c': 2,
+                'data_points': [{'x': 2, 'y': 3}, {'x': 1, 'y': 1}, {'x': 13, 'y': 45}]})
     return json.dumps(lst)
-    #return 'ok'
+    # return 'ok'
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 
 @app.route('/upload2/<user_id>', methods=['GET', 'POST'])
 def upload_file_seperately(user_id):
@@ -232,9 +278,9 @@ def upload_file_seperately(user_id):
         file = request.files['file']
         if file and allowed_file(file.filename):
             pass
-            #filename = secure_filename(file.filename)
-            #file.save(os.path.join(path2save, filename))
-            #return redirect(url_for('uploaded_file',
+            # filename = secure_filename(file.filename)
+            # file.save(os.path.join(path2save, filename))
+            # return redirect(url_for('uploaded_file',
             #                        filename=filename))
     return 'OK'
 
@@ -245,23 +291,22 @@ def upload_file():
         file = request.files['file']
         if file and allowed_file(file.filename):
             pass
-            #filename = '''secure_filename('''file.filename()''')'''
-            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            #return redirect(url_for('uploaded_file',
+            # filename = '''secure_filename('''file.filename()''')'''
+            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # return redirect(url_for('uploaded_file',
             #                        filename=filename))
     return 'OK'
 
 
-@app.route('/realtime',  methods=["GET"])
+@app.route('/realtime', methods=["GET"])
 def getRealtimeHRM():
     hrm = request.args.get('hrm')
     return hrm
 
 
-@app.route('/sendPost',  methods=["POST"])
+@app.route('/sendPost', methods=["POST"])
 def sendPost():
-    return jsonify(request.get_json(force = True))
-
+    return jsonify(request.get_json(force=True))
 
 
 @app.route('/signout')
@@ -274,4 +319,3 @@ def signout():
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5555, threaded=True)
-

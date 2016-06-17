@@ -3,7 +3,6 @@ import names
 
 
 class User:
-
     @decorators.check_user
     def __init__(self, email, password, first_name=None, last_name=None):
         self._email = email

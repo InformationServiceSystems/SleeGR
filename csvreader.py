@@ -1,7 +1,14 @@
 import csv
+import pickle
+import os
+
 from dateutil import rrule
 from datetime import datetime
 
+from linear_datascience import Comp1D
+import json
+import numpy
+import database
 
 from sleegr_reader import read_hr_data
 
@@ -61,7 +68,6 @@ class csvReader:
 
     def ReadSleepData(self, user_id, start_date, end_date):
         filename = ('%s/%s/sleep-export.csv' % (self.folder_path, user_id,))
-        print(filename)
         ret_list = []
         with open(filename, newline='') as csvfile:
             file_reader = csv.reader(csvfile, delimiter=',')
@@ -89,30 +95,29 @@ class csvReader:
     def heart_rate_sepecial(self, user_id, start_date, end_date):
         ret_list = []
         file_name = ('%s/%s/' % (
-                self.folder_path, user_id))
+            self.folder_path, user_id))
+        data_name = ('%s/%s/%s.data' % (self.folder_path, user_id, user_id))
+        data_file = open(data_name, "r+b")
+        data_lst = pickle.load(data_file)
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
-            tpl_lst = read_hr_data(file_name, day)
-            fkt_json = self.read_data(user_id, day, day, '32')
-            if not tpl_lst:
-                continue
             new_json = {}
             new_json['user_id'] = user_id
             new_json['date'] = day.strftime('%d.%m.%Y')
-            #if fkt_json is None:
-            new_json['a'] = 1
-            new_json['b'] = 1
-            new_json['c'] = 1
-            for key in fkt_json:
-                new_json['a'] = float(fkt_json[key]['value']['value_1'])
-                new_json['b'] = float(fkt_json[key]['value']['value_2'])
-                new_json['c'] = float(fkt_json[key]['value']['value_3'])
+            for data in data_lst:
+                if data['date'].date() == day.date():
+                    new_json['a'] = data['A']
+                    new_json['t'] = data['T']
+                    new_json['c'] = data['C']
+            tpl_lst = read_hr_data(file_name, day)
+            if not tpl_lst:
+                continue
             datapoints = []
             counter = 0
             for measurement in tpl_lst:
                 counter += 1
                 if counter % 10 != 0:
-                     continue
+                    continue
                 datapoints.append({'x': measurement[0],
                                    'y':measurement[1]})
             new_json['data_points'] = datapoints
@@ -120,6 +125,54 @@ class csvReader:
                 pass
             else:
                 ret_list.append(new_json)
+        return ret_list
+
+    def read_correlation_data(self, user_id, x_label, y_label, next_day):
+        data_name = ('%s/%s/%s.data' % (self.folder_path, user_id, user_id))
+
+        data = pickle.load(open(data_name, "r+b"))
+
+        to_reply = (x_label, y_label, next_day)
+        reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
+        for key, val in reply.items():
+            if type(val) == numpy.float64:
+                reply[key] = float(val)
+                print(type(reply[key]))
+            elif type(val) == list:
+                pass
+            elif type(val) == numpy.int64:
+                reply[key] = int(val)
+
+
+    # ... convert to json and send reply to the client page
+
+        return reply
+
+    def to_mongo(self, user_id):
+        db_inserts, db_extended = database.init()
+        lst = self.to_json(user_id)
+        for json in lst:
+            db_inserts.insert_csv_row(user_id, json)
+
+
+    def to_json(self, user_id):
+        ret_list = []
+        folder = ('%s/%s' % (self.folder_path,user_id))
+        print(folder, os.listdir(folder))
+        for file_name in os.listdir(folder):
+            try:
+                with open(os.path.join(folder, file_name), newline='') as csv_file:
+                    fieldnames = ['UserID', 'measurement_type', 'time_stamp',
+                                      'Type_of_activity', 'value_1', 'value_2',
+                                      'value_3']
+                    csv_reader = csv.DictReader(csv_file, fieldnames=fieldnames)
+                    for row in csv_reader:
+                        new_json = {'UserID': row['UserID'], 'measurement_type': row['measurement_type'],
+                                    'time_stamp': row['time_stamp'],'Type_of_activity': row['Type_of_activity'],
+                                    'value_1': row['value_1'], 'value_2': row['value_1'],'value_3': row['value_3']}
+                        ret_list.append(new_json)
+            except:
+                print('messed up', file_name)
         return ret_list
 
 
@@ -142,7 +195,5 @@ measurement_to_valuenumb = {
 
 if __name__ == '__main__':
     s = csvReader()
-    e = s.heart_rate_sepecial('test@test.com', datetime(2016, 1, 1),
-                              datetime(2016, 3, 31))
-    for ee in e:
-        print(ee)
+    s.to_mongo('test@test.com')
+
