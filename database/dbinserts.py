@@ -61,3 +61,7 @@ class DbInserts:
 
     def insert_fitness(self, user, json):
         self.db_base._db[user].insert_one(json)
+
+    # newer
+    def insert_csv_row(self, user, json):
+        self.db_base._db[user].insert_one(json)

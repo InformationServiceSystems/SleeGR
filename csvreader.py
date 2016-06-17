@@ -1,5 +1,6 @@
 import csv
 import pickle
+import os
 
 from dateutil import rrule
 from datetime import datetime
@@ -7,6 +8,7 @@ from datetime import datetime
 from linear_datascience import Comp1D
 import json
 import numpy
+import database
 
 from sleegr_reader import read_hr_data
 
@@ -66,7 +68,6 @@ class csvReader:
 
     def ReadSleepData(self, user_id, start_date, end_date):
         filename = ('%s/%s/sleep-export.csv' % (self.folder_path, user_id,))
-        print(filename)
         ret_list = []
         with open(filename, newline='') as csvfile:
             file_reader = csv.reader(csvfile, delimiter=',')
@@ -96,7 +97,6 @@ class csvReader:
         file_name = ('%s/%s/' % (
             self.folder_path, user_id))
         data_name = ('%s/%s/%s.data' % (self.folder_path, user_id, user_id))
-        print(data_name)
         data_file = open(data_name, "r+b")
         data_lst = pickle.load(data_file)
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
@@ -105,13 +105,10 @@ class csvReader:
             new_json['user_id'] = user_id
             new_json['date'] = day.strftime('%d.%m.%Y')
             for data in data_lst:
-                print(data['date'].date())
-                print(day.date())
                 if data['date'].date() == day.date():
                     new_json['a'] = data['A']
                     new_json['t'] = data['T']
                     new_json['c'] = data['C']
-            print("ready")
             tpl_lst = read_hr_data(file_name, day)
             if not tpl_lst:
                 continue
@@ -137,9 +134,6 @@ class csvReader:
 
         to_reply = (x_label, y_label, next_day)
         reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
-        print(reply)
-        print(type(reply))
-
         for key, val in reply.items():
             if type(val) == numpy.float64:
                 reply[key] = float(val)
@@ -148,18 +142,38 @@ class csvReader:
                 pass
             elif type(val) == numpy.int64:
                 reply[key] = int(val)
-        for key, val in reply.items():
-            if type(val) == list:
-                for item in val:
-                    print('in list')
-                    for itemitem in item:
-                        print(type(itemitem), itemitem)
-            print(key, ':', val)
-            print(type(key), ':', type(val))
+
 
     # ... convert to json and send reply to the client page
 
         return reply
+
+    def to_mongo(self, user_id):
+        db_inserts, db_extended = database.init()
+        lst = self.to_json(user_id)
+        for json in lst:
+            db_inserts.insert_csv_row(user_id, json)
+
+
+    def to_json(self, user_id):
+        ret_list = []
+        folder = ('%s/%s' % (self.folder_path,user_id))
+        print(folder, os.listdir(folder))
+        for file_name in os.listdir(folder):
+            try:
+                with open(os.path.join(folder, file_name), newline='') as csv_file:
+                    fieldnames = ['UserID', 'measurement_type', 'time_stamp',
+                                      'Type_of_activity', 'value_1', 'value_2',
+                                      'value_3']
+                    csv_reader = csv.DictReader(csv_file, fieldnames=fieldnames)
+                    for row in csv_reader:
+                        new_json = {'UserID': row['UserID'], 'measurement_type': row['measurement_type'],
+                                    'time_stamp': row['time_stamp'],'Type_of_activity': row['Type_of_activity'],
+                                    'value_1': row['value_1'], 'value_2': row['value_1'],'value_3': row['value_3']}
+                        ret_list.append(new_json)
+            except:
+                print('messed up', file_name)
+        return ret_list
 
 
 
@@ -181,7 +195,5 @@ measurement_to_valuenumb = {
 
 if __name__ == '__main__':
     s = csvReader()
-    e = s.heart_rate_sepecial('test@test.com', datetime(2016, 1, 1),
-                              datetime(2016, 3, 31))
-    for ee in e:
-        print(ee)
+    s.to_mongo('test@test.com')
+

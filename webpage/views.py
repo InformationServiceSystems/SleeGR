@@ -185,10 +185,8 @@ def profile():
 @app.route('/correlation/<user_id>/<x_label>/<y_label>/<next_day>')
 def correlations(user_id, x_label, y_label, next_day):
     cr = csvReader()
-    print('Heu')
     x_label = re.sub('_', ' ', x_label)
     y_label = re.sub('_', ' ', y_label)
-    print(x_label, y_label)
     return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))
 
 
