@@ -4,156 +4,198 @@
 {% endblock %}
 
 
-
-
 {% block sidemenu %} {{super() }} {% endblock %}
 
 {% block servicelinks %} {{super() }}
 
  {% endblock %}
-{% block maincontent %} 
+{% block maincontent %}
 
     <!-- /.col (LEFT) -->
-    
+
     <!-- /.col (RIGHT) -->
+<section class="content">
+
+	<div class="form-group">
+		<label>Please choose range for visualising data:</label>
+		<div class="input-group">
+			<div class="input-group-addon">
+				<i class="fa fa-calendar"></i>
+			</div>
+			<input type="text" class="form-control pull-right" id="reservation">
+		</div><!-- /.input group -->
+	</div><!-- /.form group -->
 
 
-<div class="row">
+	<div class="row">
+		<!-- Left col -->
+		<div class="col-md-8">
+			<!-- AREA CHART -->
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Workout Cooldown</h3>
 
-    <!-- AREA CHART -->
-    <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title">Workout Cooldown</h3>
+					<div class="box-tools pull-right">
 
-            <div class="box-tools pull-right">
+						<div class="btn-group">
+							<div>
 
-                <div class="btn-group">
-                    <div>
+								<input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="chk_type1">Show heartrate decay</label>
+								<input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="chk_data">Show Data Points</label>
+								<button type="button" class="btn btn-info">Choose timerange</button>
+								<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+									<span class="sr-only">Toggle Dropdown</span>
+								</button>
+								<ul class="dropdown-menu" role="menu">
+									<li><a onclick="update_mutlichart(true)" href="#">First 5 minutes</a></li>
+									<li><a onclick="update_mutlichart()" href="#">Whole range</a></li>
+								</ul>
 
-                        <label for="scattered_from">From</label>
-                        <input type="text" id="scattered_from" name="from"/>
-                        <label for="scattered_to">To</label>
-                        <input type="text" id="scattered_to" name="to"/>
+							</div>
 
-                        <input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="chk_type1">Show Type 1</label>
-                        <input type="checkbox" id="chk_type2"  value="son2" checked="true" /> <label for="chk_type2">Show Type 2</label>
-                        <input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="chk_data">Show Data Points</label>
+						</div>
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fa fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body chart-responsive">
 
+					<div id="chartdiv1" style="width:100%; height:500px;"></div>
 
-                    </div>
-
-                </div>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-            </div>
-        </div>
-        <div class="box-body chart-responsive">
-
-            <div id="chartdiv1" style="width:100%; height:500px;"></div>
-
-			<p><a href="#" id="dialog-link" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-newwin"></span>Show first 5 minutes</a></p>
-
-			<div id="dialog" title="First 5 minutes cooldown" style="min-width: 1350px; height: 500px; margin: 0 auto">
+				</div>
 
 			</div>
-        </div>
+		</div>
 
-	
-    </div>
+		<div class="col-md-4">
+				<div class="col-xs-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title">Curve Parameters</h3>
+							</br>
+							<p>Formula: (HRR<sub>~80%</sub>-c) &sdot; e<sup>(-(x-T)/a)</sup>+ c </p>
+						</div><!-- /.box-header -->
+						<div class="box-body">
+							<table id="tablediv" class="table table-bordered table-hover">
 
-    <!-- /.box-body -->
+							</table>
+						</div><!-- /.box-body -->
+					</div><!-- /.box -->
+				</div>
+		</div>
+
+
+
+		<!-- /.box-body -->
     </div>
 
 
     <div class="row">
+		<div class="col-md-6">
 
-        <!-- AREA CHART -->
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Sleep/Deep Sleep Distribution</h3>
+			<!-- AREA CHART -->
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Sleep/Deep Sleep Distribution</h3>
 
-                <div class="box-tools pull-right">
-                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                </div>
-            </div>
-            <div class="box-body chart-responsive">
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fa fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body chart-responsive">
 
+					<div id="chartdiv7" style="width:100%; height:500px;"></div>
 
-
-                <label for="heatmap_from">From</label>
-                <input type="text" id="heatmap_from" name="from"/>
-                <label for="heatmap_to">To</label>
-                <input type="text" id="heatmap_to" name="to"/>  </br>
-
-                <div id="chartdiv7" style="width:100%; height:500px;"></div>
-
-            </div>
-        </div>
-        <!-- /.box-body -->
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</div>
 
 
+		<div class="col-md-6">
+			<!-- AREA CHART -->
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Sleeping Hours with Deep Sleep</h3>
 
-    </div>
+					<div class="box-tools pull-right">
+						<div class="btn-group">
+							<button type="button" class="btn btn-info">Compare</button>
+							<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+								<span class="caret"></span>
+								<span class="sr-only">Toggle Dropdown</span>
+							</button>
+							<ul class="dropdown-menu" role="menu">
+								<li><a onclick="jsfunction()" href="#">Athlete 1</a></li>
+								<li><a href="#">Athlete 2</a></li>
+								<li><a href="#">Athlete 3</a></li>
+								<li><a href="#">Athlete 4</a></li>
+								<li><a href="#">Athlete 5</a></li>
 
-
-
-
-
-
-
-
-
-    <div class="row">
-
-        <!-- AREA CHART -->
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Sleeping Hours with Deep Sleep</h3>
-
-                <div class="box-tools pull-right">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-info">Compare</button>
-                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            <span class="caret"></span>
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a onclick="jsfunction()" href="#">Athlete 1</a></li>
-                            <li><a href="#">Athlete 2</a></li>
-                            <li><a href="#">Athlete 3</a></li>
-                            <li><a href="#">Athlete 4</a></li>
-                            <li><a href="#">Athlete 5</a></li>
-
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                        </ul>
+								<li class="divider"></li>
+								<li><a href="#">Separated link</a></li>
+							</ul>
 
 
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
+							<button type="button" class="btn btn-box-tool" data-widget="collapse">
+								<i class="fa fa-minus"></i>
+							</button>
 
-                    </div>
-                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                </div>
-            </div>
-            <div class="box-body chart-responsive">
-                <label for="gaussian_from">From</label>
-			    <input type="text" id="gaussian_from" name="from"/>
-			    <label for="gaussian_to">To</label>
-			    <input type="text" id="gaussian_to" name="to"/>  </br>
-			    <div id="chartdiv4" style="width:100%; height:500px;" ></div>
+						</div>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body chart-responsive">
+					<div id="chartdiv4" style="width:100%; height:500px;" ></div>
 
 
-            </div>
-        </div>
-        <!-- /.box-body -->
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</div>
 
 
 
     </div>
+
+	<div class="row">
+		<!-- AREA CHART -->
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Correlations</h3>
+				<div class="box-tools pull-right">
+
+					<div class="btn-group">
+						<div>
+
+							<label for="xLabel">From </label>
+							<select id="xLabel" onchange="fillInYlabels()"></select>
+							<label for="yLabel">To </label>
+							<select id="yLabel" onchange="update_correlations()"></select>
+						</div>
+
+					</div>
+
+			</div>
+			<div class="box-body chart-responsive">
+
+				<div id="testdiv1" style="width:100%; height:500px;"></div>
+
+			</div>
+
+
+		</div>
+
+		<!-- /.box-body -->
+		</div>
+	</div>
+</section> <!-- content section -->
     {% endblock %}
 
     {% block JS %} {{super() }}
@@ -162,132 +204,285 @@
 
 
 
-     <script type="text/javascript" src="http://momentjs.com/downloads/moment.js"></script>
-     <script src="https://code.highcharts.com/highcharts.js"></script>
+	<script type="text/javascript" src="http://momentjs.com/downloads/moment.js"></script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="{{url_for('static', filename= 'jquery-ui.js')}}"></script>
+	<script src="{{url_for('static', filename= 'jquery-ui.js')}}"></script>
+	<!-- date-range-picker -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+	<script src="../static/plugins/daterangepicker/daterangepicker.js"></script>
 
-  <link rel="stylesheet" href="{{url_for('static', filename= 'jquery-ui.css')}}">
-		<style>
-			#dialog-link {
-				padding: .4em 1em .4em 20px;
-				text-decoration: none;
-				position: relative;
-			}
-			#dialog-link span.ui-icon {
-				margin: 0 5px 0 0;
-				position: absolute;
-				left: .2em;
-				top: 50%;
-				margin-top: -8px;
-			}
-			#icons {
-				margin: 0;
-				padding: 0;
-			}
-			#icons li {
-				margin: 2px;
-				position: relative;
-				padding: 4px 0;
-				cursor: pointer;
-				float: left;
-				list-style: none;
-			}
-			#icons span.ui-icon {
-				float: left;
-				margin: 0 4px;
-			}
-			.fakewindowcontain .ui-widget-overlay {
-				position: absolute;
-			}
-			
-		</style>
+  	<link rel="stylesheet" href="{{url_for('static', filename= 'jquery-ui.css')}}">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../static/plugins/daterangepicker/daterangepicker-bs3.css">
+	<!-- Ionicons -->
+	<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../static/plugins/datatables/dataTables.bootstrap.css">
+
+	<!-- DataTables -->
+	<script src="../static/plugins/datatables/jquery.dataTables.min.js"></script>
+	<script src="../static/plugins/datatables/dataTables.bootstrap.min.js"></script>
+	<!-- SlimScroll -->
+	<script src="../static/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+	<!-- FastClick -->
+	<script src="../static/plugins/fastclick/fastclick.min.js"></script>
+	<style>
+		#dialog-link {
+			padding: .4em 1em .4em 20px;
+			text-decoration: none;
+			position: relative;
+		}
+		#dialog-link span.ui-icon {
+			margin: 0 5px 0 0;
+			position: absolute;
+			left: .2em;
+			top: 50%;
+			margin-top: -8px;
+		}
+		#icons {
+			margin: 0;
+			padding: 0;
+		}
+		#icons li {
+			margin: 2px;
+			position: relative;
+			padding: 4px 0;
+			cursor: pointer;
+			float: left;
+			list-style: none;
+		}
+		#icons span.ui-icon {
+			float: left;
+			margin: 0 4px;
+		}
+		.fakewindowcontain .ui-widget-overlay {
+			position: absolute;
+		}
+
+	</style>
     <script type="text/javascript">
-       		var multichart_id = '#chartdiv1';
 
+		/**
+		 * global fields
+		 */
+		var multichart_id = '#chartdiv1';
+		var testData = '[{"title": "Day of week -> Sleep length", "xlabel": "Day of week", "ylabel": "Sleep length", "y1": 8.195692243017147, "y0": 7.0633372614537233, "x0": 0, "x1": 6, "data": [[4.0, 7.09], [3.0, 7.86], [2.0, 7.37], [1.0, 7.2], [4.0, 6.98], [5.0, 8.54], [4.0, 7.6], [3.0, 7.94], [2.0, 7.52], [0.0, 8.78], [6.0, 8.72], [3.0, 7.56], [0.0, 7.5], [6.0, 9.47], [3.0, 6.77], [2.0, 6.74], [3.0, 7.55], [2.0, 7.5], [1.0, 7.38], [0.0, 7.99], [2.0, 7.04], [1.0, 7.59], [0.0, 7.25], [6.0, 7.95], [4.0, 7.06], [2.0, 7.6], [0.0, 7.49], [4.0, 7.44], [3.0, 7.46], [2.0, 6.93], [4.0, 6.89], [1.0, 7.54], [6.0, 9.42], [5.0, 8.67], [1.0, 6.91], [6.0, 10.98], [4.0, 6.56], [2.0, 7.37], [1.0, 7.6], [4.0, 6.13], [3.0, 7.57], [2.0, 7.61], [1.0, 7.44], [6.0, 8.85], [3.0, 6.82], [0.0, 7.27], [6.0, 8.22], [3.0, 8.27], [2.0, 7.97], [1.0, 7.78], [3.0, 7.78], [1.0, 7.6], [0.0, 7.27], [2.0, 7.82], [1.0, 5.91], [0.0, 7.06], [6.0, 8.78], [5.0, 7.99], [1.0, 6.5], [0.0, 7.38], [5.0, 7.31], [4.0, 6.37], [1.0, 6.85], [6.0, 8.53], [5.0, 8.27], [4.0, 7.83], [3.0, 7.03], [2.0, 7.44], [1.0, 6.8], [4.0, 6.45], [3.0, 7.76], [2.0, 6.77], [1.0, 6.92], [0.0, 7.85], [6.0, 8.65], [5.0, 7.59], [3.0, 5.56], [2.0, 7.66], [0.0, 7.27], [5.0, 8.81], [0.0, 8.1]]}, {"title": "Sleep length -> Load", "xlabel": "Sleep length", "ylabel": "Load", "y1": 2301.515512496961, "y0": 2846.5834073439746, "x0": 7.2000000000000002, "x1": 8.7799999999999994, "data": [[7.86, 2998.2449689744126], [7.2, 3324.24588945467], [7.94, 2713.751016023301], [8.78, 2215.7345571117144], [7.38, 1655.826153239107], [7.59, 1502.8664838265015], [7.49, 3181.115949241138], [7.54, 3738.8668683497017]]}, {"title": "Sleep start -> Load", "xlabel": "Sleep start", "ylabel": "Load", "y1": 2977.2841404990809, "y0": 2562.6770058921061, "x0": -1, "x1": 0, "data": [[-1.0, 2998.2449689744126], [-1.0, 3324.24588945467], [-1.0, 2713.751016023301], [0.0, 2215.7345571117144], [-1.0, 1655.826153239107], [-1.0, 1502.8664838265015], [-1.0, 3181.115949241138], [0.0, 3738.8668683497017]]}, {"title": "Sleep end -> Load", "xlabel": "Sleep end", "ylabel": "Load", "y1": 2215.7142047320117, "y0": 2730.7068637712805, "x0": 7, "x1": 9, "data": [[7.0, 2998.2449689744126], [7.0, 3324.24588945467], [7.0, 2713.751016023301], [9.0, 2215.7345571117144], [7.0, 1655.826153239107], [7.0, 1502.8664838265015], [7.0, 3181.115949241138], [7.0, 3738.8668683497017]]}, {"title": "Sleep length -> Deep sleep", "xlabel": "Sleep length", "ylabel": "Deep sleep", "y1": 0.47644312443833337, "y0": 0.40002341090162541, "x0": 5.5599999999999996, "x1": 10.98, "data": [[7.09, 0.3764706], [7.86, 0.5185185], [7.37, 0.36363637], [7.2, 0.40697673], [6.98, 0.47619048], [8.54, 0.47126436], [7.6, 0.36082473], [7.94, 0.4691358], [7.52, 0.36458334], [8.78, 0.7979798], [8.72, 0.53608245], [7.56, 0.41237113], [7.5, 0.46464646], [9.47, 0.44705883], [6.77, 0.4691358], [6.74, 0.4875], [7.55, 0.3298969], [7.5, 0.34375], [7.38, 0.4090909], [7.99, 0.37804878], [7.04, 0.4047619], [7.59, 0.45360824], [7.25, 0.45348838], [7.95, 0.5], [7.06, 0.45882353], [7.6, 0.5154639], [7.49, 0.21111111], [7.44, 0.28089887], [7.46, 0.3483146], [6.93, 0.36144578], [6.89, 0.46341464], [7.54, 0.57731956], [9.42, 0.3809524], [8.67, 0.34020618], [6.91, 0.20731707], [10.98, 0.35714287], [6.56, 0.37755102], [7.37, 0.44444445], [7.6, 0.41237113], [6.13, 0.38636363], [7.57, 0.45360824], [7.61, 0.42857143], [7.44, 0.3258427], [8.85, 0.45454547], [6.82, 0.39506173], [7.27, 0.4827586], [8.22, 0.45238096], [8.27, 0.4], [7.97, 0.5121951], [7.78, 0.41414142], [7.78, 0.41414142], [7.6, 0.52577317], [7.27, 0.54022986], [7.82, 0.5125], [5.91, 0.5764706], [7.06, 0.44444445], [8.78, 0.5], [7.99, 0.35365853], [6.5, 0.45360824], [7.38, 0.2840909], [7.31, 0.40229884], [6.37, 0.26373628], [6.85, 0.36585367], [8.53, 0.3908046], [8.27, 0.32941177], [7.83, 0.4625], [7.03, 0.25], [7.44, 0.5050505], [6.8, 0.38271606], [6.45, 0.42708334], [7.76, 0.45679012], [6.77, 0.30864197], [6.92, 0.4698795], [7.85, 0.575], [8.65, 0.57954544], [7.59, 0.44329897], [5.56, 0.56565654], [7.66, 0.47674417], [7.27, 0.37931034], [8.81, 0.4939759], [8.1, 0.43373495]]}, {"title": "Deep sleep -> Load", "xlabel": "Deep sleep", "ylabel": "Load", "y1": 2486.5383859944986, "y0": 2818.857927319501, "x0": 0.21111110999999999, "x1": 0.79797980000000002, "data": [[0.5185185, 2998.2449689744126], [0.40697673, 3324.24588945467], [0.4691358, 2713.751016023301], [0.7979798, 2215.7345571117144], [0.4090909, 1655.826153239107], [0.45360824, 1502.8664838265015], [0.21111111, 3181.115949241138], [0.57731956, 3738.8668683497017]]}, {"title": "Load -> Deep sleep", "xlabel": "Load", "ylabel": "Deep sleep", "y1": 0.45419004946879948, "y0": 0.50897290595717948, "x0": 1502.8664838265015, "x1": 3738.8668683497017, "data": [[2998.2449689744126, 0.5185185], [3324.24588945467, 0.40697673], [2713.751016023301, 0.4691358], [2215.7345571117144, 0.7979798], [1655.826153239107, 0.4090909], [1502.8664838265015, 0.45360824], [3181.115949241138, 0.21111111], [3738.8668683497017, 0.57731956]]}, {"title": "Load -> Activity A", "xlabel": "Load", "ylabel": "Activity A", "y1": 0.52861045513727933, "y0": 0.91540156960475405, "x0": 765.65746282402813, "x1": 4614.1137879091411, "data": [[2998.2449689744126, 0.4454734077547496], [3324.24588945467, 0.25549856643668695], [2819.8704485528688, 0.573942417024659], [2354.5928632115683, 0.29387257359724556], [2516.4793230425157, 1.163597803361168], [2713.751016023301, 0.23842856201839072], [2215.7345571117144, 0.17355212992248045], [1844.8351932503408, 1.130533964979669], [4614.113787909141, 1.013043180870583], [1655.826153239107, 1.370433315370173], [1502.8664838265015, 0.6147079058913655], [2249.8042501934674, 0.7674446536386247], [3181.115949241138, 0.6591961985435896], [765.6574628240281, 0.9672173664820413], [2065.210902967149, 1.1854329136256048], [3738.8668683497017, 0.802351007457145], [4516.426449898133, 0.4840289763882039], [2163.2976084798756, 0.9756484887648446]]}, {"title": "Load -> Activity G", "xlabel": "Load", "ylabel": "Activity G", "y1": 0.043909599573721037, "y0": 0.071840022622674263, "x0": 765.65746282402813, "x1": 4614.1137879091411, "data": [[2998.2449689744126, 0.0006565953104166667], [3324.24588945467, 0.001782858671038252], [2819.8704485528688, 0.014723706333774253], [2354.5928632115683, 0.05910063447411226], [2516.4793230425157, 0.18000798332591117], [2713.751016023301, 0.02384789902068965], [2215.7345571117144, 0.06407463496054423], [1844.8351932503408, 0.11538941165541235], [4614.113787909141, 0.09087291769062693], [1655.826153239107, 0.05643383352514111], [1502.8664838265015, 0.01671940213740718], [2249.8042501934674, 0.10891027613129167], [3181.115949241138, 0.01244283619741602], [765.6574628240281, 0.013639181779965266], [2065.210902967149, 0.09768276396816346], [3738.8668683497017, 0.049114377519451045], [4516.426449898133, 0.017729465684991647], [2163.2976084798756, 0.12716011773902738]]}, {"title": "RPE -> Deep sleep", "xlabel": "RPE", "ylabel": "Deep sleep", "y1": 0.46017766719736347, "y0": 0.3475919586226428, "x0": 2.0, "x1": 6.0, "data": [[6.0, 0.40697673], [3.0, 0.4090909], [3.0, 0.37804878], [4.0, 0.45360824], [3.0, 0.21111111], [4.0, 0.3483146], [4.0, 0.57731956], [2.0, 0.35714287], [4.0, 0.41237113], [5.0, 0.42857143]]}, {"title": "RPE -> Load", "xlabel": "RPE", "ylabel": "Load", "y1": 2928.7260211884577, "y0": 2492.1669584898618, "x0": 3.0, "x1": 6.0, "data": [[6.0, 3324.24588945467], [4.0, 2819.8704485528688], [5.0, 1844.8351932503408], [4.0, 4614.113787909141], [3.0, 1655.826153239107], [4.0, 1502.8664838265015], [4.0, 2249.8042501934674], [3.0, 3181.115949241138], [4.0, 2065.210902967149], [4.0, 3738.8668683497017], [4.0, 2163.2976084798756]]}, {"title": "DALDA -> Deep sleep", "xlabel": "DALDA", "ylabel": "Deep sleep", "y1": 0.4802866744983148, "y0": 0.42173044103165364, "x0": -1.0, "x1": 5.0, "data": [[0.0, 0.5185185], [0.0, 0.36363637], [-0.4, 0.40697673], [0.0, 0.47619048], [0.0, 0.47126436], [0.0, 0.36082473], [1.0, 0.4691358], [0.0, 0.36458334], [0.0, 0.7979798], [1.0, 0.53608245], [-1.0, 0.41237113], [0.0, 0.4691358], [0.0, 0.4875], [0.0, 0.3298969], [0.0, 0.34375], [0.0, 0.4090909], [0.4, 0.37804878], [0.0, 0.4047619], [0.0, 0.45360824], [0.0, 0.45348838], [0.0, 0.5], [0.0, 0.45882353], [-1.0, 0.5154639], [0.0, 0.21111111], [0.0, 0.28089887], [0.4, 0.3483146], [0.0, 0.36144578], [0.0, 0.46341464], [-0.16666666666666666, 0.57731956], [0.0, 0.35714287], [0.0, 0.44444445], [0.8333333333333334, 0.41237113], [1.5833333333333333, 0.42857143], [3.0, 0.41414142], [5.0, 0.52577317]]}, {"title": "Sleep end -> RPE", "xlabel": "Sleep end", "ylabel": "RPE", "y1": 2.7999990251482325, "y0": 4.3000004722771452, "x0": 6, "x1": 9, "data": [[7.0, 6.0], [7.0, 3.0], [6.0, 3.0], [7.0, 4.0], [7.0, 3.0], [7.0, 4.0], [7.0, 4.0], [9.0, 2.0], [6.0, 4.0], [7.0, 5.0]]}, {"title": "Sleep length -> RPE", "xlabel": "Sleep length", "ylabel": "RPE", "y1": 1.8204863444865458, "y0": 4.2373344097955536, "x0": 7.2000000000000002, "x1": 10.98, "data": [[7.2, 6.0], [7.38, 3.0], [7.99, 3.0], [7.59, 4.0], [7.49, 3.0], [7.46, 4.0], [7.54, 4.0], [10.98, 2.0], [7.6, 4.0], [7.61, 5.0]]}]';
+		var correlations = '{{correlations_list|safe}}';
+		var linearData;
+		var date_from;
+		var date_to;
+		var format_date_from;
+		var format_date_to;
+		var user_id	= '{{user}}';
 
-			function update_mutlichart(){
-				var user_id	= '{{ user }}';
-				var date_from 	= $("#scattered_from").val();
-				var date_to 	= $("#scattered_to").val();
-				var show_type1 	= $("#chk_type1").is(':checked');
-				var show_type2 	= $("#chk_type2").is(':checked');
-				var show_data 	= $("#chk_data").is(':checked');
-
-				// http://46.101.169.112:5000/show_stats/21/test@test.com/1.12.2015/31.03.2016
-				// charts_createMultiChart("http://46.101.214.58:5555", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
-				//charts_createMultiChart("http://web01.iss.uni-saarland.de/show_stats/21", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
-				charts_createMultiChart("http://81.169.137.80:5000/show_stats/21", show_type1, show_type2, show_data, user_id, date_from, date_to, "#dialog", "#chk_data", true);
-
+		/**
+		 * update functions
+		 */
+		function update_correlations(){
+			var nextDay;
+			var xLabel = $('#xLabel').val();
+			var yLabel = $('#yLabel').val();
+			for (var i = 0; i<linearData.length; i++){
+				if (linearData[i].x_label==xLabel&&linearData[i].y_label==yLabel){
+					nextDay=linearData[i].next_day;
+				}
 			}
-			function update_heatmap(){
-				var user_id	= '{{user}}';
-				var date_from 	= $("#heatmap_from").val();
-				var date_to 	= $("#heatmap_to").val();
-				//charts_createHeatmap("http://46.101.214.58:5555/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
-				charts_createHeatmap("http://81.169.137.80:5000/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
-			}
-
-			function update_gaussian(){
-				var user_id	= '{{ user }}';
-				var date_from 	= $("#gaussian_from").val();
-				var date_to 	= $("#gaussian_to").val();
-				//charts_createGaussian('http://46.101.214.58:5555/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id,  date_from, date_to , 'chartdiv4');
-				charts_createGaussian('http://81.169.137.80:5000/gaussianPoints', 'http://81.169.137.80:5000/gaussian', user_id,  date_from, date_to , 'chartdiv4');
-			}
-			function apply_picker(from, to, action){
-				$( from ).datepicker({
-					defaultDate: "+1w",
-					changeMonth: true,
-					numberOfMonths: 1,
-					dateFormat: 'dd.mm.yy',
-					onClose: function( selectedDate ) {
-						$( to ).datepicker( "option", "minDate", selectedDate );
-					},
-					onSelect: function(date) {
-						action();
-					}
-				});
-				$( to ).datepicker({
-					defaultDate: "+1w",
-					changeMonth: true,
-					numberOfMonths: 1,
-					dateFormat: 'dd.mm.yy',
-					onClose: function( selectedDate ) {
-						$( from ).datepicker( "option", "maxDate", selectedDate );
-					},
-					onSelect: function(date) {
-						action();
-
-					}
-				});
-				var before =  new Date();
-				var today =  new Date();
-				before.setDate(before.getDate() - 30);
-
-				$(from).datepicker('setDate', before);
-				$(to).datepicker('setDate', today);
-			}//apply_picker
-
-			function select_all(){
-				$('#chk_type1').attr("checked",true);
-				$('#chk_type2').attr("checked",true);
-				$('#chk_data').attr("checked",true);
-			}
-
-			// on ready function
-			$(function() {
-				select_all();
-				apply_picker("#scattered_from", "#scattered_to",  update_mutlichart);
-				apply_picker("#heatmap_from", "#heatmap_to", update_heatmap);
-				apply_picker("#gaussian_from", "#gaussian_to", update_gaussian);
+			var currentTitle = xLabel + ' -> ' + yLabel;
+			xLabel=xLabel.split(" ").join("_");
+			yLabel=yLabel.split(" ").join("_");
+			charts_getCorrelations("http://81.169.137.80:5000/correlation", true, user_id, "#testdiv1", currentTitle, xLabel, yLabel, nextDay, testData);
+		}
 
 
+		function update_mutlichart(only5min){
+			var show_type1 	= $("#chk_type1").is(':checked');
+			var show_data 	= $("#chk_data").is(':checked');
 
+			// http://46.101.169.112:5000/show_stats/21/test@test.com/1.12.2015/31.03.2016
+			// charts_createMultiChart("http://46.101.214.58:5555", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
 
-				update_mutlichart();
+			charts_createMultiChart("http://81.169.137.80:5000/show_stats/21", show_type1, show_data, user_id, date_from, date_to, multichart_id, '#tablediv', "#chk_data", only5min);
+			//charts_createMultiChart("http://81.169.137.80:5000/show_stats/21", show_type1, show_data, user_id, date_from, date_to, "#dialog", null, "#chk_data", true);
+		}
+		function update_heatmap(){
+			//var date_from 	= $("#heatmap_from").val();
+			//var date_to 	= $("#heatmap_to").val();
+			//charts_createHeatmap("http://46.101.214.58:5555/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
+
+			charts_createHeatmap("http://81.169.137.80:5000/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
+		}
+
+		function update_gaussian(){
+			//var date_from 	= $("#gaussian_from").val();
+			//var date_to 	= $("#gaussian_to").val();
+			//charts_createGaussian('http://46.101.214.58:5555/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id,  date_from, date_to , 'chartdiv4');
+
+			charts_createGaussian('http://81.169.137.80:5000/gaussianPoints', 'http://81.169.137.80:5000/gaussian', user_id,  date_from, date_to , 'chartdiv4');
+		}
+
+		function update_data(){
+			if (date_from !== null && date_to != null){
+				update_mutlichart(true);
 				update_heatmap();
 				update_gaussian();
+			}
+		}
+
+		/**
+		 * setup page functions
+		 */
+
+		function set_default_picker(){
+
+			//TODO modify this ugly code
+
+			var d = new Date();
+			var curr_date = d.getDate();
+			var curr_month = d.getMonth()+1;
+			var curr_year = d.getFullYear();
+
+			if(curr_month == 1){
+				date_from 	= curr_date.toString()+'.12.'+curr_year.toString();
+				format_date_from = '12/' + curr_date.toString() + '/' + curr_year.toString();
+			}
+			else {
+				date_from 	= curr_date.toString()+'.'+(curr_month-1).toString()+'.'+curr_year.toString();
+				format_date_from = (curr_month-1).toString() + '/' + curr_date.toString() + '/' + curr_year.toString();
+			}
+			date_to 	= curr_date.toString()+'.'+curr_month.toString()+'.'+curr_year.toString();
+			format_date_to = (curr_month).toString() + '/' + curr_date.toString() + '/' + curr_year.toString();
+
+
+			document.getElementById('reservation').setAttribute("value", format_date_from + " - " + format_date_to);
+		}
+		/*
+		function apply_picker(from, to, action){
+			$( from ).datepicker({
+				defaultDate: "+1w",
+				changeMonth: true,
+				numberOfMonths: 1,
+				dateFormat: 'dd.mm.yy',
+				onClose: function( selectedDate ) {
+					$( to ).datepicker( "option", "minDate", selectedDate );
+				},
+				onSelect: function(date) {
+					action();
+				}
+			});
+			$( to ).datepicker({
+				defaultDate: "+1w",
+				changeMonth: true,
+				numberOfMonths: 1,
+				dateFormat: 'dd.mm.yy',
+				onClose: function( selectedDate ) {
+					$( from ).datepicker( "option", "maxDate", selectedDate );
+				},
+				onSelect: function(date) {
+					action();
+
+				}
+			});
+			var before =  new Date();
+			var today =  new Date();
+			before.setDate(before.getDate() - 30);
+
+			$(from).datepicker('setDate', before);
+			$(to).datepicker('setDate', today);
+		}//apply_picker
+
+		*/
+
+		function select_all(){
+			$('#chk_type1').attr("checked",true);
+			$('#chk_data').attr("checked",true);
+		}
+
+		function getCorrTitles(){
+			var titles = [];
+			for (var i = 0; i < linearData.length; i++){
+				titles.push(linearData[i].x_label + " -> "+linearData[i].y_label);
+			}
+			return titles;
+		}
+
+		function fillInXlabels (){
+			var selection = document.getElementById('xLabel');
+			var temp = "";
+			var xLabels = [];
+			for (var i = 0; i<linearData.length; i++){
+				if (!(contains(xLabels, linearData[i].x_label))){
+					xLabels.push(linearData[i].x_label);
+					temp += "<option>" + linearData[i].x_label + "</option>";
+				}
+			}
+			selection.innerHTML = temp;
+		}
+		function fillInYlabels(){
+			var selection = document.getElementById('yLabel');
+			var currXlabel = $('#xLabel').val();
+			var temp = "";
+			for (var i = 0; i<linearData.length; i++){
+				if (linearData[i].x_label==currXlabel){
+					temp += "<option>" + linearData[i].y_label + "</option>";
+				}
+			}
+			selection.innerHTML = temp;
+			update_correlations();
+		}
+		function contains(a, obj) {
+			for (var i = 0; i < a.length; i++) {
+				if (a[i] == obj) {
+					return true;
+				}
+			}
+			return false;
+		}
+		function fillOptions(){
+			var selection = document.getElementById('selectmenu');
+			var titles = getCorrTitles();
+			var temp = "<option selected=\"selected\">" + titles[0] + "</option>";
+			for (var i = 1; i<titles.length; i++){
+				temp += "<option>" + titles[i] + "</option>";
+			}
+			selection.innerHTML = temp;
+		}
+
+		/**
+		 * on ready function
+		 */
+		$(function() {
+			select_all();
+			//apply_picker("#scattered_from", "#scattered_to",  update_mutlichart);
+			//apply_picker("#heatmap_from", "#heatmap_to", update_heatmap);
+			//apply_picker("#gaussian_from", "#gaussian_to", update_gaussian);
+			linearData = jQuery.parseJSON(correlations);
+			//fillOptions();
+			fillInXlabels();
+			fillInYlabels();
+			set_default_picker();
+
+			//Date range picker
+			$('#reservation').daterangepicker(
+					{
+						locale: {
+							format: 'DD.MM.YYYY'
+						},
+						"startDate": format_date_from,
+						"endDate": format_date_to
+					},
+					function(start, end, label) {
+						date_from=start.format('DD.MM.YYYY');
+						date_to=end.format('DD.MM.YYYY');
+						update_data();
+					}
+			);
+
+
+
+
+			update_data();
+			update_correlations();
 
 
 			function select_type(checkbox, container, showdata , type){
@@ -309,12 +504,7 @@
 			}
 			$('#chk_type1').click(function() {
 				var show_data = $("#chk_data").is(':checked');
-				select_type('#chk_type1', multichart_id, show_data, 'type1');}
-			);
-
-			$('#chk_type2').click(function() {
-				var show_data = $("#chk_data").is(':checked');
-				select_type('#chk_type2', multichart_id, show_data, 'type2');}
+				select_type('#chk_type1', multichart_id, show_data, 'Type1');}
 			);
 
 			$('#chk_data').click(function() {
@@ -336,55 +526,18 @@
 
 
 			});
-
-		});
-
-
-    </script>
-    <script type="text/javascript">
-
-			$( "#accordion" ).accordion();
-
-
-
-			var availableTags = [
-				"ActionScript",
-				"AppleScript",
-				"Asp",
-				"BASIC",
-				"C",
-				"C++",
-				"Clojure",
-				"COBOL",
-				"ColdFusion",
-				"Erlang",
-				"Fortran",
-				"Groovy",
-				"Haskell",
-				"Java",
-				"JavaScript",
-				"Lisp",
-				"Perl",
-				"PHP",
-				"Python",
-				"Ruby",
-				"Scala",
-				"Scheme"
-			];
-			$( "#autocomplete" ).autocomplete({
-				source: availableTags
+			$('#tablediv').DataTable({
+				"paging": true,
+				"lengthChange": false,
+				"searching": false,
+				"ordering": true,
+				"info": true,
+				"autoWidth": false
 			});
 
-
-
-			$( "#button" ).button();
-			$( "#radioset" ).buttonset();
-
-
-
-			$( "#tabs" ).tabs();
-
-
+		});
+	</script>
+    <script type="text/javascript">
 
 			$( "#dialog" ).dialog({
 				autoOpen: false,
@@ -408,38 +561,11 @@
 
 
 
-			$( "#datepicker" ).datepicker({
-				inline: true
-			});
-
-
 
 			$( "#slider" ).slider({
 				range: true,
 				values: [ 17, 67 ]
 			});
-
-
-
-			$( "#progressbar" ).progressbar({
-				value: 20
-			});
-
-
-
-			$( "#spinner" ).spinner();
-
-
-
-			$( "#menu" ).menu();
-
-
-
-			$( "#tooltip" ).tooltip();
-
-
-
-			$( "#selectmenu" ).selectmenu();
 
 
 			// Hover states on the static widgets
@@ -451,6 +577,7 @@
 						$( this ).removeClass( "ui-state-hover" );
 					}
 			);
+
      </script>
     {% endblock %}
 

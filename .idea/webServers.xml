@@ -10,6 +10,14 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
+      <webServer id="4d4d7bfe-9f65-4045-bc53-5edcfb4112fd" name="web01" url="http://web01.iss.uni-saarland.de">
+        <fileTransfer host="web01.iss.uni-saarland.de" port="22" rootFolder="/home/matthias" accessType="SFTP" username="matthias">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>
