@@ -321,10 +321,10 @@ function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLa
 	var url = encodeURI(rooturl+"/"+user_id+"/"+xLabel+"/"+yLabel+"/"+nextDay);
 	var series = [];
 	$.ajax({url: url, success: function(result){
-		var points1 = eval(result);
-		console.log(result);
-		series = get_linear_series(points1, true, series, 'circle', title);
-		draw_linearChart(title, xLabel, yLabel, html_id, series);
+		var points1 = JSON.parse(result);
+		console.log('data from  %s len: %d', url, points1.length);
+		series = get_linear_series(points1, true, 'circle', title);
+		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series);
 
 		//TODO get data from REST server and format url
 		return;
@@ -352,9 +352,8 @@ function get_linear_series(data, visible, point_symbol, title){
 }
 
 function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id){
-	var lineData = [];
 	var step = (point2[0]-point1[0])/15;
-	lineData = getTwoDotLinePoints(point1, point2, step);
+	var lineData = getTwoDotLinePoints(point1, point2, step);
 	var scatter = createScatterSeries("scatter " + id, color, "scatter", true, id, data_points, point_symbol);
 	var line = createlinearLineSeries(color, "line", id, "line " + id, lineData);
 	var serieses = [];
