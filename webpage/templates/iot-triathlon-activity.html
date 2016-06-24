@@ -511,6 +511,9 @@
 			);
 
 			$('#chk_data').click(function() {
+				var checked = $("#chk_data").is(':checked');
+				setScatterVisible(multichart_id, checked);
+				/*
 				var chart = $(multichart_id).highcharts();
 				var series = chart.series;
 				for(var i=0; i<series.length; i++){
@@ -525,7 +528,7 @@
 							}
 						}
 					}
-				}
+				}*/
 
 
 			});
