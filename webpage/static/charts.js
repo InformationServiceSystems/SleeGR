@@ -354,8 +354,10 @@ function get_linear_series(data, visible, point_symbol, title){
 function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id){
 	var step = (point2[0]-point1[0])/15;
 	var lineData = getTwoDotLinePoints(point1, point2, step);
-	var scatter = createScatterSeries("scatter " + id, color, "scatter", true, id, data_points, point_symbol);
-	var line = createlinearLineSeries(color, "line", id, "line " + id, lineData);
+	var lineColor = 'rgba(0, 85, 213, 1)';
+	var scatterColor = 'rgba(228, 6, 6, 1)';
+	var scatter = createScatterSeries("scatter " + id, scatterColor, "scatter", true, id, data_points, point_symbol);
+	var line = createlinearLineSeries(lineColor, "line", id, "line " + id, lineData);
 	var serieses = [];
 	serieses.push(line);
 	serieses.push(scatter);
@@ -368,7 +370,7 @@ function getTwoDotLinePoints(point1, point2, step){
 	var n = point1[1] - m*point1[0];
 	var points = [];
 	for (var x = point1[0]; x <= point2[0]; x+= step) {
-		var y =m*x+n;
+		var y =Math.round((m*x+n)*100)/100;
 		points.push([x, y]);
 	}
 	points.push(point2);
