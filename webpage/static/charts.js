@@ -352,7 +352,7 @@ function get_linear_series(data, visible, point_symbol, title){
 }
 
 function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id){
-	var step = (point2[0]-point1[0])/15;
+	var step = (point2[0]-point1[0])/100;
 	var lineData = getTwoDotLinePoints(point1, point2, step);
 	var lineColor = 'rgba(0, 85, 213, 1)';
 	var scatterColor = 'rgba(228, 6, 6, 1)';
@@ -370,7 +370,7 @@ function getTwoDotLinePoints(point1, point2, step){
 	var n = point1[1] - m*point1[0];
 	var points = [];
 	for (var x = point1[0]; x <= point2[0]; x+= step) {
-		var y =Math.round((m*x+n)*100)/100;
+		var y =Math.round((m*x+n)*100000)/100000;
 		points.push([x, y]);
 	}
 	points.push(point2);
@@ -776,9 +776,9 @@ function fadeInHtmlTable (points, table_div){
 		content+= "<thead>" +
 			"<tr>" +
 			"<th>Date</th>" +
-			"<th>a: curveture</th>" +
-			"<th>T: timeshift</th>" +
-			"<th>c: avg HR at rest</th>" +
+			"<th>a</th>" +
+			"<th>T</th>" +
+			"<th>c</th>" +
 			"</tr>" +
 			"</thead>" +
 			"<tbody>";
