@@ -391,16 +391,6 @@ function createlinearLineSeries(color, type, id, name, data, xAxis, yAxis){
 	series.name			= name;
 	series.data			= data;
 	series.color		= color;
-	series.tooltip		= new Object();
-	series.tooltip.headerFormat = '<table>';
-	series.tooltip.pointFormat = '<tr> <td style="color: {point.color}">' + xAxis + ': </td>' +
-		'<td style="text-align: right"><b>{point.x}</b></td> </tr>' +
-		'<td style="color: {point.color}">' + yAxis + ': </td>' +
-		'<td style="text-align: right"><b>{point.y}</b></td> </tr>';
-	series.tooltip.footerFormat = '</table>';
-	series.tooltip.shared = true;
-	series.tooltip. useHTML = true;
-	series.tooltip.valueDecimals = 2;
 
 
 	return series;
@@ -420,6 +410,12 @@ function draw_linearChart(title, xAxis, yAxis, html_id, serieses){
 			title: {
 				text: yAxis
 			}
+		},
+		tooltip: {
+			useHTML: true,
+			headerFormat:  '<span style="color:{point.color}">\u25CF</span>' + xAxis + ': ' + '{point.key}<br/>',
+			pointFormat: yAxis + ': ' +  '<b>{point.y}</b><br/>',
+			valueDecimals: 2
 		},
 		plotOptions: {
 			line: {
@@ -634,13 +630,13 @@ function draw_chart(serieses, html_id, only_5mins){
 		},
 		 yAxis: {
 			 title:{
-				 text: 'heartrate'
+				 text: 'heartrate (in bpm)'
 			 }
 		 },
 		 tooltip: {
 			 shared: true,
 			 useHTML: true,
-			 headerFormat: '<small>{point.key}</small><table>',
+			 headerFormat: '<small>Heartrate after {point.key} seconds:</small><table>',
 			 pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
 			 '<td style="text-align: right"><b>{point.y} bpm</b></td></tr>',
 			 footerFormat: '</table>',

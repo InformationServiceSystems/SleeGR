@@ -51,24 +51,32 @@
 			<!-- AREA CHART -->
 			<div class="box box-solid box-primary">
 				<div class="box-header with-border">
-					<h3 class="box-title">Workout Cooldown</h3>
-
-					<div class="box-tools pull-right">
-
-						<div class="btn-group">
-							<div>
-
-								<input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="chk_type1">Show heartrate decay</label>
-								<input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="chk_data">Show Data Points</label>
-
-							</div>
-
+					<div class="row">
+						<div class="col-md-4">
+							<h3 class="box-title">Workout Cooldown</h3>
 						</div>
-						<button type="button" class="btn btn-box-tool" data-widget="collapse">
-							<i class="fa fa-minus"></i>
-						</button>
-						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+						<div class="col-md-8">
+							<div class="box-tools pull-right">
+
+								<div class="btn-group">
+									<div>
+
+										<input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="chk_type1">Show heartrate decay</label>
+										<input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="chk_data">Show Data Points</label>
+
+									</div>
+
+								</div>
+								<button type="button" class="btn btn-box-tool" data-widget="collapse">
+									<i class="fa fa-minus"></i>
+								</button>
+								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+							</div>
+						</div>
+
+
 					</div>
+
 				</div>
 				<div class="box-body">
 
@@ -190,6 +198,7 @@
 							<!-- AREA CHART -->
 							<div class="box box-default">
 								<div class="box-header with-border">
+									<h3 class="box-title">Heatmap</h3>
 
 									<div class="box-tools pull-right">
 										<button type="button" class="btn btn-box-tool" data-widget="collapse">
@@ -212,6 +221,7 @@
 							<!-- AREA CHART -->
 							<div class="box box-default">
 								<div class="box-header with-border">
+									<h3 class="box-title">Gaussian</h3>
 
 									<div class="box-tools pull-right">
 										<button type="button" class="btn btn-box-tool" data-widget="collapse">
@@ -334,7 +344,7 @@
 					nextDay=linearData[i].next_day;
 				}
 			}
-			var currentTitle = xLabel + ' -> ' + yLabel;
+			var currentTitle = 'Correlation between <strong>' + xLabel + '</strong> and <strong>' + yLabel + '</strong>';
 			xLabel=xLabel.split(" ").join("_");
 			yLabel=yLabel.split(" ").join("_");
 			charts_getCorrelations("http://web01.iss.uni-saarland.de/correlation", true, user_id, "#testdiv1", currentTitle, xLabel, yLabel, nextDay, testData);
