@@ -16,24 +16,40 @@
     <!-- /.col (LEFT) -->
 
     <!-- /.col (RIGHT) -->
-<section class="content">
+<section class="content-header">
+	<h1>
+		Dashboard
+		<small>Version 1.0</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Services</a></li>
+		<li class="active">Dashboard</li>
+	</ol>
+</section>
 
-	<div class="form-group">
-		<label>Please choose range for visualising data:</label>
-		<div class="input-group">
-			<div class="input-group-addon">
-				<i class="fa fa-calendar"></i>
-			</div>
-			<input type="text" class="form-control pull-right" id="reservation">
-		</div><!-- /.input group -->
-	</div><!-- /.form group -->
+<section class="content">
+	<div class="row">
+		<div class="col-md-4 col-sm-6 col-xs-12">
+
+			<div class="form-group">
+				<label for="reservation">Choose Timeframe for Heartrate and Sleepdata:</label>
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="fa fa-calendar"></i>
+					</div>
+					<input type="text" class="form-control pull-right" id="reservation">
+				</div><!-- /.input group -->
+			</div><!-- /.form group -->
+		</div>
+
+	</div>
 
 
 	<div class="row">
 		<!-- Left col -->
 		<div class="col-md-8">
 			<!-- AREA CHART -->
-			<div class="box box-primary">
+			<div class="box box-solid box-primary">
 				<div class="box-header with-border">
 					<h3 class="box-title">Workout Cooldown</h3>
 
@@ -44,15 +60,6 @@
 
 								<input type="checkbox" id="chk_type1" value="son" checked="true" /> <label for="chk_type1">Show heartrate decay</label>
 								<input type="checkbox" id="chk_data" value="dataSelected" checked="true" /> <label for="chk_data">Show Data Points</label>
-								<button type="button" class="btn btn-info">Choose timerange</button>
-								<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-									<span class="caret"></span>
-									<span class="sr-only">Toggle Dropdown</span>
-								</button>
-								<ul class="dropdown-menu" role="menu">
-									<li><a onclick="update_mutlichart(true)" href="#">First 5 minutes</a></li>
-									<li><a onclick="update_mutlichart()" href="#">Whole range</a></li>
-								</ul>
 
 							</div>
 
@@ -63,34 +70,55 @@
 						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
 					</div>
 				</div>
-				<div class="box-body chart-responsive">
+				<div class="box-body">
 
-					<div id="chartdiv1" style="width:100%; height:500px;"></div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="col-md-6 col-sm-6 col-xs-12">
+								<label for="yLabel">Choose timrange</label>
+								<select class="form-control" id="timerange" onchange="update_mutlichart($('#timerange').val()=='First 5 minutes')">
+									<option>First 5 minutes</option>
+									<option>Whole Range</option>
+								</select>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="chart-responsive">
+						<div id="chartdiv1" style="width:100%; height:500px;"></div>
+					</div>
+
 
 				</div>
+
 
 			</div>
 		</div>
 
-		<div class="col-md-4">
-				<div class="col-xs-12">
-					<div class="box">
-						<div class="box-header">
+		<div class="col-md-4 col-xs-12">
+					<div class="box box-solid box-primary">
+						<div class="box-header with-border">
 							<h3 class="box-title">Curve Parameters</h3>
-							</hr>
-							<h3 class="box-title">Formula: (HRR<sub>~80%</sub>-c) &sdot; e<sup>(-(x-T)/a)</sup>+ c </h3>
-							</br>
+
+							<div class="box-tools pull-right">
+								<button type="button" class="btn btn-box-tool" data-widget="collapse">
+									<i class="fa fa-minus"></i>
+								</button>
+								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+							</div>
+						</div><!-- /.box-header -->
+						<div class="box-body" style="width:100%; height:575px;">
+							<h4>Formula: (HRR<sub>~80%</sub>-c) &sdot; e<sup>(-(x-T)/a)</sup>+ c </h4>
+							<hr>
 							<p>a: curveture</p>
 							<p>T: timeshift</p>
 							<p>c: Average Heartrate at rest</p>
-						</div><!-- /.box-header -->
-						<div class="box-body">
-							<table id="tablediv" class="table table-bordered table-hover" style="width:100%; height:500px;">
+							<table id="tablediv" class="table table-bordered table-hover">
 
 							</table>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-				</div>
 		</div>
 
 
@@ -99,46 +127,55 @@
     </div>
 
 	<div class="row">
-		<!-- AREA CHART -->
-		<div class="box box-primary">
-			<div class="box-header with-border">
-				<h3 class="box-title">Correlations</h3>
-				<div class="box-tools pull-right">
+		<div class="col-md-12">
+			<!-- AREA CHART -->
+			<div class="box box-solid box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Correlations</h3>
+					<div class="box-tools pull-right">
 
-					<div class="btn-group">
-						<div>
 
-							<label for="xLabel">From </label>
-							<select id="xLabel" onchange="fillInYlabels()"></select>
-							<label for="yLabel">To </label>
-							<select id="yLabel" onchange="update_correlations()"></select>
-						</div>
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fa fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+
 
 					</div>
-
 				</div>
-				<div class="box-body chart-responsive">
+				<div class="box-body">
+					<div>
+						<div class="btn-group">
+							<div class="row">
+								<div class="col-md-6 col-sm-6 col-xs-12">
+									<label for="xLabel">Choose x-Label</label>
+									<select class="form-control" id="xLabel" onchange="fillInYlabels()"></select>
+								</div>
+								<div class="col-md-6 col-sm-6 col-xs-12">
+									<label for="yLabel">Choose y-Label</label>
+									<select class="form-control" id="yLabel" onchange="update_correlations()"></select>
+								</div>
 
-					<div id="testdiv1" style="width:100%; height:500px;"></div>
+							</div>
+						</div>
+					</div>
 
+
+					<div class="chart-responsive">
+						<div id="testdiv1" style="width:100%; height:500px;"></div>
+					</div>
 				</div>
-
-
 			</div>
-
 			<!-- /.box-body -->
 		</div>
 	</div>
 
 
     <div class="row">
-		<div class="col-md-6">
-
-			<!-- AREA CHART -->
-			<div class="box box-primary">
+		<div class="col-md-12">
+			<div class="box box-solid box-primary">
 				<div class="box-header with-border">
-					<h3 class="box-title">Sleep/Deep Sleep Distribution</h3>
-
+					<h3 class="box-title">Sleeping Hours with Deep Sleep</h3>
 					<div class="box-tools pull-right">
 						<button type="button" class="btn btn-box-tool" data-widget="collapse">
 							<i class="fa fa-minus"></i>
@@ -146,57 +183,58 @@
 						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
 					</div>
 				</div>
-				<div class="box-body chart-responsive">
+				<div class="box-body">
+					<div class="row">
+						<div class="col-md-6">
 
-					<div id="chartdiv7" style="width:100%; height:500px;"></div>
+							<!-- AREA CHART -->
+							<div class="box box-default">
+								<div class="box-header with-border">
 
-				</div>
-			</div>
-			<!-- /.box-body -->
-		</div>
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+										<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+									</div>
+								</div>
+								<div class="box-body chart-responsive">
 
+									<div id="chartdiv7" style="width:100%; height:500px;"></div>
 
-		<div class="col-md-6">
-			<!-- AREA CHART -->
-			<div class="box box-primary">
-				<div class="box-header with-border">
-					<h3 class="box-title">Sleeping Hours with Deep Sleep</h3>
-
-					<div class="box-tools pull-right">
-						<div class="btn-group">
-							<button type="button" class="btn btn-info">Compare</button>
-							<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-								<span class="caret"></span>
-								<span class="sr-only">Toggle Dropdown</span>
-							</button>
-							<ul class="dropdown-menu" role="menu">
-								<li><a onclick="jsfunction()" href="#">Athlete 1</a></li>
-								<li><a href="#">Athlete 2</a></li>
-								<li><a href="#">Athlete 3</a></li>
-								<li><a href="#">Athlete 4</a></li>
-								<li><a href="#">Athlete 5</a></li>
-
-								<li class="divider"></li>
-								<li><a href="#">Separated link</a></li>
-							</ul>
-
-
-							<button type="button" class="btn btn-box-tool" data-widget="collapse">
-								<i class="fa fa-minus"></i>
-							</button>
-
+								</div>
+							</div>
+							<!-- /.box-body -->
 						</div>
-						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					</div>
-				</div>
-				<div class="box-body chart-responsive">
-					<div id="chartdiv4" style="width:100%; height:500px;" ></div>
 
+
+						<div class="col-md-6">
+							<!-- AREA CHART -->
+							<div class="box box-default">
+								<div class="box-header with-border">
+
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+										<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+									</div>
+								</div>
+								<div class="box-body chart-responsive">
+									<div id="chartdiv4" style="width:100%; height:500px;" ></div>
+
+
+								</div>
+							</div>
+							<!-- /.box-body -->
+						</div>
+					</div>
 
 				</div>
 			</div>
-			<!-- /.box-body -->
 		</div>
+
+
 
 
 
@@ -299,7 +337,7 @@
 			var currentTitle = xLabel + ' -> ' + yLabel;
 			xLabel=xLabel.split(" ").join("_");
 			yLabel=yLabel.split(" ").join("_");
-			charts_getCorrelations("http://81.169.137.80:5000/correlation", true, user_id, "#testdiv1", currentTitle, xLabel, yLabel, nextDay, testData);
+			charts_getCorrelations("http://web01.iss.uni-saarland.de/correlation", true, user_id, "#testdiv1", currentTitle, xLabel, yLabel, nextDay, testData);
 		}
 
 
@@ -310,15 +348,14 @@
 			// http://46.101.169.112:5000/show_stats/21/test@test.com/1.12.2015/31.03.2016
 			// charts_createMultiChart("http://46.101.214.58:5555", show_type1, show_type2, show_data, user_id, date_from, date_to, multichart_id, "#chk_data");
 
-			charts_createMultiChart("http://81.169.137.80:5000/show_stats/21", show_type1, show_data, user_id, date_from, date_to, multichart_id, '#tablediv', "#chk_data", only5min);
-			//charts_createMultiChart("http://81.169.137.80:5000/show_stats/21", show_type1, show_data, user_id, date_from, date_to, "#dialog", null, "#chk_data", true);
+			charts_createMultiChart("http://web01.iss.uni-saarland.de/show_stats/21", show_type1, show_data, user_id, date_from, date_to, multichart_id, '#tablediv', "#chk_data", only5min);
 		}
 		function update_heatmap(){
 			//var date_from 	= $("#heatmap_from").val();
 			//var date_to 	= $("#heatmap_to").val();
 			//charts_createHeatmap("http://46.101.214.58:5555/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
 
-			charts_createHeatmap("http://81.169.137.80:5000/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
+			charts_createHeatmap("http://web01.iss.uni-saarland.de/sleepPoints", user_id, date_from, date_to, 'chartdiv7');
 		}
 
 		function update_gaussian(){
@@ -326,12 +363,12 @@
 			//var date_to 	= $("#gaussian_to").val();
 			//charts_createGaussian('http://46.101.214.58:5555/gaussianPoints', 'http://46.101.214.58:5555/gaussian', user_id,  date_from, date_to , 'chartdiv4');
 
-			charts_createGaussian('http://81.169.137.80:5000/gaussianPoints', 'http://81.169.137.80:5000/gaussian', user_id,  date_from, date_to , 'chartdiv4');
+			charts_createGaussian('http://web01.iss.uni-saarland.de/gaussianPoints', 'http://web01.iss.uni-saarland.de/gaussian', user_id,  date_from, date_to , 'chartdiv4');
 		}
 
 		function update_data(){
 			if (date_from !== null && date_to != null){
-				update_mutlichart(true);
+				update_mutlichart($('#timerange').val()=='First 5 minutes');
 				update_heatmap();
 				update_gaussian();
 			}
@@ -494,49 +531,15 @@
 			update_correlations();
 
 
-			function select_type(checkbox, container, showdata , type){
-				var checked = $(checkbox).is(':checked');
-				var chart = $(container).highcharts();
-				var series = chart.series;
-				for(var i=0; i<series.length; i++){
-					if(series[i].options.grp == type && series[i].options.selected){
-						if(checked)
-							series[i].show();
-						else
-							series[i].hide();
-
-						if(!showdata && series[i].type == 'scatter')
-							series[i].hide();
-					}// if group matches
-				}// for
-
-			}
 			$('#chk_type1').click(function() {
 				var show_data = $("#chk_data").is(':checked');
-				select_type('#chk_type1', multichart_id, show_data, 'Type1');}
-			);
+				var visible = $('#chk_type1').is(':checked');
+				setTypeVisible(multichart_id, 'Type1', visible, show_data);
+			});
 
 			$('#chk_data').click(function() {
 				var checked = $("#chk_data").is(':checked');
 				setScatterVisible(multichart_id, checked);
-				/*
-				var chart = $(multichart_id).highcharts();
-				var series = chart.series;
-				for(var i=0; i<series.length; i++){
-					if(series[i].options.type == 'scatter'){
-						var linkedto = chart.get(series[i].options.linkedTo);
-						if(linkedto != null){
-							if($("#chk_data").is(':checked') && linkedto.visible){
-								series[i].show();
-							}
-							else{
-								series[i].hide();
-							}
-						}
-					}
-				}*/
-
-
 			});
 			$('#tablediv').DataTable({
 				"paging": true,
@@ -549,48 +552,6 @@
 
 		});
 	</script>
-    <script type="text/javascript">
-
-			$( "#dialog" ).dialog({
-				autoOpen: false,
-				width: 1400,
-				height: 750,
-				buttons: [
-					{
-						text: "Ok",
-						click: function() {
-							$( this ).dialog( "close" );
-						}
-					}
-				]
-			});
-
-			// Link to open the dialog
-			$( "#dialog-link" ).click(function( event ) {
-				$( "#dialog" ).dialog( "open" );
-				event.preventDefault();
-			});
-
-
-
-
-			$( "#slider" ).slider({
-				range: true,
-				values: [ 17, 67 ]
-			});
-
-
-			// Hover states on the static widgets
-			$( "#dialog-link, #icons li" ).hover(
-					function() {
-						$( this ).addClass( "ui-state-hover" );
-					},
-					function() {
-						$( this ).removeClass( "ui-state-hover" );
-					}
-			);
-
-     </script>
     {% endblock %}
 
     </html>

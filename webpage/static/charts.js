@@ -146,6 +146,7 @@ function create_gaussian(settings, points, html_id){
 		"dataProvider": chartData,
 		"precision": 2,
 		"valueAxes": [ {
+			"title": "Deep Sleep (in %)",
 			"gridAlpha": 0.2,
 			"dashLength": 0
 		} ],
@@ -170,6 +171,7 @@ function create_gaussian(settings, points, html_id){
 		  },
 		"categoryField": "category",
 		"categoryAxis": {
+			"title": "Sleeping Hours",
 		   	"gridAlpha": 0.05,
 			"startOnAxis": true,
 			"tickLength": 5,
@@ -264,7 +266,7 @@ function  create_heatmap(points, html_id){
 	var graphs = [];
 	for (var p = 0; p < 20; p++) {
 		graphs.push( {
-			"balloonText": "Original value: [[value" + p + "]]",
+			"balloonText": "Absolute frequency: [[value" + p + "]]",
 			"fillAlphas": 1,
 			"lineAlpha": 0,
 			"type": "column",
@@ -279,6 +281,7 @@ function  create_heatmap(points, html_id){
 			"type": "serial",
 			"dataProvider": sourceData,
 			"valueAxes": [ {
+				"title": "Deep Sleep (in %)",
 				"baseValue": 0,
 				"stackType": "regular",
 				"axisAlpha": 0.3,
@@ -292,11 +295,12 @@ function  create_heatmap(points, html_id){
 			"columnWidth": 1,
 			"categoryField": "hour",
 			"categoryAxis": {
+				"title": "Sleeping hours",
 				"gridPosition": "start",
 				"axisAlpha": 0,
 				"gridAlpha": 0,
 				"position": "left"
-				}
+				},
 		} );
 }
 
@@ -345,19 +349,19 @@ function get_linear_series(data, visible, point_symbol, title){
 	var data_points = data.data;
 
 
-	var series = linearSeriesFactory(point1, point2, color, data_points, point_symbol, id);
+	var series = linearSeriesFactory(point1, point2, color, data_points, point_symbol, id, data.xlabel, data.ylabel);
 
 	return series;
 	//TODO create line and scatter data an push it to series variable
 }
 
-function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id){
+function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id, xAxis, yAxis){
 	var step = (point2[0]-point1[0])/100;
 	var lineData = getTwoDotLinePoints(point1, point2, step);
 	var lineColor = 'rgba(0, 85, 213, 1)';
 	var scatterColor = 'rgba(228, 6, 6, 1)';
-	var scatter = createScatterSeries("scatter " + id, scatterColor, "scatter", true, id, data_points, point_symbol);
-	var line = createlinearLineSeries(lineColor, "line", id, "line " + id, lineData);
+	var scatter = createScatterSeries("scatter " + id, scatterColor, "scatter", true, id, data_points, point_symbol, true);
+	var line = createlinearLineSeries(lineColor, "line", id, "line " + id, lineData, xAxis, yAxis);
 	var serieses = [];
 	serieses.push(line);
 	serieses.push(scatter);
@@ -377,7 +381,7 @@ function getTwoDotLinePoints(point1, point2, step){
 	return points;
 }
 
-function createlinearLineSeries(color, type, id, name, data){
+function createlinearLineSeries(color, type, id, name, data, xAxis, yAxis){
 	var series 			= new Object();
 	series.id			= id;
 	series.type			= type;
@@ -387,6 +391,18 @@ function createlinearLineSeries(color, type, id, name, data){
 	series.name			= name;
 	series.data			= data;
 	series.color		= color;
+	series.tooltip		= new Object();
+	series.tooltip.headerFormat = '<table>';
+	series.tooltip.pointFormat = '<tr> <td style="color: {point.color}">' + xAxis + ': </td>' +
+		'<td style="text-align: right"><b>{point.x}</b></td> </tr>' +
+		'<td style="color: {point.color}">' + yAxis + ': </td>' +
+		'<td style="text-align: right"><b>{point.y}</b></td> </tr>';
+	series.tooltip.footerFormat = '</table>';
+	series.tooltip.shared = true;
+	series.tooltip. useHTML = true;
+	series.tooltip.valueDecimals = 2;
+
+
 	return series;
 }
 
@@ -581,7 +597,7 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 
 	$.ajax({url: url, success: function(result){
 			var points1 = eval(result);
-			addSerieses(points1, show_data, 'Type1', true, data_select_id, serieses, 'circle', only_5mins);
+			addSerieses(points1, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
 			console.log('data from  %s len: %d', url, points1.length);
 			// the following commented lines are for getting type2 uncomment to get the results
 			//$.ajax({url: type2_url, success: function(result_type2){
@@ -599,7 +615,7 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 function draw_chart(serieses, html_id, only_5mins){
    	 $(html_id).highcharts({
 		title: {
-			text: 'Line and Scatter Plot of Cool Down'
+			text: 'Heartrate after Workout'
 		},
 		xAxis: {
 			title: {
@@ -620,6 +636,15 @@ function draw_chart(serieses, html_id, only_5mins){
 			 title:{
 				 text: 'heartrate'
 			 }
+		 },
+		 tooltip: {
+			 shared: true,
+			 useHTML: true,
+			 headerFormat: '<small>{point.key}</small><table>',
+			 pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+			 '<td style="text-align: right"><b>{point.y} bpm</b></td></tr>',
+			 footerFormat: '</table>',
+			 valueDecimals: 2
 		 },
 		plotOptions: {
 			line: {
@@ -658,7 +683,7 @@ function addSerieses(points, show_data,  type, visible, data_select_id, serieses
 				var id 			= type + '_' + i;
 
 				var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data, legend);
-				var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol);
+				var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol, show_data);
 
 				serieses.push(lineSeries);
 				serieses.push(scatterSeries);
@@ -694,12 +719,19 @@ function getScatterData(points, only_5mins){
 	}
 	return series_data;
 }
-function createScatterSeries(name, color, type, visible, linkedId, data, point_symbol){
+function createScatterSeries(name, color, type, visible, linkedId, data, point_symbol, show_data){
 	var series = new Object();
 	series.type 		= 'scatter';
 	series.grp		= String(type);
-	series.selected		= visible;
-	series.visible		= visible;
+	if (visible&&show_data){
+		series.selected		= true;
+		series.visible		= true;
+	}
+	else {
+		series.selected		= false;
+		series.visible		= false;
+	}
+
 	series.linkedTo 	= linkedId;
 	series.name		= name;
 	series.data 		= data;
@@ -711,8 +743,9 @@ function createScatterSeries(name, color, type, visible, linkedId, data, point_s
 
 }
 function createLineSeries(color, type, visible, data_select_id, id, name, data, legend){
-	var tooltip = new Object();
-	tooltip.valuePrefix = legend;
+
+	//tooltip.valuePrefix = legend;
+	console.log(visible);
 	var series 			= new Object();
 	series.id			= id;
 	series.type			= 'line';
@@ -722,7 +755,6 @@ function createLineSeries(color, type, visible, data_select_id, id, name, data, 
 	series.name			= name;
 	series.data			= data;
 	series.color			= color;
-	series.tooltip = tooltip;
 	series.events 			= new Object();
 	series.events.legendItemClick 	= function (event) {
 						this.options.selected = !this.visible;
@@ -737,7 +769,8 @@ function createLineSeries(color, type, visible, data_select_id, id, name, data, 
 
 						this.chart.redraw();
 						return false;
-                    			}
+	};
+
 	return series;
 }
 
@@ -747,7 +780,7 @@ function setTypeVisible(htmlId, type, visible, showdata){
 	var chart = $(htmlId).highcharts();
 	var series = chart.series;
 	for(var i=0; i<series.length; i++){
-		if(series[i].options.grp == type && series[i].options.selected){
+		if(series[i].options.grp == type){
 			if(series[i].options.type == 'scatter')
 				series[i].setVisible(showdata && visible, false);
 			else

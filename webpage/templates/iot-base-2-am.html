@@ -156,9 +156,7 @@
 
                             {% block servicelinks%}
                             <li><a href="/profile"><i class="fa fa-circle-o"></i> Profile</a></li>
-                            <li><a href="/athleteActivitiesTriathlon"><i class="fa fa-circle-o"></i> My activities</a></li>
-                            <li><a href="/workout"><i class="fa fa-circle-o"></i> Workout!</a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i> My calendar</a></li>
+                            <li><a href="/dashboard"><i class="fa fa-circle-o"></i> Dashboard</a></li>
 
                             {% endblock %}
                         </ul>
@@ -176,18 +174,8 @@
 
 
         <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <section class="content-header">
-                <h1>
-                    {{Pageheader}}
-                    <small>{{Pagedescripton}}</small>
-                </h1>
-                
-            </section>
-            <!-- Main content -->
-            <section class="content">
+
                 {% block maincontent %} {% endblock %}
-            </section><!-- /.content -->
         </div><!-- /.content-wrapper -->
         <footer class="main-footer">
             <div class="pull-right hidden-xs">
