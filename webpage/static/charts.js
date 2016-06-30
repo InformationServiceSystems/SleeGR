@@ -257,7 +257,12 @@ function  create_heatmap(points, html_id){
 	// as well as replace the original value with 1
 	for ( i in sourceData ) {
 		for (var p = 0; p < 20; p++) {
-			sourceData[ i ][ 'color' + p ] = 'rgb(' + getColor(sourceData[ i ][ 'value' + p ]) + ',' +  glb_green + ',' +  glb_blue  + ')';
+			if(sourceData[ i ][ 'value' + p ]==0){
+				sourceData[ i ][ 'color' + p ] = 'rgb(105,105,105)';
+			}
+			else{
+				sourceData[ i ][ 'color' + p ] = 'rgb(' + getColor(sourceData[ i ][ 'value' + p ]) + ',' +  glb_green + ',' +  glb_blue  + ')';
+			}
 			sourceData[ i ][ 'percent' + p ] = 1;
 		}
 	}
@@ -266,9 +271,17 @@ function  create_heatmap(points, html_id){
 	var graphs = [];
 	for (var p = 0; p < 20; p++) {
 		graphs.push( {
-			"balloonText": "Absolute frequency: [[value" + p + "]]",
+			"balloonText": "<small>Sleep Data </small>" +
+			"<table>" +
+			"<tbody>" +
+			"<tr><td style='text-align: left'>Absolute frequency: </td><td style='text-align: right'><b>[[value" + p + "]]</b></td></tr>" +
+			"<tr><td style='text-align: left'>Range of percentage: </td><td style='text-align: right'><b>" + p*5 + "%-" + (p*5+5) + "%</b></td></tr>" +
+			"<tr><td style='text-align: left'>Sleeping hours: </td><td style='text-align: right'><b>[[category]]</b></td></tr>" +
+			"</tbody>" +
+			"</table>",
 			"fillAlphas": 1,
-			"lineAlpha": 0,
+			"lineAlpha": 0.2,
+			"lineColor": "rgb(255,255,255)",
 			"type": "column",
 			"colorField": "color" + p,
 			"valueField": "percent" + p
@@ -285,7 +298,8 @@ function  create_heatmap(points, html_id){
 				"baseValue": 0,
 				"stackType": "regular",
 				"axisAlpha": 0.3,
-				"gridAlpha": 0,
+				"gridAlpha": 1,
+				"gridColor": "#000000",
 				"maximum": 20,
 				"labelFunction":function( value, valueText, valueAxis) {
 							return value * 5 + '%';
@@ -298,7 +312,8 @@ function  create_heatmap(points, html_id){
 				"title": "Sleeping hours",
 				"gridPosition": "start",
 				"axisAlpha": 0,
-				"gridAlpha": 0,
+				"gridAlpha": 1,
+				"gridColor": "#000000",
 				"position": "left"
 				},
 		} );
