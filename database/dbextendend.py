@@ -51,7 +51,13 @@ class DbExtended:
         return self.db_base._db[str(measurement_type)].find_one({'user_id': user, 'date': datum,
                                                           'measurement_type': measurement_type})
 
+    def find_data(self,user, date, measurement):
+        date_string = date.strftime('%Y.%m.%d_%h:%M:%S')
+        return self.db_base._db[user].find({'measurement_type': measurement, 'date': date_string})
 
+    def find_correl_data(self, user):
+        collection_name = ('%s_data' % user)
+        return self.db_base._db[collection_name].find()
 
 
 

@@ -1,8 +1,10 @@
 import os, glob
-
+import csv
+import re
 from datetime import datetime
 import csvreader
 import database
+import pprint
 
 from dateutil import rrule
 
@@ -10,75 +12,66 @@ from dateutil import rrule
 class csv_2_reader():
 
     def __init__(self):
-        self.db, self.dbe = database.init()
-
-    def transfer_data(self, user, date, activity):
-        csv_reader = csvreader.csvReader()
-        if activity == 21:
-            print('HI')
-            print(date)
-            current_json_list = csv_reader.heart_rate_sepecial(user, date, date)
-
-            for j in current_json_list:
-                print(j)
-                self.db.insert_heart_rate_data(j)
-        elif activity == 777:
-            current_json_list = csv_reader.ReadSleepData(user, date, date)
-            for j in current_json_list:
-                self.db.insert_sleep_data(j)
-        else:
-            current_json_list = csv_reader.read_data(user, date, date, activity)
-            for j in current_json_list:
-                print('j ist:')
-                print(type(j))
-                j['user_id'] = user
-                j['date'] = date
-                self.db.inser_fitness_data(activity, j)
-
-    def search_data_single(self, user, date, activity):
-        csv_reader = csvreader.csvReader()
-        if activity == 21:
-            return self.dbe.find_heart_rate_data(date, user)
-
-        elif activity == 777:
-            return self.dbe.find_sleep_data(date, user)
-
-        else:
-            res_json = csv_reader.read_data(user, date, date, activity)
-            del(res_json['user_id'])
-            del(res_json['date'])
-            return res_json
-
-    def search_data_bulk(self, user, start_date, end_date, activity):
-        ret_lst = []
-        if activity == 21:
-            for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
-                                   until=end_date):
-                ret_lst.append(self.search_data_single(user, day, activity))
+        self.db_inserts, self.db_extended = database.init()
+        self.folder_path = "/home/matthias/data"
 
 
-        elif activity == 777:
-            for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
-                                   until=end_date):
-                ret_lst.append(self.search_data_single(user, day, activity))
-        else:
-            for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
-                               until=end_date):
-                ret_lst.append(self.search_data_single(user, day, activity))
 
-        return ret_lst
+    def to_mongo(self, user_id):
+        lst = self.to_json(user_id)
+        for json in lst:
+            self.db_inserts.insert_csv_row(user_id, json)
+        print('done')
 
 
-if __name__ == '__main__':
-    os.chdir("/home/matthias/data")
-    user_folders = (os.listdir("/home/matthias/data"))
-    translater = csv_2_reader()
+    def to_json(self, user_id):
+        ret_list = []
+        folder = ('%s/%s' % (self.folder_path, user_id))
+        for file_name in os.listdir(folder):
+            try:
+                with open(os.path.join(folder, file_name), newline='') as csv_file:
+                    if re.search('sleep', file_name) is None:
+                        fieldnames = ['UserID', 'measurement_type', 'time_stamp',
+                                      'Type_of_activity', 'value_1', 'value_2',
+                                      'value_3']
+                        csv_reader = csv.DictReader(csv_file, fieldnames=fieldnames)
+                        for row in csv_reader:
+                            new_json = {'UserID': row['UserID'], 'measurement_type': row['measurement_type'],
+                                        'time_stamp': row['time_stamp'], 'Type_of_activity': row['Type_of_activity'],
+                                        'value_1': row['value_1'], 'value_2': row['value_1'], 'value_3': row['value_3']}
+                            ret_list.append(new_json)
+                    else:
+                        csv_reader = csv.reader(csv_file)
+                        is_value = False
+                        value_list =[]
+                        for row in csv_reader:
+                            if is_value:
+                                value_list.append(row)
+                                is_value = False
+                            else:
+                                is_value = True
+                        for value in value_list:
+                            new_json = {}
+                            new_json['type'] = 777
+                            new_json['time_stamp'] = datetime.strptime(value[3], '%d. %m. %Y %H:%M')
+                            new_json['tag'] = ''
+                            new_json['val0'] = float(value[5])
+                            new_json['val1'] = datetime.strptime(value[2], '%d. %m. %Y %H:%M')
+                            new_json['val2'] = float(value[12])
+                            ret_list.append(new_json)
+            except:
+                print('messed up', file_name)
+        return ret_list
 
-    start_date = datetime(2016, 1, 1)
-    end_date = datetime(2016, 6, 1)
-    measures = csvreader.measurement_to_valuenumb.keys()
-    for user_folder in user_folders:
-        for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
-                           until=end_date):
-            for measure in measures:
-                translater.transfer_data(user_folder, day, measure)
+
+def push_to_db():
+    c2r = csv_2_reader()
+    folder_path = "/home/matthias/data"
+    for user in os.listdir(folder_path):
+        print(user)
+        c2r.to_mongo(user)
+
+#csv_2_reader = csv_2_reader()
+#csv_2_reader.to_mongo('test@test.com')
+#push_to_db()
+

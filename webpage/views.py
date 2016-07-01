@@ -16,6 +16,7 @@ import names
 from csvreader import csvReader
 from decorators import login_required
 from csv_2_mongo import csv_2_reader
+from datareader import dataReader
 
 db_inserts, db_extended = database.init()
 
@@ -91,13 +92,14 @@ def registration():
 @app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
 @login_required
 def show_measurement(measurement_type, user_id, start_date, end_date):
-    r = csvReader()
+    r = dataReader()
     rr = csv_2_reader()
 
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
         # return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
+        print('want to read hrdata')
         return json.dumps(r.heart_rate_sepecial(user_id, start, end))
     else:
         # return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
@@ -131,7 +133,8 @@ def dashboard():
 @login_required
 def sleep_data(user_id, start_date, end_date):
     user_id = session['email']
-    r = csvReader()
+    r = dataReader()
+    #r = csvReader()
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -144,7 +147,8 @@ def sleep_data(user_id, start_date, end_date):
 @login_required
 def gaussianPoints(user_id, start_date, end_date):
     user_id = session['email']
-    r = csvReader()
+    r = dataReader()
+    #r = csvReader()
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -157,7 +161,8 @@ def gaussianPoints(user_id, start_date, end_date):
 @login_required
 def sleep_data_gaussian(user_id, start_date, end_date):
     user_id = session['email']
-    r = csvReader()
+    r =  dataReader()
+    #r = csvReader()
     rr = csv_2_reader()
     start = datetime.strptime(start_date, '%d.%m.%Y')
     end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -184,7 +189,8 @@ def profile():
 
 @app.route('/correlation/<user_id>/<x_label>/<y_label>/<next_day>')
 def correlations(user_id, x_label, y_label, next_day):
-    cr = csvReader()
+    #cr = csvReader()
+    cr = dataReader()
     x_label = re.sub('_', ' ', x_label)
     y_label = re.sub('_', ' ', y_label)
     return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))

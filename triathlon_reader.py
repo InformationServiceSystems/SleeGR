@@ -10,6 +10,8 @@ from datetime import timedelta,datetime
 #import matplotlib.pyplot as plt
 from math import sqrt
 import functools
+import database
+
 
 def SensorDataToCSV(records, fname):
     with open(fname, 'w') as csvfile:
@@ -38,15 +40,29 @@ class CSVTriathlonReader:
             self.sensorRawData = [];
             for row in filereader:
                 # avoid weirdness at the end of the file
-                if  len(row) < 1:
+                if len(row) < 1:
                     continue;
                 date = datetime.strptime(row[2],'%Y.%m.%d_%H:%M:%S');
                 item = SensorData(UserID = int(row[0]), SensorType = int(row[1]), TimeStamp = date, ExtraData = row[3], ValX = float(row[4]), ValY = float(row[5]), ValZ = float(row[6]));
                 self.sensorRawData.append(item)
-            
+
             self.sensorRawData.sort(key = lambda x: x.TimeStamp)
 
-    
+    # Allows to read raw data into internal representation
+    def ReadSensorDataUser(self, user, date, measurement):
+
+        SensorData = self.SensorDataTuple;
+        self.sensorRawData = [];
+        db_inserts, db_extended = database.init()
+        for row in db_extended.find_data(user, date, measurement):
+            # avoid weirdness at the end of the file
+            if len(row) < 1:
+                continue;
+            date = datetime.strptime(row[2], '%Y.%m.%d_%H:%M:%S');
+            item = SensorData(UserID=int(row[0]), SensorType=int(row[1]), TimeStamp=date, ExtraData=row[3],
+                              ValX=float(row[4]), ValY=float(row[5]), ValZ=float(row[6]));
+            self.sensorRawData.append(item)
+        self.sensorRawData.sort(key=lambda x: x.TimeStamp)
 
     #Allows to read raw data into internal representation
     def ReadSleepData(self, filename):
