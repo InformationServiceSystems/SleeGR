@@ -9,10 +9,10 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="web01 (1)">
+      <paths name="web01">
         <serverdata>
           <mappings>
-            <mapping deploy="/iot-final" local="$PROJECT_DIR$" web="/5000" />
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
