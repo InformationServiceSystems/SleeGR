@@ -2,7 +2,6 @@ import os, glob
 import csv
 import re
 from datetime import datetime
-import csvreader
 import database
 import pprint
 
@@ -36,9 +35,9 @@ class csv_2_reader():
                                       'value_3']
                         csv_reader = csv.DictReader(csv_file, fieldnames=fieldnames)
                         for row in csv_reader:
-                            new_json = {'UserID': row['UserID'], 'measurement_type': row['measurement_type'],
-                                        'time_stamp': row['time_stamp'], 'Type_of_activity': row['Type_of_activity'],
-                                        'value_1': row['value_1'], 'value_2': row['value_1'], 'value_3': row['value_3']}
+                            new_json = {'UserID': row['UserID'], 'type': int(row['measurement_type']),
+                                        'time_stamp': datetime.strptime(row['time_stamp'], "%Y.%m.%d_%H:%M:%S"), 'tag': row['Type_of_activity'],
+                                        'val0': float(row['value_1']), 'val1': float(row['value_1']), 'val2': float(row['value_3'])}
                             ret_list.append(new_json)
                     else:
                         csv_reader = csv.reader(csv_file)
@@ -59,7 +58,8 @@ class csv_2_reader():
                             new_json['val1'] = datetime.strptime(value[2], '%d. %m. %Y %H:%M')
                             new_json['val2'] = float(value[12])
                             ret_list.append(new_json)
-            except:
+            except Exception as e:
+                print(e)
                 print('messed up', file_name)
         return ret_list
 
@@ -71,7 +71,6 @@ def push_to_db():
         print(user)
         c2r.to_mongo(user)
 
-#csv_2_reader = csv_2_reader()
-#csv_2_reader.to_mongo('test@test.com')
-#push_to_db()
+if __name__ == '__main__':
+    push_to_db()
 

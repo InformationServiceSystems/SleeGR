@@ -4,16 +4,17 @@ import os
 
 from dateutil import rrule
 from datetime import datetime
+from datetime import timedelta
+
+from matplotlib.dates import hours
 
 from linear_datascience import Comp1D
-import json
 import numpy
 import database
 
-from sleegr_reader import read_hr_data
 
 
-class dataReader:
+class DataReader:
     def __init__(self):
         '''
         CSV reader, to get healt data stored in csv
@@ -21,7 +22,6 @@ class dataReader:
         :param user_id: int
         '''
         self._db_inserts, self._db_extended = database.init()
-        self.folder_path = "/home/matthias/data"
 
 
     def read_data(self, user_id, start_date, end_date, measurement_type):
@@ -32,98 +32,141 @@ class dataReader:
 
             for row in self._db_extended.find_data(user_id, day, measurement_type):
                 if measurement_to_valuenumb[
-                    int(row['measurement_type'])] == 1:
+                    int(row['type'])] == 1:
                     ret_json[row['time_stamp']] = {
-                        'value': row['value_1']}
+                        'value': row['val1']}
                 elif measurement_to_valuenumb[
-                    int(row['measurement_type'])] == 2:
+                    int(row['type'])] == 2:
                     ret_json[row['time_stamp']] = {
-                        'value': {'value_1': row['value_1'],
-                                  'value_2': row['value_2']}}
+                        'value': {'value_1': row['val1'],
+                                  'value_2': row['val2']}}
                 elif measurement_to_valuenumb[
-                    int(row['measurement_type'])] == 3:
+                    int(row['type'])] == 3:
                     ret_json[row['time_stamp']] = {
-                        'value': {'value_1': row['value_1'],
-                                  'value_2': row['value_2'],
-                                  'value_3': row['value_3']}}
-
-        # return json.JSONEncoder().encode(ret_json)
+                        'value': {'value_1': row['val1'],
+                                  'value_2': row['val2'],
+                                  'value_3': row['val3']}}
         return ret_json
 
-    def ReadSleepData(self, user_id, start_date, end_date):
+    def read_sleep_data(self, user_id, start_date, end_date):
         ret_list = []
-
+        dates = []
+        data = []
+        cursors = []
+        cursors = self._db_extended.find_data_no_date(user_id, 777)
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
-            for row in self._db_extended.find_data(user_id, day):
-                # avoid weirdness at the end of the file
-                wake_up = datetime.strptime(row['time_stamp'], '%d. %m. %Y %H:%M')
-                drop_off = datetime.strptime(row['val1'], '%d. %m. %Y %H:%M')
-                duration = wake_up - drop_off
-                deep_sleep = float(row['val2']) * 100
-                if deep_sleep > 0:
-                    ret_list.append(
-                        {'user_id': user_id, 'date': (wake_up.date().strftime('%d.%m.%Y')),
-                         'x': float(duration.seconds / 3600),
-                         'y': deep_sleep})
+            dates.append(day.strftime('%d.%m.%Y'))
+        for cursor in cursors:
+            if cursor['time_stamp'].strftime('%d.%m.%Y') in dates:
+                data.append(cursor)
+
+        for row in data:
+            wake_up = row['time_stamp']
+            drop_off = row['val1']
+            duration = wake_up - drop_off
+            deep_sleep = float(row['val2']) * 100
+            if deep_sleep > 0:
+                ret_list.append(
+                    {'user_id': user_id, 'date': (wake_up.strftime('%d.%m.%Y')),
+                     'x': float(duration.seconds / 3600),
+                     'y': deep_sleep})
         return ret_list
 
-    def heart_rate_sepecial(self, user_id, start_date, end_date):
-        print('in hr special')
+    def heart_rate_special(self, user_id, start_date, end_date):
         ret_list = []
-        file_name = ('%s/%s/' % (self.folder_path, user_id))
-        #data_name = ('%s/%s/%s.data' % (self.folder_path, user_id, user_id))
-
-        #data_file = open(data_name, "r+b")
-        #data_lst = pickle.load(data_file)
-        data_lst = self._db_extended.find_correl_data(user_id)
-        hr_cursor_lst = []
         hr_lst = []
-
+        dates = []
+        data_lst = []
+        cursors = self._db_extended.find_correl_data(user_id)
+        hr_cursors = self._db_extended.find_data_tag(user_id, 21, 'Cooldown')
 
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
-            new_json = {}
-            new_json['user_id'] = user_id
-            new_json['date'] = day.strftime('%d.%m.%Y')
-            for data in data_lst:
-                if data['time_stamp'].date() == day.date():
-                    new_json['a'] = data['A']
-                    new_json['t'] = data['T']
-                    new_json['c'] = data['C']
-            hr_cursor_lst.append(self._db_extended.find_data(user_id, day, 21))
-        for cursor in hr_cursor_lst:
-            for data in cursor:
-                print(data)
-                hr_lst.append(data)
-        hr_lst.sort(key=lambda date : datetime.strptime(date['time_stamp']), )
+            dates.append(day.strftime('%d.%m.%Y'))
+
+        for cursor in cursors:
+            if cursor['time_stamp'].strftime('%d.%m.%Y') in dates:
+                data_lst.append(cursor)
+
+        for cursor in hr_cursors:
+            if cursor['time_stamp'].strftime('%d.%m.%Y') in dates:
+                hr_lst.append(cursor)
+
+        for day in dates:
+            data = list(filter(lambda entry : entry['time_stamp'].strftime('%d.%m.%Y') == day, data_lst))
+            if len(data) > 0:
+                data = data[0]
+                new_json = {}
+                new_json['user_id'] = user_id
+                new_json['date'] = day
+                new_json['a'] = data['A']
+                new_json['t'] = data['T']
+                new_json['c'] = data['C']
+                hr_lst_current_day = list(filter(lambda entry: entry['time_stamp'].strftime('%d.%m.%Y') == day, hr_lst))
+                if not hr_lst_current_day:
+                    continue
+                hr_lst_current_day.sort(key=lambda data : data['time_stamp'])
+                hr_lst_current_day = hr_lst[::10]
+                base_time = hr_lst[0]['time_stamp']
+                datapoints = []
+                for data in hr_lst_current_day:
+                    datapoints.append({'x': (data['time_stamp'] - base_time).seconds, 'y': data['val0']})
+                new_json['data_points'] = datapoints
+                ret_list.append(new_json)
         return ret_list
 
     def read_correlation_data(self, user_id, x_label, y_label, next_day):
-        #data_name = ('%s/%s/%s.data' % (self.folder_path, user_id, user_id))
+        data_cursor = self._db_extended.find_correl_data(user_id)
+        data = []
+        if x_label == 'Sleep start':
+            for d in data_cursor:
+                data.append(d)
+            to_reply = (x_label, y_label, next_day)
+            reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
+            for key, val in reply.items():
+                if type(val) == numpy.float64:
+                    reply[key] = float(val)
+                elif type(val) == list:
+                    pass
+                elif type(val) == numpy.int64:
+                    reply[key] = int(val)
+            reply['x0'] = self.get_timedelta(reply['x0'])
+            reply['x1'] = self.get_timedelta(reply['x1'])
+            for data in reply['data']:
+                data[0] = self.get_timedelta(data[0])
+            return reply
+        else:
+            for d in data_cursor:
+                data.append(d)
+            to_reply = (x_label, y_label, next_day)
+            reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
+            for key, val in reply.items():
+                if type(val) == numpy.float64:
+                    reply[key] = float(val)
+                    print(type(reply[key]))
+                elif type(val) == list:
+                    pass
+                elif type(val) == numpy.int64:
+                    reply[key] = int(val)
+            return reply
 
-        #data = pickle.load(open(data_name, "r+b"))
+    def convert_from_numpy(self, value):
+        if type(value) == numpy.float64:
+            return float(value)
+        elif type(value) == list:
+            pass
+        elif type(value) == numpy.int64:
+            return int(value)
 
-        data = self._db_extended.find_correl_data(user_id)
-
-        to_reply = (x_label, y_label, next_day)
-        reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
-        for key, val in reply.items():
-            if type(val) == numpy.float64:
-                reply[key] = float(val)
-                print(type(reply[key]))
-            elif type(val) == list:
-                pass
-            elif type(val) == numpy.int64:
-                reply[key] = int(val)
-
-
-    # ... convert to json and send reply to the client page
-
-        return reply
-
-
-
+    def get_timedelta(self, value):
+        midnight = datetime(year=2016, month=12, day=2, hour=0, minute=0, second= 0)
+        print(midnight)
+        time = timedelta(minutes=60 * value)
+        print(time)
+        time = midnight + time
+        delta =time - datetime(year=2016, month=12, day=1, hour=0, minute=0, second= 0)
+        return delta.total_seconds()
 
 
 measurement_to_valuenumb = {
@@ -144,5 +187,5 @@ measurement_to_valuenumb = {
 
 
 if __name__ == '__main__':
-    s = csvReader()
-    s.to_mongo('test@test.com')
+    s = DataReader()
+    s.get_timedelta(-1.0)
