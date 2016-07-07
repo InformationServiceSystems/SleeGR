@@ -644,7 +644,9 @@ function getScatterData(points, only_5mins){
 				series_data.push([points[i].x, points[i].y]);
 			}
 		}else{
-			series_data.push([points[i].x, points[i].y]);
+			if (points[i].x <= 12000){
+				series_data.push([points[i].x, points[i].y]);
+			}
 		}
 
 	}
@@ -736,24 +738,24 @@ function setScatterVisible(htmlId, visible){
 function fadeInHtmlTable (points, table_div){
 	if(table_div!=null){
 		var content = "";
-		content+= "<thead>" +
-			"<tr>" +
-			"<th>Date</th>" +
-			"<th>a</th>" +
-			"<th>T</th>" +
-			"<th>c</th>" +
+		content+= "<thead class='tablethead'>" +
+			"<tr class='tabletr'>" +
+			"<th class='tableth'>Date</th>" +
+			"<th class='tableth'>a</th>" +
+			"<th class='tableth'>T</th>" +
+			"<th class='tableth'>c</th>" +
 			"</tr>" +
 			"</thead>" +
-			"<tbody>";
+			"<tbody class='tabletbody'>";
 		if(points.length != 0){
 			try{
 				for (var i = 0; i<points.length; i++){
 					if(!(points[i].a==null)&&!(points[i].t==null)&&!(points[i].c==null)){
-						content+="<tr>";
-						content+="<td>"+points[i].date+"</td>";
-						content+="<td>"+Math.round(points[i].a*100)/100+"</td>";
-						content+="<td>"+Math.round(points[i].t*100)/100+"</td>";
-						content+="<td>"+Math.round(points[i].c*100)/100+"</td>";
+						content+="<tr class='tabletr'>";
+						content+="<td class=\"tabletd filterable-cell\">"+points[i].date+"</td>";
+						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].a*100)/100+"</td>";
+						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].t*100)/100+"</td>";
+						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].c*100)/100+"</td>";
 						content+="</tr>";
 					}
 				}

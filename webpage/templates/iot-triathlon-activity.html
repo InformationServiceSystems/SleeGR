@@ -122,7 +122,7 @@
 							<p>a: curveture</p>
 							<p>T: timeshift</p>
 							<p>c: Average Heartrate at rest</p>
-							<table id="tablediv" class="table table-bordered table-hover">
+							<table id="tablediv" class="table table-bordered table-hover table-striped tablebox">
 
 							</table>
 						</div><!-- /.box-body -->
@@ -316,6 +316,42 @@
 		.fakewindowcontain .ui-widget-overlay {
 			position: absolute;
 		}
+
+
+		.tablebox {
+			width: 100%;
+		}
+
+		.tablethead, .tabletbody, .tabletr, .tabletd, .tableth { display: block; }
+
+		.tabletr:after {
+			content: ' ';
+			display: block;
+			visibility: hidden;
+			clear: both;
+		}
+
+		.tableth {
+			height: 30px;
+
+			/*text-align: left;*/
+		}
+
+		.tabletbody {
+			height: 350px;
+			overflow-y: auto;
+		}
+
+		.tablethead {
+			/* fallback */
+		}
+
+
+		.tabletd, .tableth {
+			width: 25%;
+			float: left;
+		}
+
 
 	</style>
     <script type="text/javascript">
