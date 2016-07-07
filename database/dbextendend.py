@@ -49,9 +49,33 @@ class DbExtended:
     def find_fitness_data(self, measurement_type, date, user):
         datum = date.strftime('%d.%m.%Y')
         return self.db_base._db[str(measurement_type)].find_one({'user_id': user, 'date': datum,
-                                                          'measurement_type': measurement_type})
+                                                          'type': measurement_type})
+
+    def find_data_tag(self, user, measurement, tag=''):
+        return self.db_base._db[user].find({'type': measurement, 'tag': tag})
+
+    def find_data(self, user, time_stamp, measurement):
+        ret_lst =[]
+        for data in self.db_base._db[user].find({'type': measurement}):
+            if data['time_stamp'].date() == time_stamp.date():
+                ret_lst.append(data)
+        return ret_lst
+
+    def find_data_no_date(self, user, measurement):
+        return self.db_base._db[user].find({'type': measurement})
 
 
+    def find_correl_data(self, user):
+        collection_name = ('%s_data' % user)
+        return self.db_base._db[collection_name].find()
 
-
+    def find_one_correl_data_date(self, user, time_stamp):
+        tmp_lst = []
+        for data in self.find_correl_data(user):
+            if (data['time_stamp']).date() == time_stamp.date():
+                tmp_lst.append(data)
+        for data in tmp_lst:
+            if data['A'] is not None:
+                return data
+        return None
 
