@@ -750,14 +750,14 @@ function fadeInHtmlTable (points, table_div){
 		if(points.length != 0){
 			try{
 				for (var i = 0; i<points.length; i++){
-					//if(!(points[i].a==null)&&!(points[i].t==null)&&!(points[i].c==null)){
+					if(!(points[i].a==null)&&!(points[i].t==null)&&!(points[i].c==null)){
 						content+="<tr class='tabletr'>";
 						content+="<td class=\"tabletd filterable-cell\">"+points[i].date+"</td>";
 						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].a*100)/100+"</td>";
 						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].t*100)/100+"</td>";
 						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].c*100)/100+"</td>";
 						content+="</tr>";
-					//}
+					}
 				}
 			}
 			catch(e){
