@@ -146,6 +146,7 @@ function create_gaussian(settings, points, html_id){
 		"dataProvider": chartData,
 		"precision": 2,
 		"valueAxes": [ {
+			"title": "Deep Sleep (in %)",
 			"gridAlpha": 0.2,
 			"dashLength": 0
 		} ],
@@ -170,6 +171,7 @@ function create_gaussian(settings, points, html_id){
 		  },
 		"categoryField": "category",
 		"categoryAxis": {
+			"title": "Sleeping Hours",
 		   	"gridAlpha": 0.05,
 			"startOnAxis": true,
 			"tickLength": 5,
@@ -255,7 +257,12 @@ function  create_heatmap(points, html_id){
 	// as well as replace the original value with 1
 	for ( i in sourceData ) {
 		for (var p = 0; p < 20; p++) {
-			sourceData[ i ][ 'color' + p ] = 'rgb(' + getColor(sourceData[ i ][ 'value' + p ]) + ',' +  glb_green + ',' +  glb_blue  + ')';
+			if(sourceData[ i ][ 'value' + p ]==0){
+				sourceData[ i ][ 'color' + p ] = 'rgb(105,105,105)';
+			}
+			else{
+				sourceData[ i ][ 'color' + p ] = 'rgb(' + getColor(sourceData[ i ][ 'value' + p ]) + ',' +  glb_green + ',' +  glb_blue  + ')';
+			}
 			sourceData[ i ][ 'percent' + p ] = 1;
 		}
 	}
@@ -264,9 +271,17 @@ function  create_heatmap(points, html_id){
 	var graphs = [];
 	for (var p = 0; p < 20; p++) {
 		graphs.push( {
-			"balloonText": "Original value: [[value" + p + "]]",
+			"balloonText": "<small>Sleep Data </small>" +
+			"<table>" +
+			"<tbody>" +
+			"<tr><td style='text-align: left'>Absolute frequency: </td><td style='text-align: right'><b>[[value" + p + "]]</b></td></tr>" +
+			"<tr><td style='text-align: left'>Range of percentage: </td><td style='text-align: right'><b>" + p*5 + "%-" + (p*5+5) + "%</b></td></tr>" +
+			"<tr><td style='text-align: left'>Sleeping hours: </td><td style='text-align: right'><b>[[category]]</b></td></tr>" +
+			"</tbody>" +
+			"</table>",
 			"fillAlphas": 1,
-			"lineAlpha": 0,
+			"lineAlpha": 0.2,
+			"lineColor": "rgb(255,255,255)",
 			"type": "column",
 			"colorField": "color" + p,
 			"valueField": "percent" + p
@@ -279,10 +294,12 @@ function  create_heatmap(points, html_id){
 			"type": "serial",
 			"dataProvider": sourceData,
 			"valueAxes": [ {
+				"title": "Deep Sleep (in %)",
 				"baseValue": 0,
 				"stackType": "regular",
 				"axisAlpha": 0.3,
-				"gridAlpha": 0,
+				"gridAlpha": 1,
+				"gridColor": "#000000",
 				"maximum": 20,
 				"labelFunction":function( value, valueText, valueAxis) {
 							return value * 5 + '%';
@@ -292,11 +309,13 @@ function  create_heatmap(points, html_id){
 			"columnWidth": 1,
 			"categoryField": "hour",
 			"categoryAxis": {
+				"title": "Sleeping hours",
 				"gridPosition": "start",
 				"axisAlpha": 0,
-				"gridAlpha": 0,
+				"gridAlpha": 1,
+				"gridColor": "#000000",
 				"position": "left"
-				}
+				},
 		} );
 }
 
@@ -310,115 +329,6 @@ function  charts_createHeatmap(rooturl_points, user_id, begin_date, end_date, ht
 	 }});
 
 }//charts_createHeatmap
-
-
-//##########################################################Only Testing#############################################################################
-/*
-	function name: charts_createLinearCurve
- */
-
-function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay, testJSON){
-	var url = encodeURI(rooturl+"/"+user_id+"/"+xLabel+"/"+yLabel+"/"+nextDay);
-	var series = [];
-	$.ajax({url: url, success: function(result){
-		var points1 = JSON.parse(result);
-		console.log('data from  %s len: %d', url, points1.length);
-		series = get_linear_series(points1, true, 'circle', title);
-		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series);
-
-		//TODO get data from REST server and format url
-		return;
-
-	}});
-
-}
-
-function get_linear_series(data, visible, point_symbol, title){
-	var point1 = [];
-	point1.push(data.x0);
-	point1.push(data.y0);
-	var point2 = [];
-	point2.push(data.x1);
-	point2.push(data.y1);
-	var color		=  'rgba(0, 0, 0, 1)';
-	var id 			= title;
-	var data_points = data.data;
-
-
-	var series = linearSeriesFactory(point1, point2, color, data_points, point_symbol, id);
-
-	return series;
-	//TODO create line and scatter data an push it to series variable
-}
-
-function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id){
-	var step = (point2[0]-point1[0])/15;
-	var lineData = getTwoDotLinePoints(point1, point2, step);
-	var scatter = createScatterSeries("scatter " + id, color, "scatter", true, id, data_points, point_symbol);
-	var line = createlinearLineSeries(color, "line", id, "line " + id, lineData);
-	var serieses = [];
-	serieses.push(line);
-	serieses.push(scatter);
-	return serieses;
-
-}
-
-function getTwoDotLinePoints(point1, point2, step){
-	var m = (point2[1]-point1[1])/(point2[0]-point1[0]);
-	var n = point1[1] - m*point1[0];
-	var points = [];
-	for (var x = point1[0]; x <= point2[0]; x+= step) {
-		var y =m*x+n;
-		points.push([x, y]);
-	}
-	points.push(point2);
-	return points;
-}
-
-function createlinearLineSeries(color, type, id, name, data){
-	var series 			= new Object();
-	series.id			= id;
-	series.type			= type;
-	series.grp			= String(type);
-	series.visible		= true;
-	series.showInLegend = false;
-	series.name			= name;
-	series.data			= data;
-	series.color		= color;
-	return series;
-}
-
-function draw_linearChart(title, xAxis, yAxis, html_id, serieses){
-	$(html_id).highcharts({
-		title: {
-			text: title
-		},
-		xAxis: {
-			title: {
-				text: xAxis
-			}
-		},
-		yAxis: {
-			title: {
-				text: yAxis
-			}
-		},
-		plotOptions: {
-			line: {
-				marker: {
-					enabled: false
-				}
-			}
-		},
-		series: serieses
-	});
-}
-
-//#######################################################################################################################################################################
-
-
-
-
 
 
 /**************************************************************************************************
@@ -451,6 +361,17 @@ function toDate(str){
 	var chunks = str.split('.');
 	return new Date(chunks[2], chunks[1]-1, chunks[0]);
 }// toDate
+
+
+function secondsToMinutes(seconds){
+	var totalMins = Math.round(seconds/60);
+	var mins = totalMins%60;
+	var hours = (totalMins-mins)/60;
+	if (hours===0){
+		return mins + ' minutes';
+	}
+	return hours + ' hours ' + mins + ' minutes';
+}//secondsToMinutes
 
 /*
 	function name: format_url
@@ -579,7 +500,7 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 
 	$.ajax({url: url, success: function(result){
 			var points1 = eval(result);
-			addSerieses(points1, show_data, 'Type1', true, data_select_id, serieses, 'circle', only_5mins);
+			addSerieses(points1, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
 			console.log('data from  %s len: %d', url, points1.length);
 			// the following commented lines are for getting type2 uncomment to get the results
 			//$.ajax({url: type2_url, success: function(result_type2){
@@ -597,7 +518,7 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 function draw_chart(serieses, html_id, only_5mins){
    	 $(html_id).highcharts({
 		title: {
-			text: 'Line and Scatter Plot of Cool Down'
+			text: 'Heartrate Cooldown after Workout'
 		},
 		xAxis: {
 			title: {
@@ -616,19 +537,56 @@ function draw_chart(serieses, html_id, only_5mins){
 		},
 		 yAxis: {
 			 title:{
-				 text: 'heartrate'
+				 text: 'heartrate (in bpm)'
 			 }
 		 },
-		plotOptions: {
-			line: {
-                		marker: {
-                   			enabled: false
-                		}
-            		}
-        	},
-		series: serieses
-	});
+		 tooltip: {
+			 formatter: function () {
+				 var s='';
+				 if (!only_5mins){
+					 s = '<small> Heartrate after ' + secondsToMinutes(this.x) + '</small>' +
+						 '<table>';
+				 }
+				 else{
+					 s = '<small> Heartrate after ' +this.x+ ' seconds</small>' +
+						 '<table>';
+				 }
+
+				 if(this.points != null){
+					 $.each(this.points, function () {
+						 s += '<tr>' +
+							 '<td style="color: '+this.series.color+'">' + this.series.name + ': </td>' +
+							 '<td style="text-align: right"><b>' + Math.round(this.y*100)/100 + 'bpm </b></td>' +
+							 '</tr>';
+					 });
+				 }
+				 if (this.point != null){
+					 s += '<tr>' +
+						 '<td style="color: '+this.point.color+'">' + this.point.series.name + ': </td>' +
+						 '<td style="text-align: right"><b>' + Math.round(this.y*100)/100 + 'bpm </b></td>' +
+						 '</tr>';
+				 }
+
+				 s += '</table>';
+
+				 return s;
+			 },
+			 shared: true,
+			 useHTML: true,
+			 valueDecimals: 2
+		 },
+		 plotOptions: {
+			 line: {
+				 marker: {
+					 enabled: false
+				 }
+			 }
+		 },
+		 series: serieses
+	 });
 }
+
+
 function addSerieses(points, show_data,  type, visible, data_select_id, serieses,  point_symbol, only_5mins){
 	var max_x 	= only_5mins? 300: 12000; // 12K
 	var step	= only_5mins? 1: 10;
@@ -656,7 +614,7 @@ function addSerieses(points, show_data,  type, visible, data_select_id, serieses
 				var id 			= type + '_' + i;
 
 				var lineSeries 		= createLineSeries	(color, type, visible, data_select_id, id, line_name, line_data, legend);
-				var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol);
+				var scatterSeries 	= createScatterSeries	(scatter_name, color, type, visible, id, scatter_data, point_symbol, show_data);
 
 				serieses.push(lineSeries);
 				serieses.push(scatterSeries);
@@ -673,7 +631,7 @@ function getLineData(a, t, c, max_x, step){
 	var series_data	= [];
 	var start_HR = 180;
 	for (var x = 0; x <= max_x; x+= step) {
-		var y = Math.round(((start_HR-c)*Math.exp(-(x-t)/a) + c)*100)/100;
+		var y = (start_HR-c)*Math.exp(-(x-t)/a) + c;
 		series_data.push([x, y]);
 	}
 	return series_data;
@@ -686,18 +644,27 @@ function getScatterData(points, only_5mins){
 				series_data.push([points[i].x, points[i].y]);
 			}
 		}else{
-			series_data.push([points[i].x, points[i].y]);
+			if (points[i].x <= 12000){
+				series_data.push([points[i].x, points[i].y]);
+			}
 		}
 
 	}
 	return series_data;
 }
-function createScatterSeries(name, color, type, visible, linkedId, data, point_symbol){
+function createScatterSeries(name, color, type, visible, linkedId, data, point_symbol, show_data){
 	var series = new Object();
 	series.type 		= 'scatter';
 	series.grp		= String(type);
-	series.selected		= visible;
-	series.visible		= visible;
+	if (visible&&show_data){
+		series.selected		= true;
+		series.visible		= true;
+	}
+	else {
+		series.selected		= false;
+		series.visible		= false;
+	}
+
 	series.linkedTo 	= linkedId;
 	series.name		= name;
 	series.data 		= data;
@@ -709,8 +676,8 @@ function createScatterSeries(name, color, type, visible, linkedId, data, point_s
 
 }
 function createLineSeries(color, type, visible, data_select_id, id, name, data, legend){
-	var tooltip = new Object();
-	tooltip.valuePrefix = legend;
+
+	//tooltip.valuePrefix = legend;
 	var series 			= new Object();
 	series.id			= id;
 	series.type			= 'line';
@@ -720,7 +687,6 @@ function createLineSeries(color, type, visible, data_select_id, id, name, data, 
 	series.name			= name;
 	series.data			= data;
 	series.color			= color;
-	series.tooltip = tooltip;
 	series.events 			= new Object();
 	series.events.legendItemClick 	= function (event) {
 						this.options.selected = !this.visible;
@@ -735,7 +701,8 @@ function createLineSeries(color, type, visible, data_select_id, id, name, data, 
 
 						this.chart.redraw();
 						return false;
-                    			}
+	};
+
 	return series;
 }
 
@@ -745,7 +712,7 @@ function setTypeVisible(htmlId, type, visible, showdata){
 	var chart = $(htmlId).highcharts();
 	var series = chart.series;
 	for(var i=0; i<series.length; i++){
-		if(series[i].options.grp == type && series[i].options.selected){
+		if(series[i].options.grp == type){
 			if(series[i].options.type == 'scatter')
 				series[i].setVisible(showdata && visible, false);
 			else
@@ -771,24 +738,24 @@ function setScatterVisible(htmlId, visible){
 function fadeInHtmlTable (points, table_div){
 	if(table_div!=null){
 		var content = "";
-		content+= "<thead>" +
-			"<tr>" +
-			"<th>Date</th>" +
-			"<th>a</th>" +
-			"<th>T</th>" +
-			"<th>c</th>" +
+		content+= "<thead class='tablethead'>" +
+			"<tr class='tabletr'>" +
+			"<th class='tableth'>Date</th>" +
+			"<th class='tableth'>a</th>" +
+			"<th class='tableth'>T</th>" +
+			"<th class='tableth'>c</th>" +
 			"</tr>" +
 			"</thead>" +
-			"<tbody>";
+			"<tbody class='tabletbody'>";
 		if(points.length != 0){
 			try{
 				for (var i = 0; i<points.length; i++){
 					if(!(points[i].a==null)&&!(points[i].t==null)&&!(points[i].c==null)){
-						content+="<tr>";
-						content+="<td>"+points[i].date+"</td>";
-						content+="<td>"+Math.round(points[i].a*100)/100+"</td>";
-						content+="<td>"+Math.round(points[i].t*100)/100+"</td>";
-						content+="<td>"+Math.round(points[i].c*100)/100+"</td>";
+						content+="<tr class='tabletr'>";
+						content+="<td class=\"tabletd filterable-cell\">"+points[i].date+"</td>";
+						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].a*100)/100+"</td>";
+						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].t*100)/100+"</td>";
+						content+="<td  class=\"tabletd filterable-cell\">"+Math.round(points[i].c*100)/100+"</td>";
 						content+="</tr>";
 					}
 				}
@@ -803,4 +770,140 @@ function fadeInHtmlTable (points, table_div){
 		//document.getElementById(table_div).innerHTML = content;
 	}
 
+}
+
+/********************************************************************************************************
+
+ Correlations
+
+ ********************************************************************************************************/
+/*
+ /*
+ function name: charts_createLinearCurve
+ */
+
+function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay, testJSON){
+	var url = encodeURI(rooturl+"/"+user_id+"/"+xLabel+"/"+yLabel+"/"+nextDay);
+	var series = [];
+	$.ajax({url: url, success: function(result){
+		var points1 = JSON.parse(result);
+		console.log('data from  %s len: %d', url, points1.length);
+		series = get_linear_series(points1, true, 'circle', title);
+		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series);
+
+		//TODO get data from REST server and format url
+		return;
+
+	}});
+
+}
+
+function get_linear_series(data, visible, point_symbol, title){
+	var point1 = [];
+	point1.push(data.x0);
+	point1.push(data.y0);
+	var point2 = [];
+	point2.push(data.x1);
+	point2.push(data.y1);
+	var color		=  'rgba(0, 0, 0, 1)';
+	var id 			= title;
+	var data_points = data.data;
+
+
+	var series = linearSeriesFactory(point1, point2, color, data_points, point_symbol, id, data.xlabel, data.ylabel);
+
+	return series;
+	//TODO create line and scatter data an push it to series variable
+}
+
+function linearSeriesFactory(point1, point2, color, data_points, point_symbol, id, xAxis, yAxis){
+	var step = (point2[0]-point1[0])/200;
+	var lineData = getTwoDotLinePoints(point1, point2, step);
+	var lineColor = 'rgba(0, 85, 213, 1)';
+	var scatterColor = 'rgba(228, 6, 6, 1)';
+	var scatter = createScatterSeries("scatter " + id, scatterColor, "scatter", true, id, data_points, point_symbol, true);
+	var line = createlinearLineSeries(lineColor, "line", id, "line " + id, lineData, xAxis, yAxis);
+	var serieses = [];
+	serieses.push(line);
+	serieses.push(scatter);
+	return serieses;
+
+}
+
+function getTwoDotLinePoints(point1, point2, step){
+	var m = (point2[1]-point1[1])/(point2[0]-point1[0]);
+	var n = point1[1] - m*point1[0];
+	var points = [];
+	for (var x = point1[0]; x <= point2[0]; x+= step) {
+		var y =m*x+n;
+		points.push([x, y]);
+	}
+	points.push(point2);
+	return points;
+}
+
+function createlinearLineSeries(color, type, id, name, data, xAxis, yAxis){
+	var series 			= new Object();
+	series.id			= id;
+	series.type			= type;
+	series.grp			= String(type);
+	series.visible		= true;
+	series.showInLegend = false;
+	series.name			= name;
+	series.data			= data;
+	series.color		= color;
+
+
+	return series;
+}
+
+function draw_linearChart(title, xAxis, yAxis, html_id, serieses){
+	$(html_id).highcharts({
+		title: {
+			text: title
+		},
+		xAxis: {
+			title: {
+				text: xAxis
+			}
+		},
+		yAxis: {
+			title: {
+				text: yAxis
+			}
+		},
+		tooltip: {
+			useHTML: true,
+			formatter: function () {
+				var s=s = '<p>'+ xAxis + ': ' + Math.round(this.x*100)/100 + '</p>' +
+					'<table>'
+				if(this.points != null){
+					$.each(this.points, function () {
+						s += '<tr>' +
+							'<td style="color: '+this.series.color+'">' + yAxis+ ': </td>' +
+							'<td style="text-align: right"><b>' + this.y + '</b></td>' +
+							'</tr>';
+					});
+				}
+				if (this.point != null){
+					s += '<tr>' +
+						'<td style="color: '+this.point.color+'">' + yAxis + ': </td>' +
+						'<td style="text-align: right"><b>' + Math.round(this.y*100)/100 + '</b></td>' +
+						'</tr>';
+				}
+
+				s += '</table>';
+
+				return s;
+			}
+		},
+		plotOptions: {
+			line: {
+				marker: {
+					enabled: false
+				}
+			}
+		},
+		series: serieses
+	});
 }
