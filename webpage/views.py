@@ -98,7 +98,6 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
     end = datetime.strptime(end_date, '%d.%m.%Y')
     if int(measurement_type) == 21:
         # return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
-        print('want to read hrdata')
         return json.dumps(r.heart_rate_special(user_id, start, end))
     else:
         # return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
@@ -108,7 +107,6 @@ def show_measurement(measurement_type, user_id, start_date, end_date):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    print(session['email'])
     to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
             '{"x_label": "Sleep length", "y_label": "Load", "next_day": false},' \
             '{"x_label": "Sleep start", "y_label": "Load", "next_day": false},' \
@@ -123,8 +121,6 @@ def dashboard():
             '{"x_label": "DALDA", "y_label": "Deep sleep", "next_day": true},' \
             '{"x_label": "Sleep end", "y_label": "RPE", "next_day": false},' \
             '{"x_label": "Sleep length", "y_label": "RPE", "next_day": false}]'
-    print(to_reply)
-    print(type(to_reply))
     return render_template('iot-triathlon-activity.html', user=session['email'], correlations_list=to_reply)
 
 

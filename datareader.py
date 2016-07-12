@@ -52,7 +52,6 @@ class DataReader:
         ret_list = []
         dates = []
         data = []
-        cursors = []
         cursors = self._db_extended.find_data_no_date(user_id, 777)
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
@@ -122,7 +121,6 @@ class DataReader:
         if x_label == 'Sleep start':
             for d in data_cursor:
                 data.append(d)
-            to_reply = (x_label, y_label, next_day)
             reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
             for key, val in reply.items():
                 if type(val) == numpy.float64:
@@ -139,12 +137,10 @@ class DataReader:
         else:
             for d in data_cursor:
                 data.append(d)
-            to_reply = (x_label, y_label, next_day)
             reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
             for key, val in reply.items():
                 if type(val) == numpy.float64:
                     reply[key] = float(val)
-                    print(type(reply[key]))
                 elif type(val) == list:
                     pass
                 elif type(val) == numpy.int64:
@@ -161,9 +157,7 @@ class DataReader:
 
     def get_timedelta(self, value):
         midnight = datetime(year=2016, month=12, day=2, hour=0, minute=0, second= 0)
-        print(midnight)
         time = timedelta(minutes=60 * value)
-        print(time)
         time = midnight + time
         delta =time - datetime(year=2016, month=12, day=1, hour=0, minute=0, second= 0)
         return delta.total_seconds()

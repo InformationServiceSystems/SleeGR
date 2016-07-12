@@ -14,14 +14,11 @@ class csv_2_reader():
         self.db_inserts, self.db_extended = database.init()
         self.folder_path = "/home/matthias/data"
 
-
-
     def to_mongo(self, user_id):
         lst = self.to_json(user_id)
         for json in lst:
             self.db_inserts.insert_csv_row(user_id, json)
         print('done')
-
 
     def to_json(self, user_id):
         ret_list = []
@@ -59,7 +56,6 @@ class csv_2_reader():
                             new_json['val2'] = float(value[12])
                             ret_list.append(new_json)
             except Exception as e:
-                print(e)
                 print('messed up', file_name)
         return ret_list
 
