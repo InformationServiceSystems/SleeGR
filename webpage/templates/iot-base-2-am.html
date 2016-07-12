@@ -7,7 +7,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>ISS | IoTPlatform</title>
+    <title>ISS | Tucana</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- jvectormap -->
+    <link rel="stylesheet" href="{{url_for('static', filename='plugins/jvectormap/jquery-jvectormap-1.2.2.css')}}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{url_for('static', filename='dist/css/AdminLTE.min.css')}}" >
   
@@ -23,7 +25,7 @@
           page. However, you can choose any other skin. Make sure you
           apply the skin class to the body tag so the changes take effect.
     -->
-    <link rel="stylesheet" href="{{url_for('static', filename='dist/css/skins/skin-blue.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='dist/css/skins/skin-black-light.min.css')}}">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -46,7 +48,7 @@
 
 
 
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-black-light sidebar-mini">
     <div class="wrapper">
 
 
@@ -60,11 +62,11 @@
 
 
             <!-- Logo -->
-            <a href="../iot-index.html" class="logo">
+            <a href="/dashboard" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class="logo-mini"><b>A</b>PG</span>
+                <span class="logo-mini"><b>T</b>PF</span>
                 <!-- logo for regular state and mobile devices -->
-                <span class="logo-lg"><b>Admin</b>Page</span>
+                <span class="logo-lg"><b>Tucana</b> Platform</span>
             </a>
 
 
@@ -92,7 +94,7 @@
                         <!-- User Account: style can be found in dropdown.less -->
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="../static/dist/img/wm.jpg" class="user-image" alt="User Image">
+                                <img src="../static/dist/img/avatar.png" class="user-image" alt="User Image">
                                 <span class="hidden-xs">{{user}}</span>
                             </a>
                             <ul class="dropdown-menu">
@@ -108,7 +110,7 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                        <a href="/profile" class="btn btn-default btn-flat">Profile</a>
                                     </div>
                                     <div class="pull-right">
                                         <a href="/signout" class="btn btn-default btn-flat">Sign out</a>
@@ -130,10 +132,10 @@
                 <!-- Sidebar user panel -->
                 <div class="user-panel">
                     <div class="pull-left image">
-                        <img src=" {{url_for('static', filename='dist/img/wm.jpg')}} " class="img-circle" alt="User Image">
+                        <img src=" {{url_for('static', filename='dist/img/avatar.png')}} " class="img-circle" alt="User Image">
                     </div>
                     <div class="pull-left info">
-                        <p>{{username}}</p>
+                        <p>{{user}}</p>
                      
                     </div>
                 </div>
@@ -154,9 +156,7 @@
 
                             {% block servicelinks%}
                             <li><a href="/profile"><i class="fa fa-circle-o"></i> Profile</a></li>
-                            <li><a href="/athleteActivitiesTriathlon"><i class="fa fa-circle-o"></i> My activities</a></li>
-                            <li><a href="/workout"><i class="fa fa-circle-o"></i> Workout!</a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i> My calendar</a></li>
+                            <li><a href="/dashboard"><i class="fa fa-circle-o"></i> Dashboard</a></li>
 
                             {% endblock %}
                         </ul>
@@ -174,19 +174,15 @@
 
 
         <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <section class="content-header">
-                <h1>
-                    {{Pageheader}}
-                    <small>{{Pagedescripton}}</small>
-                </h1>
-                
-            </section>
-            <!-- Main content -->
-            <section class="content">
+
                 {% block maincontent %} {% endblock %}
-            </section><!-- /.content -->
         </div><!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0
+            </div>
+            <strong>Copyright &copy; 2016 <a href="http://iss.uni-saarland.de/en/" target="_blank">Information and Service Systems</a>.</strong> All rights reserved.
+        </footer>
 
 
 

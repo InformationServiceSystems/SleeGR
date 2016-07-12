@@ -7,15 +7,20 @@
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
-          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="4d4d7bfe-9f65-4045-bc53-5edcfb4112fd" name="web01" url="http://web01.iss.uni-saarland.de">
+      <webServer id="2b45c578-f6c0-4430-b9d6-7f8f103e99a6" name="web01" url="http://web01.iss.uni-saarland.de">
+        <fileTransfer host="web01.iss.uni-saarland.de" port="22" rootFolder="/home/matthias" accessType="SFTP" password="df9bdf98df99df9edf9fdf9cdfcbdfd0" username="matthias">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="4d4d7bfe-9f65-4045-bc53-5edcfb4112fd" name="web01 (1)" url="http://web01.iss.uni-saarland.de">
         <fileTransfer host="web01.iss.uni-saarland.de" port="22" rootFolder="/home/matthias" accessType="SFTP" username="matthias">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
-          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
     </option>
