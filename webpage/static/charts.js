@@ -212,7 +212,7 @@ var glb_green 		= 0;
 var glb_maxvalue	= 0;
 
 
-function  create_heatmap(points, html_id){
+function  create_heatmap(points, html_id, begin_date, end_date){
 	var step		= 0.25;
 
 	// for each hour find the relevant percents
@@ -258,7 +258,7 @@ function  create_heatmap(points, html_id){
 	for ( i in sourceData ) {
 		for (var p = 0; p < 20; p++) {
 			if(sourceData[ i ][ 'value' + p ]==0){
-				sourceData[ i ][ 'color' + p ] = 'rgb(105,105,105)';
+				sourceData[ i ][ 'color' + p ] = 'rgb(255,255,255)';
 			}
 			else{
 				sourceData[ i ][ 'color' + p ] = 'rgb(' + getColor(sourceData[ i ][ 'value' + p ]) + ',' +  glb_green + ',' +  glb_blue  + ')';
@@ -272,16 +272,18 @@ function  create_heatmap(points, html_id){
 	for (var p = 0; p < 20; p++) {
 		graphs.push( {
 			"balloonText": "<small>Sleep Data </small>" +
-			"<table>" +
+			"<table class=\"table\">" +
 			"<tbody>" +
-			"<tr><td style='text-align: left'>Absolute frequency: </td><td style='text-align: right'><b>[[value" + p + "]]</b></td></tr>" +
-			"<tr><td style='text-align: left'>Range of percentage: </td><td style='text-align: right'><b>" + p*5 + "%-" + (p*5+5) + "%</b></td></tr>" +
-			"<tr><td style='text-align: left'>Sleeping hours: </td><td style='text-align: right'><b>[[category]]</b></td></tr>" +
+			"<tr><td style='text-align: left'>From </td><td style='text-align: right'><b>"+ begin_date +"</b></td></tr>" +
+			"<tr><td style='text-align: left'>to </td><td style='text-align: right'><b>"+ end_date +"</b></td></tr>" +
+			"<tr><td style='text-align: left'>you slept </td><td style='text-align: right'><b>[[value" + p + "]]</b> time(s)</td></tr>" +
+			"<tr><td style='text-align: left'>with a percentage of </td><td style='text-align: right'><b>" + p*5 + "%-" + (p*5+5) + "%</b> of deep sleep</td></tr>" +
+			"<tr><td style='text-align: left'>by </td><td style='text-align: right'><b>[[category]] h</b> of total sleeping hours</td></tr>" +
 			"</tbody>" +
 			"</table>",
 			"fillAlphas": 1,
 			"lineAlpha": 0.2,
-			"lineColor": "rgb(255,255,255)",
+			"lineColor": "rgb(105,105,105)",
 			"type": "column",
 			"colorField": "color" + p,
 			"valueField": "percent" + p
@@ -299,7 +301,7 @@ function  create_heatmap(points, html_id){
 				"stackType": "regular",
 				"axisAlpha": 0.3,
 				"gridAlpha": 1,
-				"gridColor": "#000000",
+				"gridColor": "rgb(105,105,105)",
 				"maximum": 20,
 				"labelFunction":function( value, valueText, valueAxis) {
 							return value * 5 + '%';
@@ -313,7 +315,7 @@ function  create_heatmap(points, html_id){
 				"gridPosition": "start",
 				"axisAlpha": 0,
 				"gridAlpha": 1,
-				"gridColor": "#000000",
+				"gridColor": "rgb(105,105,105)",
 				"position": "left"
 				},
 		} );
@@ -325,7 +327,7 @@ function  charts_createHeatmap(rooturl_points, user_id, begin_date, end_date, ht
 	$.ajax({url: url_points, success: function(result){
 		var points = eval(result);
 		console.log('data from  %s len: %d', url_points , points.length);
-		create_heatmap(points, html_id);
+		create_heatmap(points, html_id, begin_date, end_date);
 	 }});
 
 }//charts_createHeatmap
