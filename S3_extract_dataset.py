@@ -85,7 +85,6 @@ def FittedCurve(day, values, usr):
     p0 = np.array([0.0, 100.0, 50.0])
     sol = minimize(obj, p0)
     p = sol.x
-    print('p', p)
 
 
     sc = p[1]*p[2]
@@ -169,7 +168,6 @@ for user in db.general_user.find():
     dct[user['email']] = []
 
 for user in dct:
-    print(user)
     lst = []
     for elem in db[user].find():
         if isinstance(elem['time_stamp'], datetime) :		
@@ -212,18 +210,16 @@ for usr in dct:
             r.update( fnc(daystart, values, usr) )
                 
         # save them for the user
-        print(usr, daystart, r)
         all_feat.append(r)
 
     #new save
     collection_name = ('%s_data' % (usr))
     if all_feat:
         for data in all_feat:
-            print(all_feat)
             db[collection_name].insert(data)
     else:
-        print('empty', all_feat)
-    
+        pass
+
     # save the data
 #    pc.dump(all_feat, open('/home/matthias/data/' +usr + '/' + usr + '.data','w+b'))
     
