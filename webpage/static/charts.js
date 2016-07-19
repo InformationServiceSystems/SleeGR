@@ -15,6 +15,7 @@ weekday[3] = "Wednesday";
 weekday[4] = "Thursday";
 weekday[5] = "Friday";
 weekday[6] = "Saturday";
+var points;
 /*
 		function name: charts_createRanking
 */
@@ -501,18 +502,31 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 	var serieses = [];
 
 	$.ajax({url: url, success: function(result){
-			var points1 = eval(result);
-			addSerieses(points1, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
-			console.log('data from  %s len: %d', url, points1.length);
+			points = eval(result);
+			addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
+			console.log('data from  %s len: %d', url, points.length);
 			// the following commented lines are for getting type2 uncomment to get the results
 			//$.ajax({url: type2_url, success: function(result_type2){
 			//    	var points2 = eval(result_type2);
 			//	console.log('data from  %s len: %d', type2_url, points2.length);
 			//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
 				draw_chart(serieses, html_id, only_5mins);
-				fadeInHtmlTable(points1, table_id);
+				fadeInHtmlTable(points, table_id);
  			//}});
         }});
+
+}//charts_createMultiChart
+
+function charts_switchMultiChart(show_type1, show_data, html_id, data_select_id, only_5mins){
+	var serieses = [];
+	addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
+	// the following commented lines are for getting type2 uncomment to get the results
+	//$.ajax({url: type2_url, success: function(result_type2){
+	//    	var points2 = eval(result_type2);
+	//	console.log('data from  %s len: %d', type2_url, points2.length);
+	//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
+	draw_chart(serieses, html_id, only_5mins);
+	//}});
 
 }//charts_createMultiChart
 
