@@ -3,7 +3,6 @@ import csv
 import re
 from datetime import datetime
 import database
-import pprint
 
 from dateutil import rrule
 
@@ -14,14 +13,10 @@ class csv_2_reader():
         self.db_inserts, self.db_extended = database.init()
         self.folder_path = "/home/matthias/data"
 
-
-
     def to_mongo(self, user_id):
         lst = self.to_json(user_id)
         for json in lst:
             self.db_inserts.insert_csv_row(user_id, json)
-        print('done')
-
 
     def to_json(self, user_id):
         ret_list = []
@@ -35,7 +30,7 @@ class csv_2_reader():
                                       'value_3']
                         csv_reader = csv.DictReader(csv_file, fieldnames=fieldnames)
                         for row in csv_reader:
-                            new_json = {'UserID': row['UserID'], 'type': int(row['measurement_type']),
+                            new_json = {'email': user_id, 'type': int(row['measurement_type']),
                                         'time_stamp': datetime.strptime(row['time_stamp'], "%Y.%m.%d_%H:%M:%S"), 'tag': row['Type_of_activity'],
                                         'val0': float(row['value_1']), 'val1': float(row['value_1']), 'val2': float(row['value_3'])}
                             ret_list.append(new_json)
@@ -59,7 +54,6 @@ class csv_2_reader():
                             new_json['val2'] = float(value[12])
                             ret_list.append(new_json)
             except Exception as e:
-                print(e)
                 print('messed up', file_name)
         return ret_list
 
@@ -68,7 +62,6 @@ def push_to_db():
     c2r = csv_2_reader()
     folder_path = "/home/matthias/data"
     for user in os.listdir(folder_path):
-        print(user)
         c2r.to_mongo(user)
 
 if __name__ == '__main__':
