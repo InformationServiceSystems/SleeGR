@@ -548,7 +548,7 @@ function draw_chart(serieses, html_id, only_5mins){
 					var hours = this.value/(60*60);
 					return hours.toFixed(2) + 'h';
 				}
-			},
+			}
 			//tickInterval: 1.5
 		},
 		 yAxis: {
@@ -801,11 +801,33 @@ function fadeInHtmlTable (points, table_div){
 function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay, testJSON){
 	var url = encodeURI(rooturl+"/"+user_id+"/"+xLabel+"/"+yLabel+"/"+nextDay);
 	var series = [];
+	var formatter = null;
 	$.ajax({url: url, success: function(result){
 		var points1 = JSON.parse(result);
 		console.log('data from  %s len: %d', url, points1.length);
 		series = get_linear_series(points1, true, 'circle', title);
-		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series);
+
+		if (points1.xlabel=="Sleep start"){
+			formatter = function(){
+				var format = this.value/(60*60);
+				var hours = Math.round(format);
+				var mins = format-hours;
+				if (mins<0){
+					--hours;
+					mins = format-hours;
+				}
+				mins = Math.round(mins*60);
+				return hours + ':' + mins + 'h';
+			}
+		}
+		if (points1.xlabel=="Day of week"){
+			formatter = function(){
+				if (this.value-Math.round(this.value)==0){
+					return weekday[Math.round(this.value)];
+				}
+			}
+		}
+		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series, formatter);
 
 		//TODO get data from REST server and format url
 		return;
@@ -873,7 +895,7 @@ function createlinearLineSeries(color, type, id, name, data, xAxis, yAxis){
 	return series;
 }
 
-function draw_linearChart(title, xAxis, yAxis, html_id, serieses){
+function draw_linearChart(title, xAxis, yAxis, html_id, serieses, formatter){
 	$(html_id).highcharts({
 		title: {
 			text: title
@@ -881,6 +903,9 @@ function draw_linearChart(title, xAxis, yAxis, html_id, serieses){
 		xAxis: {
 			title: {
 				text: xAxis
+			},
+			labels: {
+				formatter: formatter
 			}
 		},
 		yAxis: {
