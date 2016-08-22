@@ -183,22 +183,28 @@ function create_gaussian(settings, points, html_id){
 
 	} );
 }// create_gaussian
-function charts_createGaussian(rooturl_points, rooturl_settings, user_id, begin_date, end_date, html_id){
+function charts_createGaussian(rooturl, user_id, begin_date, end_date, html_id){
 	try{
-		log('charts_createGaussian', 'start');
-		var url_points 		= format_url(rooturl_points, user_id, begin_date, end_date);
-		var url_settings 	= format_url(rooturl_settings, user_id, begin_date, end_date);
+		var data = {
+					userId: user_id,
+					beginDate: begin_date,
+					endDate: end_date,
+					gaussianSettings: true
+					};
 
-		$.ajax({url:  url_settings , success: function(setting_result){
-				var settings = eval(setting_result);
-				$.ajax({url:  url_points, success: function(points_result){
+		$.ajax({type: "POST", url:  rooturl, data: data, success: function(setting_result){
+			var settings = eval(setting_result);
+			data.gaussianSettings = false;
+			$.ajax({type: "POST", url:  rooturl, data: data, success: function(points_result){
 					var points = eval(points_result);
-					console.log('data from  %s len: %d', url_points , points.length);
+					console.log('data from  %s len: %d', rooturl , points.length);
 					create_gaussian(settings, points, html_id);
 				}});
 		}});
 	}
-	catch(e){logerr('charts_createGaussian', e);}
+	catch(e){
+		logerr('charts_createGaussian', e);
+	}
 
 
 }// charts_createGaussian
@@ -322,12 +328,17 @@ function  create_heatmap(points, html_id, begin_date, end_date){
 		} );
 }
 
-function  charts_createHeatmap(rooturl_points, user_id, begin_date, end_date, html_id){
-	var url_points 	= format_url(rooturl_points, user_id, begin_date, end_date);
+function  charts_createHeatmap(rooturl, user_id, begin_date, end_date, html_id){
+	var data = {
+				userId: user_id,
+				beginDate: begin_date,
+				endDate: end_date,
+				gaussianSettings: false
+				};
 
-	$.ajax({url: url_points, success: function(result){
+	$.ajax({type: "POST", url: rooturl, data: data, success: function(result){
 		var points = eval(result);
-		console.log('data from  %s len: %d', url_points , points.length);
+		console.log('data from  %s len: %d', rooturl , points.length);
 		create_heatmap(points, html_id, begin_date, end_date);
 	 }});
 
@@ -497,14 +508,19 @@ function newRandomColor() {
 }
 
 
-function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id, begin_date, end_date, html_id, table_id, data_select_id, only_5mins){
-	var url = format_url(rooturl_points , user_id, begin_date, end_date);
+function charts_createMultiChart(rooturl, show_type1, show_data, user_id, begin_date, end_date, html_id, table_id, data_select_id, only_5mins){
+	var data = {
+				userId: user_id,
+				type: "Cooldown",
+				beginDate: begin_date,
+				endDate: end_date
+				};
 	var serieses = [];
 
-	$.ajax({url: url, success: function(result){
+	$.ajax({type: "POST", url: rooturl, data: data, success: function(result){
 			points = eval(result);
 			addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
-			console.log('data from  %s len: %d', url, points.length);
+			console.log('data from  %s len: %d', rooturl, points.length);
 			// the following commented lines are for getting type2 uncomment to get the results
 			//$.ajax({url: type2_url, success: function(result_type2){
 			//    	var points2 = eval(result_type2);
@@ -520,15 +536,9 @@ function charts_createMultiChart(rooturl_points, show_type1, show_data, user_id,
 function charts_switchMultiChart(show_type1, show_data, html_id, data_select_id, only_5mins){
 	var serieses = [];
 	addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
-	// the following commented lines are for getting type2 uncomment to get the results
-	//$.ajax({url: type2_url, success: function(result_type2){
-	//    	var points2 = eval(result_type2);
-	//	console.log('data from  %s len: %d', type2_url, points2.length);
-	//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
 	draw_chart(serieses, html_id, only_5mins);
-	//}});
 
-}//charts_createMultiChart
+}//charts_switchMultiChart
 
 
 function draw_chart(serieses, html_id, only_5mins){
@@ -799,12 +809,17 @@ function fadeInHtmlTable (points, table_div){
  */
 
 function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay, testJSON){
-	var url = encodeURI(rooturl+"/"+user_id+"/"+xLabel+"/"+yLabel+"/"+nextDay);
+	var data = {
+				userId: user_id,
+				xAxis: xLabel,
+				yAxis: yLabel,
+				nextDay: nextDay
+				};
 	var series = [];
 	var formatter = null;
-	$.ajax({url: url, success: function(result){
+	$.ajax({type: "POST", url: rooturl, data: data, success: function(result){
 		var points1 = JSON.parse(result);
-		console.log('data from  %s len: %d', url, points1.length);
+		console.log('data from  %s len: %d', rooturl, points1.length);
 		series = get_linear_series(points1, true, 'circle', title);
 
 		if (points1.xlabel=="Sleep start"){
@@ -829,7 +844,6 @@ function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLa
 		}
 		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series, formatter);
 
-		//TODO get data from REST server and format url
 		return;
 
 	}});
