@@ -362,12 +362,11 @@ function log(fun_name, msg){
 		console.log('[%s]:%s', fun_name, msg);
 }
 
-function no_data_handler(html_id, measurement_type){
+function no_data_handler(html_id, text){
 	var error_page = '<div class="error-content" align="center"> ' +
 		'<h3><i class="fa fa-warning text-yellow"></i> No data available.</h3> ' +
 		'<p>' +
-		'Sorry! There is no ' + measurement_type + ' data measured in the given time period. ' +
-		'Please choose another period to analyse your personal ' + measurement_type + ' data.' +
+		'Sorry! ' + text +
 		'</p> ' +
 		'</div><!-- /.error-content --> ';
 
@@ -547,8 +546,8 @@ function charts_createMultiChart(rooturl, show_type1, show_data, user_id, begin_
 				if ($(html_id).highcharts()!=null){
 					$(html_id).highcharts().destroy();
 				}
-				no_data_handler(html_id, 'heartrate');
-				no_data_handler(table_id, 'heartrate');
+				no_data_handler(html_id, 'There is no heartrate data measured in the given time period. Please choose another period to analyse your personal heartrate data.');
+				no_data_handler(table_id, 'There is no heartrate data measured in the given time period. Please choose another period to analyse your personal heartrate data.');
 			}
 
         }});
@@ -839,7 +838,7 @@ function fadeInHtmlTable (points, table_div){
  function name: charts_createLinearCurve
  */
 
-function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay, testJSON){
+function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLabel, yLabel, nextDay){
 	var data = {
 				userId: user_id,
 				xAxis: xLabel,
@@ -850,30 +849,39 @@ function charts_getCorrelations(rooturl, show_data, user_id, html_id, title, xLa
 	var formatter = null;
 	$.ajax({type: "POST", url: rooturl, data: data, success: function(result){
 		var points1 = JSON.parse(result);
-		console.log('data from  %s len: %d', rooturl, points1.length);
-		series = get_linear_series(points1, true, 'circle', title);
+		if (points1!=null){
+			console.log('data from  %s', rooturl);
+			series = get_linear_series(points1, true, 'circle', title);
 
-		if (points1.xlabel=="Sleep start"){
-			formatter = function(){
-				var format = this.value/(60*60);
-				var hours = Math.round(format);
-				var mins = format-hours;
-				if (mins<0){
-					--hours;
-					mins = format-hours;
-				}
-				mins = Math.round(mins*60);
-				return hours + ':' + mins + 'h';
-			}
-		}
-		if (points1.xlabel=="Day of week"){
-			formatter = function(){
-				if (this.value-Math.round(this.value)==0){
-					return weekday[Math.round(this.value)];
+			if (points1.xlabel=="Sleep start"){
+				formatter = function(){
+					var format = this.value/(60*60);
+					var hours = Math.round(format);
+					var mins = format-hours;
+					if (mins<0){
+						--hours;
+						mins = format-hours;
+					}
+					mins = Math.round(mins*60);
+					return hours + ':' + mins + 'h';
 				}
 			}
+			if (points1.xlabel=="Day of week"){
+				formatter = function(){
+					if (this.value-Math.round(this.value)==0){
+						return weekday[Math.round(this.value)];
+					}
+				}
+			}
+			draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series, formatter);
 		}
-		draw_linearChart(title, points1.xlabel, points1.ylabel, html_id, series, formatter);
+		else{
+			if($(html_id).highcharts()!=null){
+				$(html_id).highcharts().destroy();
+			}
+			no_data_handler(html_id, 'There is no correlation data available from ' + xLabel + ' to ' + yLabel + '. Please choose other labels.');
+		}
+
 
 		return;
 
