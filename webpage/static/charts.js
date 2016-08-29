@@ -361,6 +361,19 @@ function log(fun_name, msg){
 	if(enable_logging)
 		console.log('[%s]:%s', fun_name, msg);
 }
+
+function no_data_handler(html_id, measurement_type){
+	var error_page = '<div class="error-content" align="center"> ' +
+		'<h3><i class="fa fa-warning text-yellow"></i> No data available.</h3> ' +
+		'<p>' +
+		'Sorry! There is no ' + measurement_type + ' data measured in the given time period. ' +
+		'Please choose another period to analyse your personal ' + measurement_type + ' data.' +
+		'</p> ' +
+		'</div><!-- /.error-content --> ';
+
+	$(html_id).html(error_page);
+
+}
 /*
 	function name: logerr
 */
@@ -516,27 +529,39 @@ function charts_createMultiChart(rooturl, show_type1, show_data, user_id, begin_
 				endDate: end_date
 				};
 	var serieses = [];
-
 	$.ajax({type: "POST", url: rooturl, data: data, success: function(result){
 			points = eval(result);
-			addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
-			console.log('data from  %s len: %d', rooturl, points.length);
-			// the following commented lines are for getting type2 uncomment to get the results
-			//$.ajax({url: type2_url, success: function(result_type2){
-			//    	var points2 = eval(result_type2);
-			//	console.log('data from  %s len: %d', type2_url, points2.length);
-			//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
+			if (points.length!=0){
+				addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
+				console.log('data from  %s len: %d', rooturl, points.length);
+				// the following commented lines are for getting type2 uncomment to get the results
+				//$.ajax({url: type2_url, success: function(result_type2){
+				//    	var points2 = eval(result_type2);
+				//	console.log('data from  %s len: %d', type2_url, points2.length);
+				//	addSerieses(points2, show_data, 'Type2', true, data_select_id, serieses,  'triangle');
 				draw_chart(serieses, html_id, only_5mins);
 				fadeInHtmlTable(points, table_id);
- 			//}});
+				//}});
+			}
+			else{
+				if ($(html_id).highcharts()!=null){
+					$(html_id).highcharts().destroy();
+				}
+				no_data_handler(html_id, 'heartrate');
+				no_data_handler(table_id, 'heartrate');
+			}
+
         }});
 
 }//charts_createMultiChart
 
 function charts_switchMultiChart(show_type1, show_data, html_id, data_select_id, only_5mins){
-	var serieses = [];
-	addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
-	draw_chart(serieses, html_id, only_5mins);
+	if (points.length != 0){
+		var serieses = [];
+		addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
+		draw_chart(serieses, html_id, only_5mins);
+	}
+
 
 }//charts_switchMultiChart
 
@@ -735,30 +760,36 @@ function createLineSeries(color, type, visible, data_select_id, id, name, data, 
 
 function setTypeVisible(htmlId, type, visible, showdata){
 
-	var chart = $(htmlId).highcharts();
-	var series = chart.series;
-	for(var i=0; i<series.length; i++){
-		if(series[i].options.grp == type){
-			if(series[i].options.type == 'scatter')
-				series[i].setVisible(showdata && visible, false);
-			else
-				series[i].setVisible(visible, false);
+	if ($(htmlId).highcharts()!=null){
+		var chart = $(htmlId).highcharts();
+		var series = chart.series;
+		for(var i=0; i<series.length; i++){
+			if(series[i].options.grp == type){
+				if(series[i].options.type == 'scatter')
+					series[i].setVisible(showdata && visible, false);
+				else
+					series[i].setVisible(visible, false);
 
-		}// if group matches
-	}// for
-	chart.redraw();
+			}// if group matches
+		}// for
+		chart.redraw();
+	}
+
 }
 
 function setScatterVisible(htmlId, visible){
-	var chart = $(htmlId).highcharts();
-	var series = chart.series;
-	for(var i=0; i<series.length; i++){
-		if(series[i].options.type == 'scatter'){
-			var linkedto = chart.get(series[i].options.linkedTo);
-			series[i].setVisible((visible && linkedto.visible), false);
-		}// if group matches
-	}// for
-	chart.redraw();
+	if ($(htmlId).highcharts()!=null){
+		var chart = $(htmlId).highcharts();
+		var series = chart.series;
+		for(var i=0; i<series.length; i++){
+			if(series[i].options.type == 'scatter'){
+				var linkedto = chart.get(series[i].options.linkedTo);
+				series[i].setVisible((visible && linkedto.visible), false);
+			}// if group matches
+		}// for
+		chart.redraw();
+	}
+
 }
 
 function fadeInHtmlTable (points, table_div){
