@@ -1,4 +1,4 @@
-define (['jquery', 'charts', 'highcharts'], function ($, chart){
+define (['jquery', 'charts'], function ($, chart){
     var setup = {};
     /**
      * update functions
