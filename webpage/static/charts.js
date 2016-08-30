@@ -16,6 +16,7 @@ weekday[4] = "Thursday";
 weekday[5] = "Friday";
 weekday[6] = "Saturday";
 var points;
+
 /*
 		function name: charts_createRanking
 */
@@ -196,9 +197,21 @@ function charts_createGaussian(rooturl, user_id, begin_date, end_date, html_id){
 			var settings = eval(setting_result);
 			data.gaussianSettings = false;
 			$.ajax({type: "POST", url:  rooturl, data: data, success: function(points_result){
-					var points = eval(points_result);
+				var points = eval(points_result);
+				if (points.length != 0){
 					console.log('data from  %s len: %d', rooturl , points.length);
 					create_gaussian(settings, points, html_id);
+				}
+				else{
+					var chart = getChart(html_id);
+					if (chart != null){
+						chart.clear();
+						chart=null;
+					}
+					html_id = '#'+html_id;
+					no_data_handler(html_id, 'There is no sleep data measured in the given time period. Please choose another period to analyse your personal sleep data.');
+				}
+
 				}});
 		}});
 	}
@@ -338,8 +351,19 @@ function  charts_createHeatmap(rooturl, user_id, begin_date, end_date, html_id){
 
 	$.ajax({type: "POST", url: rooturl, data: data, success: function(result){
 		var points = eval(result);
-		console.log('data from  %s len: %d', rooturl , points.length);
-		create_heatmap(points, html_id, begin_date, end_date);
+		if (points.length != 0){
+			console.log('data from  %s len: %d', rooturl , points.length);
+			create_heatmap(points, html_id, begin_date, end_date);
+		}
+		else{
+			var chart = getChart(html_id);
+			if (chart != null){
+				chart.clear();
+				chart=null;
+			}
+			html_id = '#'+html_id;
+			no_data_handler(html_id, 'There is no sleep data measured in the given time period. Please choose another period to analyse your personal sleep data.');
+		}
 	 }});
 
 }//charts_createHeatmap
@@ -373,11 +397,34 @@ function no_data_handler(html_id, text){
 	$(html_id).html(error_page);
 
 }
+
+function get_current_color(html_id, name){
+	if ($(html_id).highcharts()!=null){
+		var chart = $(html_id).highcharts();
+		var serieses = chart.series;
+		for (var i = 0; i<serieses.length; i++){
+			if (serieses[i].options.type=='line'&& serieses[i].options.name==name){
+				return serieses[i].options.color
+			}
+		}
+	}
+	return newRandomColor();
+
+}
 /*
 	function name: logerr
 */
 function logerr(fun_name, msg){
 	console.error('ERROR [%s]:%s', fun_name, msg);
+}
+
+function getChart(id) {
+    var allCharts = AmCharts.charts;
+    for (var i = 0; i < allCharts.length; i++) {
+        if (id == allCharts[i].div.id) {
+            return allCharts[i];
+        }
+    }
 }
 /*
 	function name: toDate
@@ -557,7 +604,7 @@ function charts_createMultiChart(rooturl, show_type1, show_data, user_id, begin_
 function charts_switchMultiChart(show_type1, show_data, html_id, data_select_id, only_5mins){
 	if (points.length != 0){
 		var serieses = [];
-		addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins);
+		addSerieses(points, show_data, 'Type1', show_type1, data_select_id, serieses, 'circle', only_5mins, html_id);
 		draw_chart(serieses, html_id, only_5mins);
 	}
 
@@ -637,7 +684,7 @@ function draw_chart(serieses, html_id, only_5mins){
 }
 
 
-function addSerieses(points, show_data,  type, visible, data_select_id, serieses,  point_symbol, only_5mins){
+function addSerieses(points, show_data,  type, visible, data_select_id, serieses,  point_symbol, only_5mins, html_id){
 	var max_x 	= only_5mins? 300: 12000; // 12K
 	var step	= only_5mins? 1: 10;
 
@@ -659,7 +706,12 @@ function addSerieses(points, show_data,  type, visible, data_select_id, serieses
 				var scatter_name	= weekday[dateObj.getDay()] + ' ' + date;
 				var line_name		= weekday[dateObj.getDay()] + ' ' + date;
 				var legend		= 'maximum: ' + line_data[0][1] + ', minimum: ' + line_data[line_data.length-1][1] + ', current: ';
-				var color		=  newRandomColor();
+				if (html_id){
+					var color = get_current_color(html_id, line_name);
+				}
+				else{
+					var color		=  newRandomColor();
+				}
 
 				var id 			= type + '_' + i;
 
