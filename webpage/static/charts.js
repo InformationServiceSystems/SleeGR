@@ -1,4 +1,4 @@
-define (['jquery', 'serial','highcharts', 'exporting', 'amStock', 'themeLight', 'gauge'], function ($, AmCharts) {
+define (['jquery', 'amcharts.serial', 'highcharts', 'highcharts.exporting', 'amcharts.themeLight', 'amcharts.export'], function ($, AmCharts) {
 	var chart = {};
 	/**************************************************************************************************
 

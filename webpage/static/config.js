@@ -1,55 +1,69 @@
-// config.js
+/**
+ * Configuration file for all requirejs dependencies
+ * used in order to achieve dynamically loaded javascript files
+ */
 
 require.config({
     baseUrl: 'static',
     paths: {
-        amcharts:   'amcharts/amcharts',
-        serial:     'amcharts/serial',
-        amStock:    'amcharts/amstock',
-        themeLight: 'http://www.amcharts.com/lib/3/themes/light',
-        gauge:      'http://www.amcharts.com/lib/3/gauge',
-        jquery:     'plugins/jQuery/jQuery-2.1.4.min',
-        jqueryui:  'jquery-ui',
-        bootstrap:  'bootstrap/js/bootstrap.min',
-        app:        'dist/js/app.min',
-        charts:     'charts',
-        moment:     'http://momentjs.com/downloads/moment',
-        highcharts: 'https://code.highcharts.com/highcharts',
-        exporting:  'https://code.highcharts.com/modules/exporting',
-        datepicker: 'plugins/daterangepicker/daterangepicker',
-        datatables: 'plugins/datatables/jquery.dataTables.min',
-        tablesbootstrap:    'plugins/datatables/dataTables.bootstrap.min',
-        slimScroll: 'plugins/slimScroll/jquery.slimscroll.min',
-        fastClick:  'plugins/fastclick/fastclick.min',
-        setup:      'setup'
+        'amcharts':             'amcharts/amcharts',
+        'amcharts.serial':      'amcharts/serial',
+        'amcharts.stock':       'amcharts/amstock',
+        'amcharts.themeLight':  'http://www.amcharts.com/lib/3/themes/light',
+        'amcharts.gauge':       'http://www.amcharts.com/lib/3/gauge',
+        'amcharts.export':      'amcharts/plugins/export/export',
+        'jquery':               'plugins/jQuery/jQuery-2.1.4.min',
+        'jqueryui':             'jquery-ui',
+        'bootstrap':            'bootstrap/js/bootstrap.min',
+        'app':                  'dist/js/app.min',
+        'charts':               'charts',
+        'moment':               'http://momentjs.com/downloads/moment',
+        'highcharts':           'https://code.highcharts.com/highcharts',
+        'highcharts.exporting': 'https://code.highcharts.com/modules/exporting',
+        'datepicker':           'plugins/daterangepicker/daterangepicker',
+        'jquery.datatables':    'plugins/datatables/jquery.dataTables.min',
+        'bootstrap.tables':     'plugins/datatables/dataTables.bootstrap.min',
+        'jquery.slimScroll':    'plugins/slimScroll/jquery.slimscroll.min',
+        'fastClick':            'plugins/fastclick/fastclick.min',
+        'setup':                'setup'
     },
     shim:  {
         'highcharts': {
-            exports: "Highcharts",
-            deps: ["jquery"]
+            exports: 'Highcharts',
+            deps: ['jquery']
         },
-        'exporting': {
-            deps: ['highcharts']
+        'highcharts.exporting': {
+            deps: ['jquery', 'highcharts']
         },
-        'gauge': {
+        'amcharts.gauge': {
 			deps: [ 'amcharts' ],
 			exports: 'AmCharts',
 			init: function() {
 				AmCharts.isReady = true;
 			}
 		},
-        'themeLight': {
-            deps: ['amcharts', 'serial', 'amStock']
+        'amcharts.themeLight': {
+            deps: ['amcharts']
         },
-        'serial': {
+        'amcharts.serial': {
 			deps: [ 'amcharts' ],
 			exports: 'AmCharts',
 			init: function() {
 				AmCharts.isReady = true;
 			}
 		},
-        'amStock': {
-            deps: ['amcharts', 'serial']
+        'amcharts.stock': {
+            deps: [ 'amcharts' ],
+			exports: 'AmCharts',
+			init: function() {
+				AmCharts.isReady = true;
+			}
+        },
+        'amcharts.export': {
+            deps: ['amcharts']
+        },
+        'bootstrap': {
+            deps: ['jquery']
         }
     }
 });
