@@ -16,6 +16,7 @@ import names
 from decorators import login_required
 from csv_2_mongo import csv_2_reader
 from datareader import DataReader
+from json2mongo import  Json2mongo
 
 db_inserts, db_extended = database.init()
 
@@ -88,20 +89,19 @@ def registration():
     return app.send_static_file('iot-register.html')
 
 
-@app.route('/show_stats/<measurement_type>/<user_id>/<start_date>/<end_date>', methods=['POST', 'GET'])
+@app.route('/heartrate', methods=['POST'])
 @login_required
-def show_measurement(measurement_type, user_id, start_date, end_date):
-    r = DataReader()
-    rr = csv_2_reader()
-
-    start = datetime.strptime(start_date, '%d.%m.%Y')
-    end = datetime.strptime(end_date, '%d.%m.%Y')
-    if int(measurement_type) == 21:
-        # return json.dumps(rr.search_data_bulk(user_id, start, end,  measurement_type))
+def show_measurement():
+    if request.method == 'POST':
+        user_id = request.values['userId']
+        type = request.values['type']
+        start_date = request.values['beginDate']
+        end_date = request.values['endDate']
+        r = DataReader()
+        start = datetime.strptime(start_date, '%d.%m.%Y')
+        end = datetime.strptime(end_date, '%d.%m.%Y')
         return json.dumps(r.heart_rate_special(user_id, start, end))
-    else:
-        # return json.dumps(rr.search_data_bulk(user_id, start, end, measurement_type))
-        return json.dumps(r.read_data(user_id, start, end, measurement_type))
+
 
 
 @app.route('/dashboard')
@@ -123,57 +123,37 @@ def dashboard():
             '{"x_label": "Sleep length", "y_label": "RPE", "next_day": false}]'
     return render_template('iot-triathlon-activity.html', user=session['email'], correlations_list=to_reply)
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
 
-@app.route('/sleepPoints/<user_id>/<start_date>/<end_date>')
+@app.route('/sleepPoints', methods=['POST'])
 @login_required
-def sleep_data(user_id, start_date, end_date):
-    user_id = session['email']
-    r = DataReader()
-    #r = csvReader()
-    rr = csv_2_reader()
-    start = datetime.strptime(start_date, '%d.%m.%Y')
-    end = datetime.strptime(end_date, '%d.%m.%Y')
-    ret = json.dumps(r.read_sleep_data(user_id, start, end))
-    # ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
-    return ret
+def sleep_data():
+    if request.method == 'POST':
+        user_id = request.values['userId']
+        start_date = request.values['beginDate']
+        end_date = request.values['endDate']
+        gaussian_settings = str2bool(request.values['gaussianSettings'])
+        r = DataReader()
+        start = datetime.strptime(start_date, '%d.%m.%Y')
+        end = datetime.strptime(end_date, '%d.%m.%Y')
+        if gaussian_settings:
+            sleep_data = r.read_sleep_data(user_id, start, end)
+            average_list = []
+            var_list = []
+            for data in sleep_data:
+                average_list.append(data['x'])
+                var_list.append(data['y'])
+            if len(average_list) > 1 and len(var_list) > 1:
+                mean_duration = mean(average_list)
+                variance_duration = variance(average_list)
+                return json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}])
+            else:
+                return json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}])
+        else:
+            return json.dumps(r.read_sleep_data(user_id, start, end))
 
 
-@app.route('/gaussianPoints/<user_id>/<start_date>/<end_date>')
-@login_required
-def gaussianPoints(user_id, start_date, end_date):
-    user_id = session['email']
-    r = DataReader()
-    #r = csvReader()
-    rr = csv_2_reader()
-    start = datetime.strptime(start_date, '%d.%m.%Y')
-    end = datetime.strptime(end_date, '%d.%m.%Y')
-    ret = json.dumps(r.read_sleep_data(user_id, start, end))
-    # ret = json.dumps(rr.search_data_bulk(user_id, start,end, 777))
-    return ret
-
-
-@app.route('/gaussian/<user_id>/<start_date>/<end_date>', methods=['GET'])
-@login_required
-def sleep_data_gaussian(user_id, start_date, end_date):
-    user_id = session['email']
-    r =  DataReader()
-    #r = csvReader()
-    rr = csv_2_reader()
-    start = datetime.strptime(start_date, '%d.%m.%Y')
-    end = datetime.strptime(end_date, '%d.%m.%Y')
-    sleep_data = r.read_sleep_data(user_id, start, end)
-    # sleep_data = rr.search_data_bulk(user_id, start,end, 777)
-    average_list = []
-    var_list = []
-    for data in sleep_data:
-        average_list.append(data['x'])
-        var_list.append(data['y'])
-    if len(average_list) > 1 and len(var_list) > 1:
-        mean_duration = mean(average_list)
-        variance_duration = variance(average_list)
-        return json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}])
-    else:
-        return json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}])
 
 
 @app.route('/profile')
@@ -182,13 +162,15 @@ def profile():
     return render_template('iot-triathlon-profile.html', user=session['email'])
 
 
-@app.route('/correlation/<user_id>/<x_label>/<y_label>/<next_day>')
-def correlations(user_id, x_label, y_label, next_day):
-    #cr = csvReader()
-    cr = DataReader()
-    x_label = re.sub('_', ' ', x_label)
-    y_label = re.sub('_', ' ', y_label)
-    return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))
+@app.route('/correlation', methods=['POST'])
+def correlations():
+    if request.method == 'POST':
+        user_id = request.values['userId']
+        x_label = request.values['xAxis']
+        y_label = request.values['yAxis']
+        next_day = request.values['nextDay']
+        cr = DataReader()
+        return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
@@ -217,6 +199,14 @@ def gaussianPoints(user_id, start_date, end_date):
     lst.append({'user_id':1, 'x':0.2 , 'y':4, 'date': '05.03.2016'})
     return json.dumps(lst)
 '''
+
+@app.route('/post_json', methods=['POST'])
+def receive_json():
+    if request.method == 'POST':
+        json = request.json
+        user = ""
+        j2m = Json2mongo(json, user)
+        j2m.check_and_commit()
 
 
 @app.route('/son')
