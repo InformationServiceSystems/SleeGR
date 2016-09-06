@@ -11,7 +11,7 @@ class csv_2_reader():
 
     def __init__(self):
         self.db_inserts, self.db_extended = database.init()
-        self.folder_path = "C:\\Users\\Mirco\\Desktop\\iss\\data"
+        self.folder_path = "/home/matthias/data"
 
     def to_mongo(self, user_id):
         lst = self.to_json(user_id)
@@ -60,7 +60,7 @@ class csv_2_reader():
 
 def push_to_db():
     c2r = csv_2_reader()
-    folder_path = "C:\\Users\\Mirco\\Desktop\\iss\\data"
+    folder_path = "/home/matthias/data"
     for user in os.listdir(folder_path):
         c2r.to_mongo(user)
 

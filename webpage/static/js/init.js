@@ -7,7 +7,7 @@
     /**
 	 * global fields
 	 */
-	var url = 'http://localhost:5000/';
+	var url = 'http://web01.iss.uni-saarland.de/';
 	var multichart_id = '#chartdiv1';
 	var table_id = '#tablediv';
 	var correlations_id = '#correlationsdiv';
