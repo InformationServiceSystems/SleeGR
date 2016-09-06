@@ -1,42 +1,10 @@
+/**
+ * setup module
+ * includes functions to dynamically load content
+ */
+
 define (['jquery', 'charts'], function ($, chart){
-    var setup = {};
-    /**
-     * update functions
-     */
-    setup.update_correlations = function (url, user_id, linearData, correlations_id){
-        var nextDay;
-        var xLabel = $('#xLabel').val();
-        var yLabel = $('#yLabel').val();
-        for (var i = 0; i<linearData.length; i++){
-            if (linearData[i].x_label==xLabel&&linearData[i].y_label==yLabel){
-                nextDay=linearData[i].next_day;
-            }
-        }
-        var currentTitle = 'Correlation between <strong>' + xLabel + '</strong> and <strong>' + yLabel + '</strong>';
-        chart.charts_getCorrelations(url+'correlation', true, user_id, correlations_id, currentTitle, xLabel, yLabel, nextDay);
-    }
-
-
-    setup.update_mutlichart = function (url, user_id, date_from, date_to, multichart_id, table_id, chk_data, only5min,newData){
-        var show_type1 	= $("#chk_type1").is(':checked');
-        var show_data 	= $("#chk_data").is(':checked');
-
-        if (newData){
-            chart.charts_createMultiChart(url+'heartrate', show_type1, show_data, user_id, date_from, date_to, multichart_id, table_id, chk_data, only5min);
-        }
-        else{
-            chart.charts_switchMultiChart(show_type1, show_data, multichart_id, chk_data, only5min);
-        }
-    }
-    setup.update_heatmap = function (url, user_id, date_from, date_to, heatmap_id){
-        chart.charts_createHeatmap(url+'sleepPoints', user_id, date_from, date_to, heatmap_id);
-    }
-
-    setup.update_gaussian = function (url, user_id,  date_from, date_to , gaussian_id){
-        chart.charts_createGaussian(url+'sleepPoints', user_id,  date_from, date_to , gaussian_id);
-    }
-
-    
+    var setup = {};  
 
     
     /**
@@ -97,7 +65,7 @@ define (['jquery', 'charts'], function ($, chart){
             }
         }
         $('#yLabel').html(temp);
-        setup.update_correlations(url, user_id, linearData, correlations_id);
+        chart.update_correlations(url, user_id, linearData, correlations_id);
     }
     setup.contains = function (a, obj) {
         for (var i = 0; i < a.length; i++) {
@@ -106,6 +74,23 @@ define (['jquery', 'charts'], function ($, chart){
             }
         }
         return false;
+    }
+
+    setup.setup_datepicker = function (picker_id, time, update_function) {
+        $(picker_id).daterangepicker(
+					{
+						locale: {
+							format: 'DD.MM.YYYY'
+						},
+						"startDate": time.datepicker_date_from,
+						"endDate": time.datepicker_date_to
+					},
+					function(start, end, label) {
+						time.date_from=start.format('DD.MM.YYYY');
+						time.date_to=end.format('DD.MM.YYYY');
+						update_function ();
+					}
+			);
     }
     
     return setup;

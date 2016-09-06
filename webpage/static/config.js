@@ -16,7 +16,7 @@ require.config({
         'jqueryui':             'jquery-ui',
         'bootstrap':            'bootstrap/js/bootstrap.min',
         'app':                  'dist/js/app.min',
-        'charts':               'charts',
+        'charts':               'js/charts',
         'moment':               'http://momentjs.com/downloads/moment',
         'highcharts':           'https://code.highcharts.com/highcharts',
         'highcharts.exporting': 'https://code.highcharts.com/modules/exporting',
@@ -25,7 +25,7 @@ require.config({
         'bootstrap.tables':     'plugins/datatables/dataTables.bootstrap.min',
         'jquery.slimScroll':    'plugins/slimScroll/jquery.slimscroll.min',
         'fastClick':            'plugins/fastclick/fastclick.min',
-        'setup':                'setup'
+        'setup':                'js/setup'
     },
     shim:  {
         'highcharts': {
@@ -63,6 +63,9 @@ require.config({
             deps: ['amcharts']
         },
         'bootstrap': {
+            deps: ['jquery']
+        },
+        'app':{
             deps: ['jquery']
         }
     }

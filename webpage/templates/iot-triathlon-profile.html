@@ -63,13 +63,11 @@
 {% endblock %}
 
   {% block JS %} {{super() }}
-    <script data-main="../static/config" src="../static/require-2.2.0.js"></script>
+
     <script type="text/javascript">
         require(['config'], function(){
             var dependecies = ['jquery', 'datepicker','jqueryui', 'bootstrap', 'app', 'jquery.slimScroll', 'fastClick'];
-           require(dependecies, function($){
-
-           });
+           require(dependecies);
         });
     </script>
     {% endblock %}

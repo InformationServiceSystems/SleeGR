@@ -1,4 +1,4 @@
-define (['jquery', 'amcharts.serial', 'highcharts', 'highcharts.exporting', 'amcharts.themeLight', 'amcharts.export'], function ($, AmCharts) {
+define (['jquery', 'amcharts.serial', 'highcharts', 'highcharts.exporting', 'amcharts.themeLight'], function ($, AmCharts) {
 	var chart = {};
 	/**************************************************************************************************
 
@@ -18,6 +18,42 @@ define (['jquery', 'amcharts.serial', 'highcharts', 'highcharts.exporting', 'amc
 	weekday[5] = "Friday";
 	weekday[6] = "Saturday";
 	var points;
+
+	/**
+     * update functions
+     */
+    chart.update_correlations = function (url, user_id, linearData, correlations_id){
+        var nextDay;
+        var xLabel = $('#xLabel').val();
+        var yLabel = $('#yLabel').val();
+        for (var i = 0; i<linearData.length; i++){
+            if (linearData[i].x_label==xLabel&&linearData[i].y_label==yLabel){
+                nextDay=linearData[i].next_day;
+            }
+        }
+        var currentTitle = 'Correlation between <strong>' + xLabel + '</strong> and <strong>' + yLabel + '</strong>';
+        chart.charts_getCorrelations(url+'correlation', true, user_id, correlations_id, currentTitle, xLabel, yLabel, nextDay);
+    }
+
+
+    chart.update_mutlichart = function (url, user_id, date_from, date_to, multichart_id, table_id, chk_data, only5min,newData){
+        var show_type1 	= $("#chk_type1").is(':checked');
+        var show_data 	= $("#chk_data").is(':checked');
+
+        if (newData){
+            chart.charts_createMultiChart(url+'heartrate', show_type1, show_data, user_id, date_from, date_to, multichart_id, table_id, chk_data, only5min);
+        }
+        else{
+            chart.charts_switchMultiChart(show_type1, show_data, multichart_id, chk_data, only5min);
+        }
+    }
+    chart.update_heatmap = function (url, user_id, date_from, date_to, heatmap_id){
+        chart.charts_createHeatmap(url+'sleepPoints', user_id, date_from, date_to, heatmap_id);
+    }
+
+    chart.update_gaussian = function (url, user_id,  date_from, date_to , gaussian_id){
+        chart.charts_createGaussian(url+'sleepPoints', user_id,  date_from, date_to , gaussian_id);
+    }
 	
 	/*
 			function name: charts_createRanking
