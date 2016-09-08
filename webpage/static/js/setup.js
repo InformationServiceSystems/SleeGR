@@ -3,14 +3,14 @@
  * includes functions to dynamically load content
  */
 
-define (['jquery', 'charts'], function ($, chart){
+define (['jquery', 'common.functions', 'charts.updater'], function ($, utils, updater){
     var setup = {};  
 
     
     /**
      * setup page functions
      */
-    setup.set_default_picker = function (time, dateRange){
+    setup.set_default_picker = function (time, dateRange, picker_id){
 
         var d = new Date();
         var curr_date = d.getDate();
@@ -34,14 +34,15 @@ define (['jquery', 'charts'], function ($, chart){
     
         time.date_to 	= curr_date.toString()+'.'+curr_month.toString()+'.'+curr_year.toString();
         time.datepicker_date_to = (curr_month).toString() + '/' + curr_date.toString() + '/' + curr_year.toString();
-    
-        document.getElementById('reservation').setAttribute("value", time.datepicker_date_from + " - " + time.datepicker_date_to);
+
+        $(picker_id).attr ('value', time.datepicker_date_from + " - " + time.datepicker_date_to);
     }
 
 
-    setup.select_all = function (){
-        $('#chk_type1').attr("checked",true);
-        $('#chk_data').attr("checked",true);
+    setup.select_all = function (checkboxes){
+        checkboxes.forEach(function(html_id){
+            $(html_id).attr('checked', true);
+        });
     }
 
 
@@ -49,7 +50,7 @@ define (['jquery', 'charts'], function ($, chart){
         var temp = "";
         var xLabels = [];
         for (var i = 0; i<linearData.length; i++){
-            if (!(setup.contains(xLabels, linearData[i].x_label))){
+            if (!(utils.contains(xLabels, linearData[i].x_label))){
                 xLabels.push(linearData[i].x_label);
                 temp += "<option>" + linearData[i].x_label + "</option>";
             }
@@ -65,16 +66,9 @@ define (['jquery', 'charts'], function ($, chart){
             }
         }
         $('#yLabel').html(temp);
-        chart.update_correlations(url, user_id, linearData, correlations_id);
+        updater.update_correlations(url, user_id, linearData, correlations_id);
     }
-    setup.contains = function (a, obj) {
-        for (var i = 0; i < a.length; i++) {
-            if (a[i] == obj) {
-                return true;
-            }
-        }
-        return false;
-    }
+    
 
     setup.setup_datepicker = function (picker_id, time, update_function) {
         $(picker_id).daterangepicker(

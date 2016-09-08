@@ -37,8 +37,7 @@ class JsonValidator:
             result = result and type(json[j]) == self._pattern[j]
         return result
 
-class JsonValidatorSleeGr(JsonValidator):
-    def
+
 class Json2Mongo:
     def _to_db(self,json):
         """
@@ -61,5 +60,5 @@ if __name__ == '__main__':
     pattern =  {'UserID': str, 'type': int,
                             'time_stamp': datetime.datetime, 'tag': str,
                             'val0':float , 'val1':float, 'val2': float}
-    j2m = Json2mongo(json, 'Matthias', pattern)
-    print(j2m.check_format())
+    #j2m = Json2mongo(json, 'Matthias', pattern)
+    #print(j2m.check_format())

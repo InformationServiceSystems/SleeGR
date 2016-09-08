@@ -335,7 +335,9 @@
 
 <script type="text/javascript">
 	require(['config'], function(){
-		require(['../static/js/init']);
+		require(['../static/js/init'], function (init) {
+            init.initDashboard();
+        });
 	});
 </script>
 {% endblock %}

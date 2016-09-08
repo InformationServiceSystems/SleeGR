@@ -119,6 +119,8 @@ class DataReader:
                     pass
                 elif type(val) == numpy.int64:
                     reply[key] = int(val)
+                elif type(val) == numpy.int32:
+                    reply[key] = int(val)
             reply['x0'] = self.get_timedelta(reply['x0'])
             reply['x1'] = self.get_timedelta(reply['x1'])
             for data in reply['data']:
@@ -133,6 +135,8 @@ class DataReader:
                     reply[key] = float(val)
                 elif type(val) == list:
                     pass
+                elif type(val) == numpy.int32:
+                    reply[key] = int(val)
                 elif type(val) == numpy.int64:
                     reply[key] = int(val)
             return reply
