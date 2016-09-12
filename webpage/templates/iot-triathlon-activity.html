@@ -1,4 +1,4 @@
-{% extends "iot-base-2-am.html" %}
+{% extends "iot-base.html" %}
 {% block header %} {{super() }}
 
 {% endblock %}
@@ -254,13 +254,13 @@
 
 {% block JS %} {{super() }}
 
-<link rel="stylesheet" href="{{url_for('static', filename= 'jquery-ui.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/jquery-ui/jquery-ui.css')}}">
 <!-- daterange picker -->
-<link rel="stylesheet" href="../static/plugins/daterangepicker/daterangepicker-bs3.css">
+<link rel="stylesheet" href="{{url_for('static', filename= 'plugins/daterangepicker/daterangepicker-bs3.css')}}">
 <!-- Ionicons -->
 <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 <!-- DataTables -->
-<link rel="stylesheet" href="../static/plugins/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="{{url_for('static', filename= 'plugins/datatables/dataTables.bootstrap.css')}}">
 
 <style>
 	#dialog-link {
