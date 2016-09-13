@@ -16,12 +16,14 @@ reference = {
 
 
 class Json2Mongo:
+    def __init__(self):
+        self._validator = MappingValidator(reference)
+
     def _to_db(self,json):
         """
         JUST USE THIS METHOD IF YOU USED check_format!
         Better use check_and_commit
         """
-        self._validator = MappingValidator(reference)
         self._db_inserts.insert_csv_row(self._user, json)
 
     def check_and_commit(self, json):

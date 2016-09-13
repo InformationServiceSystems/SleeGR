@@ -19,7 +19,7 @@ from json2mongo import Json2Mongo, reference
 
 
 db_inserts, db_extended = database.init()
-j2m = Json2Mongo(reference)
+j2m = Json2Mongo()
 
 
 @app.route('/')
@@ -199,4 +199,4 @@ def signout():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='0.0.0.0', port=5555, threaded=True)
+    app.run(host='0.0.0.0', threaded=True)

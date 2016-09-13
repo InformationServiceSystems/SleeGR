@@ -1,3 +1,2 @@
 SECRET_KEY = "SECRET!"
 DEBUG = True
-PORT = "5001"
