@@ -1,10 +1,16 @@
 import database
 import datetime
 
+from mapval import MappingValidator
+reference_json = {
+    'ID': str,
+    'type': int,
+    'date': str,
 
+}
 class JsonValidator:
 
-    def __init__(self, user, pattern ):
+    def __init__(self, user, pattern):
         self._user = user
         self._pattern = pattern
 
@@ -33,13 +39,16 @@ class JsonValidator:
         val2: floats
         """
         result = True
-        for j in  json:
+        for j in json:
             result = result and type(json[j]) == self._pattern[j]
         return result
 
-class JsonValidatorSleeGr(JsonValidator):
-    def
+
 class Json2Mongo:
+
+    def __init__(self):
+        self._validator = MappingValidator()
+
     def _to_db(self,json):
         """
         JUST USE THIS METHOD IF YOU USED check_format!
@@ -61,5 +70,5 @@ if __name__ == '__main__':
     pattern =  {'UserID': str, 'type': int,
                             'time_stamp': datetime.datetime, 'tag': str,
                             'val0':float , 'val1':float, 'val2': float}
-    j2m = Json2mongo(json, 'Matthias', pattern)
+    j2m = Json2Mongo(json, 'Matthias', pattern)
     print(j2m.check_format())
