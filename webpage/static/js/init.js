@@ -34,7 +34,7 @@ define([], function () {
 				if (time.date_from != null && time.date_to != null){
 					updater.update_mutlichart(url, user_id, time.date_from, time.date_to, multichart_id, table_id, chk_data, $(multi_timerange).val()=='First 5 minutes', true);
 					updater.update_heatmap(url, user_id, time.date_from, time.date_to, heatmap_id);
-					updater.update_gaussian(url, user_id, time.date_from, time.date_to, gaussian_id);
+					//updater.update_gaussian(url, user_id, time.date_from, time.date_to, gaussian_id);
 				}
 			}
 
