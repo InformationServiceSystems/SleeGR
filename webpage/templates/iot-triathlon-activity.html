@@ -186,57 +186,15 @@
 					</div>
 				</div>
 				<div class="box-body">
-					<div class="row">
-						<div class="col-md-6">
+                    <div class="box-body chart-responsive">
 
-							<!-- AREA CHART -->
-							<div class="box box-default">
-								<div class="box-header with-border">
-									<h3 class="box-title">Heatmap</h3>
+                        <div id="heatmapdiv" style="width:100%; height:500px;"></div>
 
-									<div class="box-tools pull-right">
-										<button type="button" class="btn btn-box-tool" data-widget="collapse">
-											<i class="fa fa-minus"></i>
-										</button>
-										<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-									</div>
-								</div>
-								<div class="box-body chart-responsive">
-
-									<div id="heatmapdiv" style="width:100%; height:500px;"></div>
-
-								</div>
-							</div>
-							<!-- /.box-body -->
-						</div>
-
-
-						<div class="col-md-6">
-							<!-- AREA CHART -->
-							<div class="box box-default">
-								<div class="box-header with-border">
-									<h3 class="box-title">Gaussian</h3>
-
-									<div class="box-tools pull-right">
-										<button type="button" class="btn btn-box-tool" data-widget="collapse">
-											<i class="fa fa-minus"></i>
-										</button>
-										<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-									</div>
-								</div>
-								<div class="box-body chart-responsive">
-									<div id="gaussiandiv" style="width:100%; height:500px;" ></div>
-
-
-								</div>
-							</div>
-							<!-- /.box-body -->
-						</div>
-					</div>
-
-				</div>
-			</div>
-		</div>
+                    </div>
+		        </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -245,100 +203,32 @@
     </div>
 
 
-</section>
-<!-- content section -->
-<!--store data frpm flask-->
-<div id="main_data" data-cdn-corellations="{{correlations_list}}" data-cdn-user="{{user}}"></div>
+    </section>
+    <!-- content section -->
+    <!--store data frpm flask-->
+    <div id="main_data" data-cdn-corellations="{{correlations_list}}" data-cdn-user="{{user}}"></div>
 
-{% endblock %}
+    {% endblock %}
 
-{% block JS %} {{super() }}
+    {% block JS %} {{super() }}
 
-<link rel="stylesheet" href="{{url_for('static', filename= 'css/jquery-ui/jquery-ui.css')}}">
-<!-- daterange picker -->
-<link rel="stylesheet" href="{{url_for('static', filename= 'plugins/daterangepicker/daterangepicker-bs3.css')}}">
-<!-- Ionicons -->
-<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-<!-- DataTables -->
-<link rel="stylesheet" href="{{url_for('static', filename= 'plugins/datatables/dataTables.bootstrap.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename= 'css/jquery-ui/jquery-ui.css')}}">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="{{url_for('static', filename= 'plugins/daterangepicker/daterangepicker-bs3.css')}}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{url_for('static', filename= 'plugins/datatables/dataTables.bootstrap.css')}}">
 
-<style>
-	#dialog-link {
-		padding: .4em 1em .4em 20px;
-		text-decoration: none;
-		position: relative;
-	}
-	#dialog-link span.ui-icon {
-		margin: 0 5px 0 0;
-		position: absolute;
-		left: .2em;
-		top: 50%;
-		margin-top: -8px;
-	}
-	#icons {
-		margin: 0;
-		padding: 0;
-	}
-	#icons li {
-		margin: 2px;
-		position: relative;
-		padding: 4px 0;
-		cursor: pointer;
-		float: left;
-		list-style: none;
-	}
-	#icons span.ui-icon {
-		float: left;
-		margin: 0 4px;
-	}
-	.fakewindowcontain .ui-widget-overlay {
-		position: absolute;
-	}
+    <!-- Custom css for ISS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/iss.css') }}">
 
-
-	.tablebox {
-		width: 100%;
-	}
-
-	.tablethead, .tabletbody, .tabletr, .tabletd, .tableth { display: block; }
-
-	.tabletr:after {
-		content: ' ';
-		display: block;
-		visibility: hidden;
-		clear: both;
-	}
-
-	.tableth {
-		height: 30px;
-
-		/*text-align: left;*/
-	}
-
-	.tabletbody {
-		height: 350px;
-		overflow-y: auto;
-	}
-
-	.tablethead {
-		/* fallback */
-	}
-
-
-	.tabletd, .tableth {
-		width: 25%;
-		float: left;
-	}
-
-
-</style>
-
-<script type="text/javascript">
-	require(['config'], function(){
-		require(['../static/js/init'], function (init) {
-            init.initDashboard();
+    <script type="text/javascript">
+        require(['config'], function(){
+            require(['../static/js/init'], function (init) {
+                init.initDashboard();
+            });
         });
-	});
-</script>
-{% endblock %}
+    </script>
+    {% endblock %}
 

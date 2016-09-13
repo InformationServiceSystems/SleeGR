@@ -68,7 +68,7 @@ define(['jquery'], function ($) {
 			'<p>' +
 			'Sorry! ' + text +
 			'</p> ' +
-			'</div><!-- /.error-content --> ';
+			'</div>';
 
 		return error_page;
 
@@ -77,24 +77,24 @@ define(['jquery'], function ($) {
 	utils.getHtmlDataTable = function (data_points){
 
 		var content = "";
-		content += "<thead class='tablethead'>" +
-			"<tr class='tabletr'>" +
-			"<th class='tableth'>Date</th>" +
-			"<th class='tableth'>a</th>" +
-			"<th class='tableth'>T</th>" +
-			"<th class='tableth'>c</th>" +
+		content += "<thead class='datathead'>" +
+			"<tr class='datatr'>" +
+			"<th class='datath'>Date</th>" +
+			"<th class='datath'>a</th>" +
+			"<th class='datath'>T</th>" +
+			"<th class='datath'>c</th>" +
 			"</tr>" +
 			"</thead>" +
-			"<tbody class='tabletbody'>";
+			"<tbody class='datatbody'>";
 		if (data_points.length != 0) {
 			try {
 				for (var i = 0; i < data_points.length; i++) {
 					if (!(data_points[i].a == null) && !(data_points[i].t == null) && !(data_points[i].c == null)) {
-						content += "<tr class='tabletr'>";
-						content += "<td class=\"tabletd filterable-cell\">" + data_points[i].date + "</td>";
-						content += "<td  class=\"tabletd filterable-cell\">" + Math.round(data_points[i].a * 100) / 100 + "</td>";
-						content += "<td  class=\"tabletd filterable-cell\">" + Math.round(data_points[i].t * 100) / 100 + "</td>";
-						content += "<td  class=\"tabletd filterable-cell\">" + Math.round(data_points[i].c * 100) / 100 + "</td>";
+						content += "<tr class='datatr'>";
+						content += "<td class=\"datatd filterable-cell\">" + data_points[i].date + "</td>";
+						content += "<td  class=\"datatd filterable-cell\">" + Math.round(data_points[i].a * 100) / 100 + "</td>";
+						content += "<td  class=\"datatd filterable-cell\">" + Math.round(data_points[i].t * 100) / 100 + "</td>";
+						content += "<td  class=\"datatd filterable-cell\">" + Math.round(data_points[i].c * 100) / 100 + "</td>";
 						content += "</tr>";
 					}
 				}
