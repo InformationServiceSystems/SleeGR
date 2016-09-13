@@ -21,8 +21,7 @@ define([], function () {
 		var multi_timerange = '#timerange';
 		var picker_id = '#reservation';
 		var flask_data = document.getElementById('main_data');
-		var correlations = flask_data.getAttribute('data-cdn-corellations');
-		var linearData;
+		var correlationList;
 		var time = new Object();
 		var dateRange = 4;
 		var user_id	= flask_data.getAttribute('data-cdn-user');
@@ -42,21 +41,26 @@ define([], function () {
 			 * on ready function
 			 */
 			$(function() {
-				var linearData = $.parseJSON(correlations);
+				correlationList = new Object();
+				var correlationsUrl = url + '/' +  'get_correlations_list';
+				$.ajax({type : 'GET', url: correlationsUrl, success: function (data) {
+					correlationList=JSON.parse(data);
+					setup.fillInXlabels(correlationList);
+					setup.fillInYlabels(url, user_id, correlationList, correlations_id);
+				}});
+
 				setup.select_all([chk_data, chk_type1]);
 				setup.set_default_picker(time, dateRange, picker_id);
-				setup.fillInXlabels(linearData);
-				setup.fillInYlabels(url, user_id, linearData, correlations_id);
 				setup.setup_datepicker(picker_id, time, update_data);
 
 				$('body').on('change', '#timerange', function() {
 					updater.update_mutlichart(url, user_id, time.date_from, time.date_to, multichart_id, table_id, chk_data,$(multi_timerange).val()=='First 5 minutes');
 				});
 				$('body').on('change', '#xLabel', function() {
-					setup.fillInYlabels(url, user_id, linearData, correlations_id);
+					setup.fillInYlabels(url, user_id, correlationList, correlations_id);
 				});
 				$('body').on('change', '#yLabel', function() {
-					updater.update_correlations(url, user_id, linearData, correlations_id)
+					updater.update_correlations(url, user_id, correlationList, correlations_id)
 				});
 
 				$(chk_type1).click(function() {
