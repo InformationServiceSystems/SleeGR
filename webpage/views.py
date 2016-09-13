@@ -103,11 +103,8 @@ def show_measurement():
         end = datetime.strptime(end_date, '%d.%m.%Y')
         return json.dumps(r.heart_rate_special(user_id, start, end))
 
-
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
+@app.route('/get_correlations_list', methods=['GET'])
+def get_correlations_list():
     to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
             '{"x_label": "Sleep length", "y_label": "Load", "next_day": false},' \
             '{"x_label": "Sleep start", "y_label": "Load", "next_day": false},' \
@@ -122,7 +119,13 @@ def dashboard():
             '{"x_label": "DALDA", "y_label": "Deep sleep", "next_day": true},' \
             '{"x_label": "Sleep end", "y_label": "RPE", "next_day": false},' \
             '{"x_label": "Sleep length", "y_label": "RPE", "next_day": false}]'
-    return render_template('iot-triathlon-activity.html', user=session['email'], correlations_list=to_reply)
+    return to_reply
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+
+    return render_template('iot-triathlon-activity.html', user=session['email'])
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
