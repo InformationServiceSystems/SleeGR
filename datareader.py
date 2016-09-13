@@ -9,6 +9,7 @@ from datetime import timedelta
 from matplotlib.dates import hours
 
 from linear_datascience import Comp1D
+
 import numpy
 import database
 
@@ -74,26 +75,17 @@ class DataReader:
 
     def heart_rate_special(self, user_id, start_date, end_date):
         ret_list = []
-        hr_lst = []
         dates = []
-        data_lst = []
-        cursors = self._db_extended.find_correl_data(user_id)
-        hr_cursors = self._db_extended.find_data_tag(user_id, 21, 'Cooldown')
-
+        cursors = list(self._db_extended.find_correl_data(user_id))
+        hr_cursors = list(self._db_extended.find_data_tag(user_id, 21, 'Cooldown'))
+        hr_cursors_rec = list(self._db_extended.find_data_tag(user_id, 21, 'Recovery'))
+        hr_cursors.extend(hr_cursors_rec)
+        hr_cursors = hr_cursors[::10]
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
             dates.append(day.strftime('%d.%m.%Y'))
-
-        for cursor in cursors:
-            if cursor['time_stamp'].strftime('%d.%m.%Y') in dates:
-                data_lst.append(cursor)
-
-        for cursor in hr_cursors:
-            if cursor['time_stamp'].strftime('%d.%m.%Y') in dates:
-                hr_lst.append(cursor)
-
         for day in dates:
-            data = list(filter(lambda entry : entry['time_stamp'].strftime('%d.%m.%Y') == day, data_lst))
+            data = list(filter(lambda entry : entry['time_stamp'].strftime('%d.%m.%Y') == day, cursors))
             if len(data) > 0:
                 data = data[0]
                 new_json = {}
@@ -102,12 +94,10 @@ class DataReader:
                 new_json['a'] = data['A']
                 new_json['t'] = data['T']
                 new_json['c'] = data['C']
-                hr_lst_current_day = list(filter(lambda entry: entry['time_stamp'].strftime('%d.%m.%Y') == day, hr_lst))
-                if not hr_lst_current_day:
+                hr_lst_current_day = list(filter(lambda entry: entry['time_stamp'].strftime('%d.%m.%Y') == day, hr_cursors))
+                if len(hr_lst_current_day) < 1:
                     continue
-                hr_lst_current_day.sort(key=lambda data : data['time_stamp'])
-                hr_lst_current_day = hr_lst[::10]
-                base_time = hr_lst[0]['time_stamp']
+                base_time = hr_lst_current_day[0]['time_stamp']
                 datapoints = []
                 for data in hr_lst_current_day:
                     datapoints.append({'x': (data['time_stamp'] - base_time).seconds, 'y': data['val0']})
@@ -129,6 +119,8 @@ class DataReader:
                     pass
                 elif type(val) == numpy.int64:
                     reply[key] = int(val)
+                elif type(val) == numpy.int32:
+                    reply[key] = int(val)
             reply['x0'] = self.get_timedelta(reply['x0'])
             reply['x1'] = self.get_timedelta(reply['x1'])
             for data in reply['data']:
@@ -143,6 +135,8 @@ class DataReader:
                     reply[key] = float(val)
                 elif type(val) == list:
                     pass
+                elif type(val) == numpy.int32:
+                    reply[key] = int(val)
                 elif type(val) == numpy.int64:
                     reply[key] = int(val)
             return reply

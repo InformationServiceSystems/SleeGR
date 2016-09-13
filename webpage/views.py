@@ -16,7 +16,8 @@ import names
 from decorators import login_required
 from csv_2_mongo import csv_2_reader
 from datareader import DataReader
-from json2mongo import  Json2mongo
+#from json2mongo import  Json2mongo
+
 
 db_inserts, db_extended = database.init()
 

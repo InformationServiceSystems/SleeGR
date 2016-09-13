@@ -1,5 +1,6 @@
 from database.database import DbBase
 import names
+import pymongo
 from datetime import datetime
 
 class DbExtended:
@@ -52,7 +53,7 @@ class DbExtended:
                                                           'type': measurement_type})
 
     def find_data_tag(self, user, measurement, tag=''):
-        return self.db_base._db[user].find({'type': measurement, 'tag': tag})
+        return self.db_base._db[user].find({'type': measurement, 'tag': tag}).sort('time_stamp', pymongo.ASCENDING)
 
     def find_data(self, user, time_stamp, measurement):
         ret_lst =[]

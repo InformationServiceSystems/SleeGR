@@ -1,16 +1,13 @@
-{% extends "iot-base-2-am.html" %}
+{% extends "iot-base.html" %}
 {% block header %} {{super() }}
 
 {% endblock %}
-
-
-
 
 {% block sidemenu %} {{super() }} {% endblock %}
 
 {% block servicelinks %} {{super() }}
 
- {% endblock %}
+{% endblock %}
 {% block maincontent %}
 
     <!-- /.col (LEFT) -->
@@ -84,7 +81,7 @@
 						<div class="col-md-6">
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<label for="yLabel">Choose timrange</label>
-								<select class="form-control" id="timerange" onchange="update_mutlichart($('#timerange').val()=='First 5 minutes')">
+								<select class="form-control" id="timerange">
 									<option>First 5 minutes</option>
 									<option>Whole Range</option>
 								</select>
@@ -105,32 +102,29 @@
 		</div>
 
 		<div class="col-md-4 col-xs-12">
-					<div class="box box-solid box-primary">
-						<div class="box-header with-border">
-							<h3 class="box-title">Curve Parameters</h3>
+			<div class="box box-solid box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">Curve Parameters</h3>
 
-							<div class="box-tools pull-right">
-								<button type="button" class="btn btn-box-tool" data-widget="collapse">
-									<i class="fa fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-							</div>
-						</div><!-- /.box-header -->
-						<div class="box-body" style="width:100%; min-height:580px;">
-							<h4>Formula: (HRR<sub>~80%</sub>-c) &sdot; e<sup>(-(x-T)/a)</sup>+ c </h4>
-							<hr>
-							<p>a: curveture</p>
-							<p>T: timeshift</p>
-							<p>c: Average Heartrate at rest</p>
-							<table id="tablediv" class="table table-bordered table-hover table-striped tablebox">
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fa fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div><!-- /.box-header -->
+				<div class="box-body" style="width:100%; min-height:580px;">
+					<h4>Formula: (HRR<sub>~80%</sub>-c) &sdot; e<sup>(-(x-T)/a)</sup>+ c </h4>
+					<hr>
+					<p>a: curvature</p>
+					<p>T: timeshift</p>
+					<p>c: Average Heartrate at rest</p>
+					<table id="tablediv" class="table table-bordered table-hover table-striped tablebox">
 
-							</table>
-						</div><!-- /.box-body -->
-					</div><!-- /.box -->
+					</table>
+				</div><!-- /.box-body -->
+			</div><!-- /.box -->
 		</div>
-
-
-
 		<!-- /.box-body -->
     </div>
 
@@ -157,11 +151,11 @@
 							<div class="row">
 								<div class="col-md-6 col-sm-6 col-xs-12">
 									<label for="xLabel">Choose x-Label</label>
-									<select class="form-control" id="xLabel" onchange="fillInYlabels()"></select>
+									<select class="form-control" id="xLabel"></select>
 								</div>
 								<div class="col-md-6 col-sm-6 col-xs-12">
 									<label for="yLabel">Choose y-Label</label>
-									<select class="form-control" id="yLabel" onchange="update_correlations()"></select>
+									<select class="form-control" id="yLabel"></select>
 								</div>
 
 							</div>
@@ -251,281 +245,100 @@
     </div>
 
 
-</section> <!-- content section -->
-    {% endblock %}
+</section>
+<!-- content section -->
+<!--store data frpm flask-->
+<div id="main_data" data-cdn-corellations="{{correlations_list}}" data-cdn-user="{{user}}"></div>
 
-    {% block JS %} {{super() }}
-    <script src="{{url_for('static', filename= 'iss-ui.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename= 'charts.js')}}"></script>
+{% endblock %}
 
+{% block JS %} {{super() }}
 
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/jquery-ui/jquery-ui.css')}}">
+<!-- daterange picker -->
+<link rel="stylesheet" href="{{url_for('static', filename= 'plugins/daterangepicker/daterangepicker-bs3.css')}}">
+<!-- Ionicons -->
+<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+<!-- DataTables -->
+<link rel="stylesheet" href="{{url_for('static', filename= 'plugins/datatables/dataTables.bootstrap.css')}}">
 
-	<script type="text/javascript" src="http://momentjs.com/downloads/moment.js"></script>
-	<script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-	<script src="{{url_for('static', filename= 'jquery-ui.js')}}"></script>
-	<!-- date-range-picker -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
-	<script src="../static/plugins/daterangepicker/daterangepicker.js"></script>
-
-  	<link rel="stylesheet" href="{{url_for('static', filename= 'jquery-ui.css')}}">
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="../static/plugins/daterangepicker/daterangepicker-bs3.css">
-	<!-- Ionicons -->
-	<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-	<!-- DataTables -->
-	<link rel="stylesheet" href="../static/plugins/datatables/dataTables.bootstrap.css">
-
-	<!-- DataTables -->
-	<script src="../static/plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="../static/plugins/datatables/dataTables.bootstrap.min.js"></script>
-	<!-- SlimScroll -->
-	<script src="../static/plugins/slimScroll/jquery.slimscroll.min.js"></script>
-	<!-- FastClick -->
-	<script src="../static/plugins/fastclick/fastclick.min.js"></script>
-
-	<style>
-		#dialog-link {
-			padding: .4em 1em .4em 20px;
-			text-decoration: none;
-			position: relative;
-		}
-		#dialog-link span.ui-icon {
-			margin: 0 5px 0 0;
-			position: absolute;
-			left: .2em;
-			top: 50%;
-			margin-top: -8px;
-		}
-		#icons {
-			margin: 0;
-			padding: 0;
-		}
-		#icons li {
-			margin: 2px;
-			position: relative;
-			padding: 4px 0;
-			cursor: pointer;
-			float: left;
-			list-style: none;
-		}
-		#icons span.ui-icon {
-			float: left;
-			margin: 0 4px;
-		}
-		.fakewindowcontain .ui-widget-overlay {
-			position: absolute;
-		}
+<style>
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
 
 
-		.tablebox {
-			width: 100%;
-		}
+	.tablebox {
+		width: 100%;
+	}
 
-		.tablethead, .tabletbody, .tabletr, .tabletd, .tableth { display: block; }
+	.tablethead, .tabletbody, .tabletr, .tabletd, .tableth { display: block; }
 
-		.tabletr:after {
-			content: ' ';
-			display: block;
-			visibility: hidden;
-			clear: both;
-		}
+	.tabletr:after {
+		content: ' ';
+		display: block;
+		visibility: hidden;
+		clear: both;
+	}
 
-		.tableth {
-			height: 30px;
+	.tableth {
+		height: 30px;
 
-			/*text-align: left;*/
-		}
+		/*text-align: left;*/
+	}
 
-		.tabletbody {
-			height: 350px;
-			overflow-y: auto;
-		}
+	.tabletbody {
+		height: 350px;
+		overflow-y: auto;
+	}
 
-		.tablethead {
-			/* fallback */
-		}
-
-
-		.tabletd, .tableth {
-			width: 25%;
-			float: left;
-		}
+	.tablethead {
+		/* fallback */
+	}
 
 
-	</style>
-    <script type="text/javascript">
-
-		/**
-		 * global fields
-		 */
-		var multichart_id = '#chartdiv1';
-		var correlations_id = '#correlationsdiv';
-		var heatmap_id = 'heatmapdiv';
-		var gaussian_id = 'gaussiandiv';
-		var correlations = '{{correlations_list|safe}}';
-		var linearData;
-		var date_from;
-		var date_to;
-		var datepicker_date_from;
-		var datepicker_date_to;
-		var dateRange = 8;
-		var user_id	= '{{user}}';
-
-		/**
-		 * update functions
-		 */
-		function update_correlations(){
-			var nextDay;
-			var xLabel = $('#xLabel').val();
-			var yLabel = $('#yLabel').val();
-			for (var i = 0; i<linearData.length; i++){
-				if (linearData[i].x_label==xLabel&&linearData[i].y_label==yLabel){
-					nextDay=linearData[i].next_day;
-				}
-			}
-			var currentTitle = 'Correlation between <strong>' + xLabel + '</strong> and <strong>' + yLabel + '</strong>';
-			xLabel=xLabel.split(" ").join("_");
-			yLabel=yLabel.split(" ").join("_");
-			charts_getCorrelations("http://web01.iss.uni-saarland.de/correlation", true, user_id, correlations_id, currentTitle, xLabel, yLabel, nextDay);
-		}
+	.tabletd, .tableth {
+		width: 25%;
+		float: left;
+	}
 
 
-		function update_mutlichart(only5min){
-			var show_type1 	= $("#chk_type1").is(':checked');
-			var show_data 	= $("#chk_data").is(':checked');
+</style>
 
-			charts_createMultiChart("http://web01.iss.uni-saarland.de/show_stats/21", show_type1, show_data, user_id, date_from, date_to, multichart_id, '#tablediv', "#chk_data", only5min);
-		}
-		function update_heatmap(){
-			charts_createHeatmap("http://web01.iss.uni-saarland.de/sleepPoints", user_id, date_from, date_to, heatmap_id);
-		}
+<script type="text/javascript">
+	require(['config'], function(){
+		require(['../static/js/init'], function (init) {
+            init.initDashboard();
+        });
+	});
+</script>
+{% endblock %}
 
-		function update_gaussian(){
-			charts_createGaussian('http://web01.iss.uni-saarland.de/gaussianPoints', 'http://web01.iss.uni-saarland.de/gaussian', user_id,  date_from, date_to , gaussian_id);
-		}
-
-		function update_data(){
-			if (date_from !== null && date_to != null){
-				update_mutlichart($('#timerange').val()=='First 5 minutes');
-				update_heatmap();
-				update_gaussian();
-			}
-		}
-
-		/**
-		 * setup page functions
-		 */
-
-		function set_default_picker(){
-
-			var d = new Date();
-			var curr_date = d.getDate();
-			var curr_month = d.getMonth()+1;
-			var curr_year = d.getFullYear();
-
-			var startDay = curr_date;
-			var startMonth = curr_month-dateRange;
-			var startYear = curr_year;
-
-			if (startDay>28){
-				startDay=28;
-			}
-
-			while(startMonth<1){
-				startYear--;
-				startMonth = 12 + startMonth;
-			}
-			date_from 	= startDay.toString()+'.' + startMonth.toString() + '.' +startYear.toString();
-			datepicker_date_from = startMonth.toString() + '/' + startDay.toString() + '/' + startYear.toString();
-
-			date_to 	= curr_date.toString()+'.'+curr_month.toString()+'.'+curr_year.toString();
-			datepicker_date_to = (curr_month).toString() + '/' + curr_date.toString() + '/' + curr_year.toString();
-
-
-			document.getElementById('reservation').setAttribute("value", datepicker_date_from + " - " + datepicker_date_to);
-		}
-
-		function select_all(){
-			$('#chk_type1').attr("checked",true);
-			$('#chk_data').attr("checked",true);
-		}
-
-
-		function fillInXlabels (){
-			var selection = document.getElementById('xLabel');
-			var temp = "";
-			var xLabels = [];
-			for (var i = 0; i<linearData.length; i++){
-				if (!(contains(xLabels, linearData[i].x_label))){
-					xLabels.push(linearData[i].x_label);
-					temp += "<option>" + linearData[i].x_label + "</option>";
-				}
-			}
-			selection.innerHTML = temp;
-		}
-		function fillInYlabels(){
-			var selection = document.getElementById('yLabel');
-			var currXlabel = $('#xLabel').val();
-			var temp = "";
-			for (var i = 0; i<linearData.length; i++){
-				if (linearData[i].x_label==currXlabel){
-					temp += "<option>" + linearData[i].y_label + "</option>";
-				}
-			}
-			selection.innerHTML = temp;
-			update_correlations();
-		}
-		function contains(a, obj) {
-			for (var i = 0; i < a.length; i++) {
-				if (a[i] == obj) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		/**
-		 * on ready function
-		 */
-		$(function() {
-			select_all();
-			set_default_picker();
-			linearData = jQuery.parseJSON(correlations);
-
-			//Date range picker
-			$('#reservation').daterangepicker(
-					{
-						locale: {
-							format: 'DD.MM.YYYY'
-						},
-						"startDate": datepicker_date_from,
-						"endDate": datepicker_date_to
-					},
-					function(start, end, label) {
-						date_from=start.format('DD.MM.YYYY');
-						date_to=end.format('DD.MM.YYYY');
-						update_data();
-					}
-			);
-
-			$('#chk_type1').click(function() {
-				var show_data = $("#chk_data").is(':checked');
-				var visible = $('#chk_type1').is(':checked');
-				setTypeVisible(multichart_id, 'Type1', visible, show_data);
-			});
-
-			$('#chk_data').click(function() {
-				var checked = $("#chk_data").is(':checked');
-				setScatterVisible(multichart_id, checked);
-			});
-
-			fillInXlabels();
-			fillInYlabels();
-			update_data();
-
-		});
-	</script>
-    {% endblock %}
-
-    </html>

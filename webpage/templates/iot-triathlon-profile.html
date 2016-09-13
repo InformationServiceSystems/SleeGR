@@ -1,4 +1,4 @@
-{% extends "iot-base-2-am.html" %}
+{% extends "iot-base.html" %}
 
 <html>
 <head>
@@ -62,7 +62,15 @@
 </section>
 {% endblock %}
 
-  {% block JS %} {{super() }} {% endblock %}
+  {% block JS %} {{super() }}
+
+    <script type="text/javascript">
+        require(['config'], function(){
+            var dependecies = ['jquery', 'datepicker','jqueryui', 'bootstrap', 'app', 'jquery.slimScroll', 'fastClick'];
+           require(dependecies);
+        });
+    </script>
+    {% endblock %}
 
 </html>
 
