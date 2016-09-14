@@ -46,7 +46,7 @@ define (['jquery', 'common.functions', 'charts.updater'], function ($, utils, up
     }
 
 
-    setup.fillInXlabels = function(linearData){
+    setup.fillInXlabels = function(linearData, x_label_id){
         var temp = "";
         var xLabels = [];
         for (var i = 0; i<linearData.length; i++){
@@ -55,17 +55,17 @@ define (['jquery', 'common.functions', 'charts.updater'], function ($, utils, up
                 temp += "<option>" + linearData[i].x_label + "</option>";
             }
         }
-        $('#xLabel').html(temp);
+        $(x_label_id).html(temp);
     }
-    setup.fillInYlabels = function (url, user_id, linearData, correlations_id){
-        var currXlabel = $('#xLabel').val();
+    setup.fillInYlabels = function (url, user_id, linearData, correlations_id, x_label_id, y_label_id){
+        var currXlabel = $(x_label_id).val();
         var temp = "";
         for (var i = 0; i<linearData.length; i++){
             if (linearData[i].x_label==currXlabel){
                 temp += "<option>" + linearData[i].y_label + "</option>";
             }
         }
-        $('#yLabel').html(temp);
+        $(y_label_id).html(temp);
         updater.update_correlations(url, user_id, linearData, correlations_id);
     }
     
