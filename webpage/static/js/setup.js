@@ -87,6 +87,17 @@ define (['jquery', 'common.functions', 'charts.updater'], function ($, utils, up
 			);
     }
     
+    setup.get_correlationsList = function(url){
+        var correlationsUrl = utils.format_url(url, 'get_correlations_list');
+        var list;
+        $.ajax({type : 'GET', url: correlationsUrl, success: function (data) {
+                list=JSON.parse(data);
+            },
+            async: false
+        });
+        return list;
+    }
+    
     return setup;
 
 });

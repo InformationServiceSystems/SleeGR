@@ -41,16 +41,12 @@ define([], function () {
 			 * on ready function
 			 */
 			$(function() {
-				correlationList = new Object();
-				var correlationsUrl = url + '/' +  'get_correlations_list';
-				$.ajax({type : 'GET', url: correlationsUrl, success: function (data) {
-					correlationList=JSON.parse(data);
-					setup.fillInXlabels(correlationList);
-					setup.fillInYlabels(url, user_id, correlationList, correlations_id);
-				}});
+				correlationList = setup.get_correlationsList(url);
 
 				setup.select_all([chk_data, chk_type1]);
 				setup.set_default_picker(time, dateRange, picker_id);
+				setup.fillInXlabels(correlationList);
+				setup.fillInYlabels(url, user_id, correlationList, correlations_id);
 				setup.setup_datepicker(picker_id, time, update_data);
 
 				$('body').on('change', '#timerange', function() {
