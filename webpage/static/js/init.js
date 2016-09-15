@@ -10,7 +10,7 @@ define([], function () {
 		/**
 		 * global fields
 		 */
-		var url = 'http://web01.iss.uni-saarland.de:5001';
+		var url = 'http://localhost:5001';
 		var multichart_id = '#chartdiv1';
 		var table_id = '#tablediv';
 		var correlations_id = '#correlationsdiv';
