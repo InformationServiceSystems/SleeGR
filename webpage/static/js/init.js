@@ -10,8 +10,7 @@ define([], function () {
 		/**
 		 * global fields
 		 */
-		//var url = 'http://web01.iss.uni-saarland.de';
-		var url = 'http://81.169.137.80:5000';
+		var url = 'http://localhost:5001';
 		var multichart_id = '#chartdiv1';
 		var table_id = '#tablediv';
 		var correlations_id = '#correlationsdiv';
@@ -75,6 +74,20 @@ define([], function () {
 
 			});
 
+		});
+
+	}
+
+	init.initLogin = function () {
+
+		require(['jquery', 'icheck', 'bootstrap'], function ($) {
+			$(function () {
+        		$('input').iCheck({
+          			checkboxClass: 'icheckbox_square-blue',
+          			radioClass: 'iradio_square-blue',
+          			increaseArea: '20%' // optional
+				});
+      		});
 		});
 
 	}

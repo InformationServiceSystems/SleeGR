@@ -11,11 +11,11 @@ require.config({
         'amcharts.stock':       'js/amcharts/amstock',
         'amcharts.themeLight':  'http://www.amcharts.com/lib/3/themes/light',
         'amcharts.gauge':       'http://www.amcharts.com/lib/3/gauge',
-        'amcharts.export':      'amcharts/plugins/export/export',
+        'amcharts.export':      'js/amcharts/plugins/export/export',
         'jquery':               'js/jquery/jquery',
         'jqueryui':             'js/jquery/jquery-ui',
-        'bootstrap':            'bootstrap/js/bootstrap.min',
-        'app':                  'dist/js/app.min',
+        'bootstrap':            'adminLTE/bootstrap/js/bootstrap.min',
+        'app':                  'adminLTE/dist/js/app.min',
         'charts.updater':       'js/chart_updater',
         'charts':               'js/isscharts/charts',
         'common.functions':     'js/utils/common_functions',
@@ -24,12 +24,13 @@ require.config({
         'moment':               'http://momentjs.com/downloads/moment',
         'highcharts':           'https://code.highcharts.com/highcharts',
         'highcharts.exporting': 'https://code.highcharts.com/modules/exporting',
-        'datepicker':           'plugins/daterangepicker/daterangepicker',
-        'jquery.datatables':    'plugins/datatables/jquery.dataTables.min',
-        'bootstrap.tables':     'plugins/datatables/dataTables.bootstrap.min',
-        'jquery.slimScroll':    'plugins/slimScroll/jquery.slimscroll.min',
-        'fastClick':            'plugins/fastclick/fastclick.min',
-        'setup':                'js/setup'
+        'datepicker':           'adminLTE/plugins/daterangepicker/daterangepicker',
+        'jquery.datatables':    'adminLTE/plugins/datatables/jquery.dataTables.min',
+        'bootstrap.tables':     'adminLTE/plugins/datatables/dataTables.bootstrap.min',
+        'jquery.slimScroll':    'adminLTE/plugins/slimScroll/jquery.slimscroll.min',
+        'fastClick':            'adminLTE/plugins/fastclick/fastclick.min',
+        'setup':                'js/setup',
+        'icheck':               'adminLTE/plugins/iCheck/icheck.min'
     },
     shim:  {
         'highcharts': {
@@ -70,6 +71,12 @@ require.config({
             deps: ['jquery']
         },
         'app':{
+            deps: ['jquery']
+        },
+        'jquery.slimScroll': {
+            deps: ['jquery']
+        },
+        'fastclick': {
             deps: ['jquery']
         }
     }
