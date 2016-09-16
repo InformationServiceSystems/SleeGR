@@ -9,5 +9,5 @@ app.config.from_object('settings')
 import webpage.views
 
 app.debug = True
-app.run(host='0.0.0.0', port=5001)
+app.run(host='0.0.0.0', port=80)
 #app.run()
