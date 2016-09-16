@@ -3,9 +3,9 @@ from datetime import datetime
 from mapval import MappingValidator
 
 reference = {
-    'ID': str,
+    'Id': str,
     'type': int,
-    'Measurement_ID': int,
+    'Measurement_Id': int,
     'time': str,
     'date': str,
     'tag': str,
