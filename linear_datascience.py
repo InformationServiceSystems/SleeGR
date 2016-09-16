@@ -40,7 +40,10 @@ def Comp1D(vals, A, B, regr=True, B_next_day=False):
     ylabel = B + ", next day" if B_next_day else B
     title = A + ' -> ' + ylabel
 
+    if not (any(x) and any(y)):
+        return None
     data = x,y
+
     xmn, xmx = min(x), max(x)
     ymn, ymx = ln(xmn, p), ln(xmx, p)
 

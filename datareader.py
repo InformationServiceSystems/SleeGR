@@ -111,9 +111,9 @@ class DataReader:
         if x_label == 'Sleep start':
             for d in data_cursor:
                 data.append(d)
-            if not data:
-                return {}
             reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
+            if not reply:
+                return None
             for key, val in reply.items():
                 if type(val) == numpy.float64:
                     reply[key] = float(val)
@@ -132,6 +132,8 @@ class DataReader:
             for d in data_cursor:
                 data.append(d)
             reply = Comp1D(data, x_label, y_label, regr=True, B_next_day=False)
+            if not reply:
+                return None
             for key, val in reply.items():
                 if type(val) == numpy.float64:
                     reply[key] = float(val)
