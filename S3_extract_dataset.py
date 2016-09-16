@@ -164,8 +164,10 @@ ff = [ Day, RestingHR, FittedCurve, Activity, Sleep, Feedback]
 client = MongoClient('localhost', 27017)
 db = client['triathlon']
 dct = {}
+collection_names = db.collection_names()
 for user in db.general_user.find():
-    dct[user['email']] = []
+    if not ('%s_%s' % (user['email'], 'data')) in collection_names:
+        dct[user['email']] = []
 
 for user in dct:
     lst = []
