@@ -38,4 +38,4 @@ python3 __init__.py
 
 ```
 
-An instance of the server is running on [a link](http://web01.iss.uni-saarland.de/login)
+An instance of the server is running on [SleeGr](http://web01.iss.uni-saarland.de/login)

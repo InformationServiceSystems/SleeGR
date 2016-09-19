@@ -18,24 +18,26 @@ reference = {
 class Json2Mongo:
     def __init__(self):
         self._validator = MappingValidator(reference)
+        self._db_inserts, self._db_extended = database.init()
 
-    def _to_db(self,json):
+    def _to_db(self, user, json):
         """
         JUST USE THIS METHOD IF YOU USED check_format!
         Better use check_and_commit
         """
-        self._db_inserts.insert_csv_row(self._user, json)
+        return self._db_inserts.insert_csv_row(user, json)
 
     def check_and_commit(self, json):
         if self._validator.validate(json):
             time_stamp_str = '%s,%s' % (json['date'],json['time'])
             new_json = {
                 "tag": json['tag'],
-                "UserID": json['ID'],
-                "type": json['val2'],
+                "UserID": json['Id'],
+                "type": json['type'],
                 "time_stamp": datetime.strptime(time_stamp_str, '%Y.%m.%d,%H:%M:%S'),
-                "val1": json['val0'],
-                "val2": json['val1'],
-                "val0": 0
+                "val1": json['val1'],
+                "val2": json['val2'],
+                "val0": json['val0']
             }
-            self._to_db(new_json)
+            return self._to_db(json['Id'], new_json)
+        return False
