@@ -4,6 +4,7 @@ dct of the athletes
 """
 
 from datetime import datetime, timedelta
+import re
 import numpy as np
 from scipy.optimize import minimize
 from pymongo import MongoClient
@@ -157,7 +158,14 @@ def Sleep(day, values, usr):
     return result
 
 
-def run():
+def run(user=None):
+    '''
+    run the S3-script
+    Args:
+        user: If user is None, als users in db will be taken
+    Returns:
+
+    '''
     ### choose here the features to be extracted
 
     ff = [ Day, RestingHR, FittedCurve, Activity, Sleep, Feedback]
@@ -166,11 +174,17 @@ def run():
     client = MongoClient('localhost', 27017)
     db = client['triathlon']
     dct = {}
-    collection_names = db.collection_names()
-    for user in db.general_user.find():
-        if not ('%s_%s' % (user['email'], 'data')) in collection_names:
+    collections = db.collection_names()
+    #find users to compute
+    if user:
+        dct[user] = []
+    else:
+        for user in db.general_user.find():
             dct[user['email']] = []
-
+    #delete users _data-collections
+    for user in dct:
+        db.drop_collection('%s_data' % user)
+    #find all measuremtens and sort list by date
     for user in dct:
         lst = []
         for elem in db[user].find():
@@ -226,8 +240,6 @@ def run():
 
         # save the data
     #    pc.dump(all_feat, open('/home/matthias/data/' +usr + '/' + usr + '.data','w+b'))
-
-
 
 
 if __name__ == '__main__':
