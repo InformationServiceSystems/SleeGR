@@ -67,3 +67,8 @@ class DbInserts:
         if not self.db_base._db[user].insert_one(json) is None:
             return True
         return False
+
+    def insert_csv_row_many(self, user, json_lst):
+        if not self.db_base._db[user].insert_many(json_lst) is None:
+            return True
+        return False

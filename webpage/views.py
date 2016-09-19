@@ -186,10 +186,12 @@ def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
         try:
+            json_lst = []
             for list_entry in received_json['arrayOfMeasurements']:
                 for le in list_entry['values']:
-                    if not j2m.check_and_commit(le):
-                        return json.dumps({'status': 'failure'})
+                    json_lst.append(le)
+            if not j2m.check_and_commit_many(json_lst):
+                return json.dumps({'status': 'failure'})
         except KeyError:
             return json.dumps({'status': 'failure'})
     return json.dumps({'status': 'success'})
