@@ -183,10 +183,19 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 
 @app.route('/post_json', methods=['POST'])
 def receive_json():
+    res = False
     if request.method == 'POST':
         received_json = request.get_json()
-        for json in received_json['arrayOfMeasurements']['values']:
-            j2m.check_and_commit(json)
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(received_json)
+        for list_entry in received_json['arrayOfMeasurements']:
+            for le in list_entry['values']:
+                res =  j2m.check_and_commit(le)
+    if res:
+        return json.dumps({'status': 'success'})
+    return json.dumps({'status': 'failure'})
+
 
 
 def allowed_file(filename):

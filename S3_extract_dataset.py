@@ -156,75 +156,79 @@ def Sleep(day, values, usr):
     
     return result
 
-### choose here the features to be extracted
 
-ff = [ Day, RestingHR, FittedCurve, Activity, Sleep, Feedback]
+def run():
+    ### choose here the features to be extracted
 
-###
-client = MongoClient('localhost', 27017)
-db = client['triathlon']
-dct = {}
-collection_names = db.collection_names()
-for user in db.general_user.find():
-    if not ('%s_%s' % (user['email'], 'data')) in collection_names:
-        dct[user['email']] = []
+    ff = [ Day, RestingHR, FittedCurve, Activity, Sleep, Feedback]
 
-for user in dct:
-    lst = []
-    for elem in db[user].find():
-        if isinstance(elem['time_stamp'], datetime) :		
-            lst.append(elem)
-    dct[user] = sorted(lst, key=lambda date: date['time_stamp'] )	
+    ###
+    client = MongoClient('localhost', 27017)
+    db = client['triathlon']
+    dct = {}
+    collection_names = db.collection_names()
+    for user in db.general_user.find():
+        if not ('%s_%s' % (user['email'], 'data')) in collection_names:
+            dct[user['email']] = []
+
+    for user in dct:
+        lst = []
+        for elem in db[user].find():
+            if isinstance(elem['time_stamp'], datetime) :
+                lst.append(elem)
+        dct[user] = sorted(lst, key=lambda date: date['time_stamp'] )
 
 
 
-#with open("sorted.bin", "r+b") as u:
-#    dct = pc.load(u)
+    #with open("sorted.bin", "r+b") as u:
+    #    dct = pc.load(u)
 
-feat = {key: [] for key in dct}
+    feat = {key: [] for key in dct}
 
-oneday = timedelta(days = 1)
-    
-for usr in dct:
-    
-    daystart = datetime.today().replace(hour = 3, minute = 00)
-    dayend = daystart + oneday
-    
-    data = dct[usr]
-    
-    all_feat = []
-    
-    for i in range(300):
-        
-        daystart = daystart - oneday
-        dayend = dayend - oneday
-        
-        # get data in the range
-        values = [val for val in data if daystart <= val['time_stamp'] and val['time_stamp'] <= dayend ]        
-        
-        if len(values) < 1:
-            continue
-        
-        # extract features from the data
-                
-        r = {'time_stamp':daystart}
-        for fnc in ff :
-            r.update( fnc(daystart, values, usr) )
-                
-        # save them for the user
-        all_feat.append(r)
+    oneday = timedelta(days = 1)
 
-    #new save
-    collection_name = ('%s_data' % (usr))
-    if all_feat:
-        for data in all_feat:
-            db[collection_name].insert(data)
-    else:
-        pass
+    for usr in dct:
 
-    # save the data
-#    pc.dump(all_feat, open('/home/matthias/data/' +usr + '/' + usr + '.data','w+b'))
-    
-    
-            
+        daystart = datetime.today().replace(hour = 3, minute = 00)
+        dayend = daystart + oneday
 
+        data = dct[usr]
+
+        all_feat = []
+
+        for i in range(300):
+
+            daystart = daystart - oneday
+            dayend = dayend - oneday
+
+            # get data in the range
+            values = [val for val in data if daystart <= val['time_stamp'] and val['time_stamp'] <= dayend ]
+
+            if len(values) < 1:
+                continue
+
+            # extract features from the data
+
+            r = {'time_stamp':daystart}
+            for fnc in ff :
+                r.update( fnc(daystart, values, usr) )
+
+            # save them for the user
+            all_feat.append(r)
+
+        #new save
+        collection_name = ('%s_data' % (usr))
+        if all_feat:
+            for data in all_feat:
+                db[collection_name].insert(data)
+        else:
+            pass
+
+        # save the data
+    #    pc.dump(all_feat, open('/home/matthias/data/' +usr + '/' + usr + '.data','w+b'))
+
+
+
+
+if __name__ == '__main__':
+    run()

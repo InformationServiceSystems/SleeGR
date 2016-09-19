@@ -64,4 +64,6 @@ class DbInserts:
 
     # newer
     def insert_csv_row(self, user, json):
-        self.db_base._db[user].insert_one(json)
+        if self.db_base._db[user].insert_one(json):
+            return True
+        return False
