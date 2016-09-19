@@ -1,7 +1,11 @@
 # SleeGR
 
-Installationscript for Ubuntu:
-------------------------------
+SleeGr is a webserver for storing, processing and showing fitnessdata collected by 
+the SleeGr-smartphoneapp.
+
+
+Getting Started:
+----------------
 
 ```bash
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
@@ -23,3 +27,15 @@ the required Python packages are listed in requirements.txt.
 
 If you have problems with tha installation, you may want use Anacondapython. This is a framework (for Windows an other OS)
 that provides various packages especially for datascienc.
+
+Starting the server
+-------------------
+to start the server, you just need to go into 
+
+```bash
+/path/to/SleeGr/webpage
+python3 __init__.py
+
+```
+
+An instance of the server is running on [a link](http://web01.iss.uni-saarland.de/login)
