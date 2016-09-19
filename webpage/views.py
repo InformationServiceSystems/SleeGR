@@ -183,18 +183,16 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 
 @app.route('/post_json', methods=['POST'])
 def receive_json():
-    res = False
     if request.method == 'POST':
         received_json = request.get_json()
-        import pprint
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(received_json)
-        for list_entry in received_json['arrayOfMeasurements']:
-            for le in list_entry['values']:
-                res =  j2m.check_and_commit(le)
-    if res:
-        return json.dumps({'status': 'success'})
-    return json.dumps({'status': 'failure'})
+        try:
+            for list_entry in received_json['arrayOfMeasurements']:
+                for le in list_entry['values']:
+                    if not j2m.check_and_commit(le):
+                        return json.dumps({'status': 'failure'})
+        except KeyError:
+            return json.dumps({'status': 'failure'})
+    return json.dumps({'status': 'success'})
 
 
 

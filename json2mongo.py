@@ -9,9 +9,9 @@ reference = {
     'time': str,
     'date': str,
     'tag': str,
-    'val0': float,
-    'val1': float,
-    'val2': float
+    'val0': lambda val: type(val) is int or type(val) is float,
+    'val1': lambda val: type(val) is int or type(val) is float,
+    'val2': lambda val: type(val) is int or type(val) is float
 }
 
 
