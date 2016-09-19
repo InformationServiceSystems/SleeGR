@@ -2,6 +2,7 @@ from datetime import datetime
 from statistics import mean, variance
 import re
 import math
+import S3_extract_dataset
 
 import os
 from flask import request, redirect, url_for, json, jsonify, session, render_template
@@ -22,11 +23,11 @@ db_inserts, db_extended = database.init()
 j2m = Json2Mongo()
 
 
+#@app.route('/')
+#def index():
+#    return 'Under construction'
+
 @app.route('/')
-def index():
-    return 'Under construction'
-
-
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
@@ -124,7 +125,6 @@ def get_correlations_list():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-
     return render_template('iot-triathlon-activity.html', user=session['email'])
 
 def str2bool(v):
@@ -194,6 +194,7 @@ def receive_json():
                 return json.dumps({'status': 'failure'})
         except KeyError:
             return json.dumps({'status': 'failure'})
+    S3_extract_dataset.run(received_json['arrayOfMeasurements'][0]['values'][0]['Id'])
     return json.dumps({'status': 'success'})
 
 
