@@ -4,3 +4,4 @@ flask-recaptcha
 validate_email
 flask-cors
 python-dateutil
+bcrypt
