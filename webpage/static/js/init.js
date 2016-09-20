@@ -78,7 +78,6 @@ define([], function () {
 		});
 
 	}
-
 	init.initLogin = function () {
 
 		require(['jquery', 'icheck', 'bootstrap'], function ($) {

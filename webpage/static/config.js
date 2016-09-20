@@ -78,6 +78,9 @@ require.config({
         },
         'fastclick': {
             deps: ['jquery']
+        },
+        'icheck': {
+            deps: ['jquery']
         }
     }
 });
