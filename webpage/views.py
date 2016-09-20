@@ -15,8 +15,10 @@ from exceptions import InputError
 from webpage import app
 import names
 from decorators import login_required
+from authentification import requires_BASEAuth
 from datareader import DataReader
 from json2mongo import Json2Mongo, reference
+import bcrypt
 
 
 db_inserts, db_extended = database.init()
@@ -66,7 +68,7 @@ def sign():
 def registration():
     if request.method == 'POST':
         email = request.values['email']
-        password = request.values['password']
+        password = bcrypt.hashpw(request.values['password'].encode(), bcrypt.gensalt())
         fullname = request.values['name']
         import re
         name_list = re.split(' ', fullname)
@@ -182,6 +184,7 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 
 
 @app.route('/post_json', methods=['POST'])
+@requires_BASEAuth
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
