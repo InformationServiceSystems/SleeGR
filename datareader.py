@@ -9,7 +9,7 @@ from datetime import timedelta
 from matplotlib.dates import hours
 
 from linear_datascience import Comp1D
-
+from datawrapper.value_wrapper import ValueWrapper
 import numpy
 import database
 
