@@ -79,7 +79,7 @@ define([], function () {
 	}
 	init.initLogin = function () {
 
-		require(['jquery', 'icheck', 'bootstrap'], function ($) {
+		require(['jquery', 'auth0', 'icheck', 'bootstrap'], function ($, Auth0) {
 			$(function () {
         		$('input').iCheck({
           			checkboxClass: 'icheckbox_square-blue',
@@ -87,6 +87,30 @@ define([], function () {
           			increaseArea: '20%' // optional
 				});
       		});
+
+			var auth0 = new Auth0({
+				domain:         'mircopp.eu.auth0.com',
+				clientID:       '6fP99Tdfa3W2xWgfQGEtSO0EC83GOZ9a',
+				callbackURL:    'http://localhost:5000/callback'
+			  });
+
+			// sign-in with social provider with plain redirect
+			$('.signin-google').on('click', function() {
+				auth0.signin({connection: 'google-oauth2'}); // use connection identifier
+			  });
+
+
+			// sign-in with social provider using a popup (window.open)
+			$('.signin-google-popup').on('click', function() {
+				auth0.signin({popup: true, connection: 'google-oauth2'},
+					function(err, profile, id_token, access_token, state) {
+						//store the profile and id_token in a cookie or local storage
+						//$.cookie('profile', profile);
+						//$.cookie('id_token', id_token);
+
+				});
+			  });
+
 		});
 
 	}

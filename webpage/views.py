@@ -4,7 +4,8 @@ import re
 import math
 
 import os
-from flask import request, redirect, url_for, json, jsonify, session, render_template
+from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory
+import requests
 
 from linear_datascience import Comp1D
 
@@ -14,7 +15,7 @@ from exceptions import InputError
 from webpage import app
 import names
 from decorators import login_required
-from authentification import requires_BASEAuth
+from authentification import requires_BASEAuth, requires_auth
 from datareader import DataReader
 from json2mongo import Json2Mongo, reference
 import bcrypt
@@ -28,6 +29,38 @@ j2m = Json2Mongo()
 def index():
     return 'Under construction'
 
+# Here we're using the /callback route.
+@app.route('/callback')
+def callback_handling():
+  env = os.environ
+  code = request.args.get('code')
+
+  json_header = {'content-type': 'application/json'}
+
+  token_url = "https://{domain}/oauth/token".format(domain='mircopp.eu.auth0.com')
+
+  token_payload = {
+    'client_id':     '6fP99Tdfa3W2xWgfQGEtSO0EC83GOZ9a',
+    'client_secret': 'n9mNcidg58b2lVXWCcP--lbL84qTeh4Y1gYx4AzX_4Gzcic3CB3x1-zh-GcAvSo7',
+    'redirect_uri':  'http://localhost:5000/callback',
+    'code':          code,
+    'grant_type':    'authorization_code'
+  }
+
+  token_info = requests.post(token_url, data=json.dumps(token_payload), headers = json_header).json()
+
+  user_url = "https://{domain}/userinfo?access_token={access_token}" \
+      .format(domain='mircopp.eu.auth0.com', access_token=token_info['access_token'])
+
+  user_info = requests.get(user_url).json()
+  print(user_info)
+
+  # We're saving all user information into the session
+  session['profile'] = user_info
+
+  # Redirect to the User logged in page that you want here
+  # In our case it's /dashboard
+  return redirect('/dashboard')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -35,10 +68,12 @@ def login():
     if request.args.get('next'):
         session['next'] = request.args.get('next', None)
     if request.method == 'POST':
+        print(request.values)
         email = request.values['email']
         password = request.values['password']
         if db_extended.password_matches_email(email, password):
-            session['email'] = email
+            profile = {'email': email}
+            session['profile'] = profile
             if 'next' in session:
                 next = session.get('next')
                 session.pop('next')
@@ -93,7 +128,7 @@ def registration():
 
 
 @app.route('/heartrate', methods=['POST'])
-@login_required
+@requires_auth
 def show_measurement():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -105,7 +140,8 @@ def show_measurement():
         end = datetime.strptime(end_date, '%d.%m.%Y')
         return json.dumps(r.heart_rate_special(user_id, start, end))
 
-@app.route('/get_correlations_list', methods=['GET'])
+@app.route('/get_correlations_list', methods=['GET'])#
+@requires_auth
 def get_correlations_list():
     to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
             '{"x_label": "Sleep length", "y_label": "Load", "next_day": false},' \
@@ -124,16 +160,16 @@ def get_correlations_list():
     return to_reply
 
 @app.route('/dashboard')
-@login_required
+@requires_auth
 def dashboard():
-
-    return render_template('iot-triathlon-activity.html', user=session['email'])
+    user = session['profile']
+    return render_template('iot-triathlon-activity.html', user=user['email'])
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
 @app.route('/sleepPoints', methods=['POST'])
-@login_required
+@requires_auth
 def sleep_data():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -163,12 +199,12 @@ def sleep_data():
 
 
 @app.route('/profile')
-@login_required
+@requires_auth
 def profile():
-    return render_template('iot-triathlon-profile.html', user=session['email'])
+    return render_template('iot-triathlon-profile.html', user=session['profile']['email'])
 
 @app.route('/correlation', methods=['POST'])
-@login_required
+@requires_auth
 def correlations():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -203,7 +239,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/signout')
-@login_required
+@requires_auth
 def signout():
     session.clear()
     return redirect(url_for('login'))
