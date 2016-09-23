@@ -1,4 +1,4 @@
-from pymongo import MongoClient#
+from pymongo import MongoClient
 import bcrypt
 client = MongoClient('localhost', 27017)
 db = client['triathlon']
