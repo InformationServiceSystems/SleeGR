@@ -20,19 +20,30 @@ from datareader import DataReader
 from json2mongo import Json2Mongo, reference
 import bcrypt
 
+from dotenv import Dotenv
+import os
+
+
+
+env = None
+try:
+    env = Dotenv(os.path.dirname(os.path.realpath(__file__)) + '/.env')
+except IOError:
+    env = os.environ
+
 
 db_inserts, db_extended = database.init()
 j2m = Json2Mongo()
 
 
-@app.route('/')
-def index():
-    return 'Under construction'
+@app.route("/")
+def home():
+    return render_template('iot-login-auth0.html', env=env)
 
 # Here we're using the /callback route.
 @app.route('/callback')
 def callback_handling():
-  env = os.environ
+
   code = request.args.get('code')
 
   json_header = {'content-type': 'application/json'}
@@ -40,20 +51,19 @@ def callback_handling():
   token_url = "https://{domain}/oauth/token".format(domain='mircopp.eu.auth0.com')
 
   token_payload = {
-    'client_id':     '6fP99Tdfa3W2xWgfQGEtSO0EC83GOZ9a',
-    'client_secret': 'n9mNcidg58b2lVXWCcP--lbL84qTeh4Y1gYx4AzX_4Gzcic3CB3x1-zh-GcAvSo7',
-    'redirect_uri':  'http://localhost:5000/callback',
-    'code':          code,
-    'grant_type':    'authorization_code'
-  }
+      'client_id': env['AUTH0_CLIENT_ID'], \
+      'client_secret': env['AUTH0_CLIENT_SECRET'], \
+      'redirect_uri': env['AUTH0_CALLBACK_URL'], \
+      'code': code, \
+      'grant_type': 'authorization_code' \
+      }
 
   token_info = requests.post(token_url, data=json.dumps(token_payload), headers = json_header).json()
 
   user_url = "https://{domain}/userinfo?access_token={access_token}" \
-      .format(domain='mircopp.eu.auth0.com', access_token=token_info['access_token'])
+      .format(domain=env["AUTH0_DOMAIN"], access_token=token_info['access_token'])
 
   user_info = requests.get(user_url).json()
-  print(user_info)
 
   # We're saving all user information into the session
   session['profile'] = user_info
@@ -68,7 +78,6 @@ def login():
     if request.args.get('next'):
         session['next'] = request.args.get('next', None)
     if request.method == 'POST':
-        print(request.values)
         email = request.values['email']
         password = request.values['password']
         if db_extended.password_matches_email(email, password):
