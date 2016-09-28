@@ -5,12 +5,12 @@ define([], function () {
 
 	var init = new Object();
 	
-	init.initDashboard = function () {
+	init.initDashboard = function (url) {
 
 		/**
 		 * global fields
 		 */
-		var url = 'http://localhost:5000';
+		var url = url;
 		var multichart_id = '#chartdiv1';
 		var table_id = '#tablediv';
 		var correlations_id = '#correlationsdiv';

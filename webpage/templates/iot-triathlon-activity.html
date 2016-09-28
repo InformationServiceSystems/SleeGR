@@ -226,9 +226,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/iss.css') }}">
 
     <script type="text/javascript">
+        var url = '{{ url }}';
         require(['config'], function(){
             require(['../static/js/init'], function (init) {
-                init.initDashboard();
+                init.initDashboard(url);
             });
         });
     </script>

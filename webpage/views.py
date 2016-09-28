@@ -60,8 +60,12 @@ def callback_handling():
 
   token_info = requests.post(token_url, data=json.dumps(token_payload), headers = json_header).json()
 
-  user_url = "https://{domain}/userinfo?access_token={access_token}" \
-      .format(domain=env["AUTH0_DOMAIN"], access_token=token_info['access_token'])
+  try:
+      user_url = "https://{domain}/userinfo?access_token={access_token}" \
+        .format(domain=env["AUTH0_DOMAIN"], access_token=token_info['access_token'])
+  except KeyError:
+      return redirect('/')
+
 
   user_info = requests.get(user_url).json()
 
@@ -172,7 +176,7 @@ def get_correlations_list():
 @requires_auth
 def dashboard():
     user = session['profile']
-    return render_template('iot-triathlon-activity.html', user=user)
+    return render_template('iot-triathlon-activity.html', user=user, url=env['GLOBAL_URL'])
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
@@ -251,7 +255,7 @@ def allowed_file(filename):
 @requires_auth
 def signout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect('/')
 
 
 if __name__ == '__main__':
