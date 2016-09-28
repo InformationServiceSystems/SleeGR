@@ -172,7 +172,7 @@ def get_correlations_list():
 @requires_auth
 def dashboard():
     user = session['profile']
-    return render_template('iot-triathlon-activity.html', user=user['email'])
+    return render_template('iot-triathlon-activity.html', user=user)
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
@@ -210,7 +210,7 @@ def sleep_data():
 @app.route('/profile')
 @requires_auth
 def profile():
-    return render_template('iot-triathlon-profile.html', user=session['profile']['email'])
+    return render_template('iot-triathlon-profile.html', user=session['profile'])
 
 @app.route('/correlation', methods=['POST'])
 @requires_auth
