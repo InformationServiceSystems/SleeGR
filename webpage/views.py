@@ -37,6 +37,7 @@ j2m = Json2Mongo()
 
 
 @app.route("/")
+@app.route("/login")
 def home():
     return render_template('iot-login-auth0.html', env=env)
 
@@ -48,7 +49,7 @@ def callback_handling():
 
   json_header = {'content-type': 'application/json'}
 
-  token_url = "https://{domain}/oauth/token".format(domain='mircopp.eu.auth0.com')
+  token_url = "https://{domain}/oauth/token".format(domain=env['AUTH0_DOMAIN'])
 
   token_payload = {
       'client_id': env['AUTH0_CLIENT_ID'], \
@@ -76,7 +77,7 @@ def callback_handling():
   # In our case it's /dashboard
   return redirect('/dashboard')
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/oldLogin', methods=['POST', 'GET'])
 def login():
     error = None
     if request.args.get('next'):
