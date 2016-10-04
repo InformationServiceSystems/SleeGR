@@ -15,7 +15,7 @@ from exceptions import InputError
 from webpage import app
 import names
 from decorators import login_required
-from authentification import requires_BASEAuth, requires_auth
+from authentification import requires_BASEAuth, requires_auth, requires_auth_api
 from datareader import DataReader
 from json2mongo import Json2Mongo, reference
 import bcrypt
@@ -48,7 +48,7 @@ def callback_handling():
 
   json_header = {'content-type': 'application/json'}
 
-  token_url = "https://{domain}/oauth/token".format(domain='mircopp.eu.auth0.com')
+  token_url = "https://{domain}/oauth/token".format(domain=env['AUTH0_DOMAIN'])
 
   token_payload = {
       'client_id': env['AUTH0_CLIENT_ID'], \
@@ -233,7 +233,7 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 
 
 @app.route('/post_json', methods=['POST'])
-@requires_BASEAuth
+@requires_auth_api
 def receive_json():
     res = False
     if request.method == 'POST':
