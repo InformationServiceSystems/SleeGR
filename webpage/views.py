@@ -15,7 +15,7 @@ from exceptions import InputError
 from webpage import app
 import names
 from decorators import login_required
-from authentification import requires_BASEAuth, requires_auth, requires_auth_api
+from authentification import requires_BASEAuth, requires_auth_api
 from datareader import DataReader
 from json2mongo import Json2Mongo, reference
 import bcrypt
@@ -142,7 +142,7 @@ def registration():
 
 
 @app.route('/heartrate', methods=['POST'])
-@requires_auth
+@requires_auth_api
 def show_measurement():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -155,7 +155,7 @@ def show_measurement():
         return json.dumps(r.heart_rate_special(user_id, start, end))
 
 @app.route('/get_correlations_list', methods=['GET'])#
-@requires_auth
+@requires_auth_api
 def get_correlations_list():
     to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
             '{"x_label": "Sleep length", "y_label": "Load", "next_day": false},' \
@@ -174,7 +174,7 @@ def get_correlations_list():
     return to_reply
 
 @app.route('/dashboard')
-@requires_auth
+@login_required
 def dashboard():
     user = session['profile']
     return render_template('iot-triathlon-activity.html', user=user, url=env['GLOBAL_URL'])
@@ -183,7 +183,7 @@ def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
 @app.route('/sleepPoints', methods=['POST'])
-@requires_auth
+@requires_auth_api
 def sleep_data():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -213,12 +213,12 @@ def sleep_data():
 
 
 @app.route('/profile')
-@requires_auth
+@login_required
 def profile():
     return render_template('iot-triathlon-profile.html', user=session['profile'])
 
 @app.route('/correlation', methods=['POST'])
-@requires_auth
+@requires_auth_api
 def correlations():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -253,7 +253,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/signout')
-@requires_auth
+@login_required
 def signout():
     session.clear()
     return redirect('/')

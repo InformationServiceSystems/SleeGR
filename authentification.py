@@ -36,21 +36,11 @@ def requires_BASEAuth(f):
         return f(*args, **kwargs)
     return decorated
 
-def requires_auth(f):
-  @wraps(f)
-  def decorated(*args, **kwargs):
-    if 'profile' not in session:
-      # Redirect to Login page here
-      return redirect('/login')
-    return f(*args, **kwargs)
-
-  return decorated
-
 # Authentication annotation
 current_user = LocalProxy(lambda: _request_ctx_stack.top.current_user)
 
 # Authentication attribute/annotation
-def authenticate(error):
+def authenticate_error(error):
   resp = jsonify(error)
   resp.status_code = 401
   return resp
@@ -58,35 +48,37 @@ def authenticate(error):
 def requires_auth_api(f):
   @wraps(f)
   def decorated(*args, **kwargs):
-    auth = request.headers.get('Authorization', None)
-    if not auth:
-      return authenticate({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'})
+    if 'profile' in session:
+      return f(*args, **kwargs)
+    else:
+        auth = request.headers.get('Authorization', None)
+        if not auth:
+          return authenticate_error({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'})
 
-    parts = auth.split()
+        parts = auth.split()
 
-    if parts[0].lower() != 'bearer':
-      return {'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}
-    elif len(parts) == 1:
-      return {'code': 'invalid_header', 'description': 'Token not found'}
-    elif len(parts) > 2:
-      return {'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}
+        if parts[0].lower() != 'bearer':
+          return authenticate_error({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'})
+        elif len(parts) == 1:
+          return authenticate_error({'code': 'invalid_header', 'description': 'Token not found'})
+        elif len(parts) > 2:
+          return authenticate_error({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'})
 
-    token = parts[1]
-    try:
-        payload = jwt.decode(
-            token,
-            base64.b64decode(client_secret.replace("_","/").replace("-","+")),
-            audience=client_id
-        )
+        token = parts[1]
+        try:
+            payload = jwt.decode(
+                token,
+                base64.b64decode(client_secret.replace("_","/").replace("-","+")),
+                audience=client_id
+            )
 
-    except jwt.ExpiredSignature:
-        return authenticate({'code': 'token_expired', 'description': 'token is expired'})
-    except jwt.InvalidAudienceError:
-        return authenticate({'code': 'invalid_audience', 'description': 'incorrect audience, expected: ' + client_id})
-    except jwt.DecodeError:
-        return authenticate({'code': 'token_invalid_signature', 'description': 'token signature is invalid'})
+        except jwt.ExpiredSignature:
+            return authenticate_error({'code': 'token_expired', 'description': 'token is expired'})
+        except jwt.InvalidAudienceError:
+            return authenticate_error({'code': 'invalid_audience', 'description': 'incorrect audience, expected: ' + client_id})
+        except jwt.DecodeError:
+            return authenticate_error({'code': 'token_invalid_signature', 'description': 'token signature is invalid'})
 
-    _request_ctx_stack.top.current_user = user = payload
-    return f(*args, **kwargs)
-
+        _request_ctx_stack.top.current_user = user = payload
+        return f(*args, **kwargs)
   return decorated
