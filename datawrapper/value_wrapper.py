@@ -1,4 +1,23 @@
 from datetime import datetime
+from mapval import MappingValidator
+value_reference = {
+        "type": int,
+        "email": str,
+        "tag": str,
+        "time_stamp": datetime,
+        "val2": lambda val: isinstance(val, float) or isinstance(val, int),
+        "val1": lambda val: isinstance(val, float) or isinstance(val, int),
+        "val0": lambda val: isinstance(val, float) or isinstance(val, int)
+    }
+
+
+def value_wrapper_gen(json):
+    validator = MappingValidator(value_reference)
+    if validator.validate(json):
+        return ValueWrapper(json)
+    else:
+        return None
+
 
 class ValueWrapper:
     def __init__(self, json):
@@ -49,6 +68,6 @@ if __name__ == '__main__':
         "val0": 1111
     }
 
-    vw = ValueWrapper(json)
+    vw = value_wrapper_gen(json)
 
     print(vw.val0)

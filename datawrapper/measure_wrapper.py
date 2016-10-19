@@ -1,8 +1,33 @@
-from datawrapper.value_wrapper import ValueWrapper
+from datawrapper.value_wrapper import ValueWrapper, value_reference
+from mapval import MappingValidator
 from datetime import datetime
 
-class MeasureWrapper:
 
+
+def value_bla(lst):
+    value_validator = MappingValidator(value_reference)
+    result = True
+    for value in lst:
+        result = result and value_validator.validate(value)
+    return result
+
+reference= {
+    'Id': int,
+    'Type': str,
+    'Timestamp': str,
+    'values': value_bla
+}
+
+def measure_value_generator(json):
+    validator = MappingValidator(reference)
+    if validator.validate(json):
+        return MeasureWrapper(json)
+    else:
+        return None
+
+
+
+class MeasureWrapper:
     def __init__(self, measurement_json):
         self._measuremet_json = measurement_json
 
@@ -24,38 +49,53 @@ class MeasureWrapper:
         else:
             raise KeyError
 
+value_validator = MappingValidator(reference)
 
-date = datetime(2016,1,18,11,22,55)
-json =  {
-    'values': [{
-        "type": 4,
-        "email": "test@test.com",
-        "tag": "Idle",
-        "time_stamp": date,
-        "val2": 0,
-        "val1": 0,
-        "val0": 1111
-    },
-    {
-        "type": 4,
-        "email": "test@test.com",
-        "tag": "Idle",
-        "time_stamp": date,
-        "val2": 0,
-        "val1": 0,
-        "val0": 1112
-    },
-    {
-        "type": 4,
-        "email": "test@test.com",
-        "tag": "Idle",
-        "time_stamp": date,
-        "val2": 0,
-        "val1": 0,
-        "val0": 1113
-    }]
-}
 
-mw = MeasureWrapper(json)
-for v in mw:
-    print(v)
+if __name__ == '__main__':
+    date = datetime(2016, 1, 18, 11, 22, 55)
+    measurements = {
+        'arrayOfMeasurements': [
+            {
+                'Id': 1,
+                'Type': 'bal',
+                'Timestamp': '2016, 1, 18, 11, 22, 55',
+                'values': [
+                    {
+                        "type": 4,
+                        "email": "test@test.com",
+                        "tag": "Idle",
+                        "time_stamp": date,
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1111
+                    },
+                    {
+                        "type": 4,
+                        "email": "test@test.com",
+                        "tag": "Idle",
+                        "time_stamp": date,
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1112
+                    },
+                    {
+                        "type": 4,
+                        "email": "test@test.com",
+                        "tag": "Idle",
+                        "time_stamp": date,
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1113
+                    }]
+            }
+        ]
+
+    }
+
+    measures = measurements['arrayOfMeasurements']
+    for measure in measures:
+        res = measure_value_generator(measure)
+        for elem in res:
+            print(elem)
+
