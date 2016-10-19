@@ -33,20 +33,20 @@ class DataReader:
 
             for row in self._db_extended.find_data(user_id, day, measurement_type):
                 if measurement_to_valuenumb[
-                    int(row['type'])] == 1:
-                    ret_json[row['time_stamp']] = {
-                        'value': row['val1']}
+                    int(row.type)] == 1:
+                    ret_json[row.time_stamp] = {
+                        'value': row.val1}
                 elif measurement_to_valuenumb[
-                    int(row['type'])] == 2:
-                    ret_json[row['time_stamp']] = {
-                        'value': {'value_1': row['val1'],
-                                  'value_2': row['val2']}}
+                    int(row.type)] == 2:
+                    ret_json[row.time_stamp] = {
+                        'value': {'value_1': row.val1,
+                                  'value_2': row.val2}}
                 elif measurement_to_valuenumb[
-                    int(row['type'])] == 3:
-                    ret_json[row['time_stamp']] = {
-                        'value': {'value_1': row['val1'],
-                                  'value_2': row['val2'],
-                                  'value_3': row['val3']}}
+                    int(row.type)] == 3:
+                    ret_json[row.time_stamp] = {
+                        'value': {'value_1': row.val1,
+                                  'value_2': row.val2,
+                                  'value_3': row.val3}}
         return ret_json
 
     def read_sleep_data(self, user_id, start_date, end_date):

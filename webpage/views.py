@@ -184,10 +184,11 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 
 
 @app.route('/post_json', methods=['POST'])
-@requires_BASEAuth
+#@requires_BASEAuth
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
+        user_name = received_json['arrayOfMeasurements'][0]['values'][0]['email']
         try:
             json_lst = []
             for list_entry in received_json['arrayOfMeasurements']:
@@ -197,7 +198,7 @@ def receive_json():
                 return json.dumps({'status': 'failure'})
         except KeyError:
             return json.dumps({'status': 'failure'})
-    S3_extract_dataset.run(received_json['arrayOfMeasurements'][0]['values'][0]['Id'])
+    S3_extract_dataset.run(user_name)
     return json.dumps({'status': 'success'})
 
 
