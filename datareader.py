@@ -58,14 +58,14 @@ class DataReader:
                                until=end_date):
             dates.append(day.strftime('%d.%m.%Y'))
         for cursor in cursors:
-            if cursor['time_stamp'].strftime('%d.%m.%Y') in dates:
+            if cursor.time_stamp.strftime('%d.%m.%Y') in dates:
                 data.append(cursor)
 
         for row in data:
-            wake_up = row['time_stamp']
-            drop_off = row['val1']
+            wake_up = row.time_stamp
+            drop_off = row.val1
             duration = wake_up - drop_off
-            deep_sleep = float(row['val2']) * 100
+            deep_sleep = float(row.val2) * 100
             if deep_sleep > 0:
                 ret_list.append(
                     {'user_id': user_id, 'date': (wake_up.strftime('%d.%m.%Y')),
@@ -91,16 +91,16 @@ class DataReader:
                 new_json = {}
                 new_json['user_id'] = user_id
                 new_json['date'] = day
-                new_json['a'] = data['A']
-                new_json['t'] = data['T']
-                new_json['c'] = data['C']
-                hr_lst_current_day = list(filter(lambda entry: entry['time_stamp'].strftime('%d.%m.%Y') == day, hr_cursors))
+                new_json['a'] = data.a
+                new_json['t'] = data.t
+                new_json['c'] = data.c
+                hr_lst_current_day = list(filter(lambda entry: entry.time_stamp.strftime('%d.%m.%Y') == day, hr_cursors))
                 if len(hr_lst_current_day) < 1:
                     continue
-                base_time = hr_lst_current_day[0]['time_stamp']
+                base_time = hr_lst_current_day[0].time_stamp
                 datapoints = []
                 for data in hr_lst_current_day:
-                    datapoints.append({'x': (data['time_stamp'] - base_time).seconds, 'y': data['val0']})
+                    datapoints.append({'x': (data.time_stamp - base_time).seconds, 'y': data.val0})
                 new_json['data_points'] = datapoints
                 ret_list.append(new_json)
         return ret_list
