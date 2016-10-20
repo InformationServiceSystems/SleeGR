@@ -6,6 +6,7 @@ import math
 import os
 from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory
 import requests
+from flask_cors import CORS, cross_origin
 
 from linear_datascience import Comp1D
 
@@ -154,7 +155,8 @@ def show_measurement():
         end = datetime.strptime(end_date, '%d.%m.%Y')
         return json.dumps(r.heart_rate_special(user_id, start, end))
 
-@app.route('/get_correlations_list', methods=['GET'])#
+@app.route('/get_correlations_list', methods=['GET'])
+@cross_origin()
 @requires_auth_api
 def get_correlations_list():
     to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
@@ -218,6 +220,7 @@ def profile():
     return render_template('iot-triathlon-profile.html', user=session['profile'])
 
 @app.route('/correlation', methods=['POST'])
+@cross_origin()
 @requires_auth_api
 def correlations():
     if request.method == 'POST':
