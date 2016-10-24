@@ -6,11 +6,12 @@ from flask import session, redirect, url_for, request
 
 def login_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('email') is None:
-            return redirect(url_for('login', next=request.url))
+    def decorated(*args, **kwargs):
+        if 'profile' not in session:
+            # Redirect to Login page here
+            return redirect('/login')
         return f(*args, **kwargs)
-    return decorated_function
+    return decorated
 
 def check_user(f):
     def d(self, email, password, first_name=None, last_name=None):

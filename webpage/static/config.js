@@ -30,7 +30,8 @@ require.config({
         'jquery.slimScroll':    'adminLTE/plugins/slimScroll/jquery.slimscroll.min',
         'fastClick':            'adminLTE/plugins/fastclick/fastclick.min',
         'setup':                'js/setup',
-        'icheck':               'adminLTE/plugins/iCheck/icheck.min'
+        'icheck':               'adminLTE/plugins/iCheck/icheck.min',
+        'auth0':                'https://cdn.auth0.com/w2/auth0-7.1.min'
     },
     shim:  {
         'highcharts': {

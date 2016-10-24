@@ -5,7 +5,9 @@ import math
 import S3_extract_dataset
 
 import os
-from flask import request, redirect, url_for, json, jsonify, session, render_template
+from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory
+import requests
+from flask_cors import CORS, cross_origin
 
 from linear_datascience import Comp1D
 
@@ -15,22 +17,69 @@ from exceptions import InputError
 from webpage import app
 import names
 from decorators import login_required
-from authentification import requires_BASEAuth
+from authentification import requires_BASEAuth, requires_auth_api
 from datareader import DataReader
 from json2mongo import Json2Mongo, reference
 import bcrypt
+
+from dotenv import Dotenv
+import os
+
+
+
+env = None
+try:
+    env = Dotenv(os.path.dirname(os.path.realpath(__file__)) + '/.env')
+except IOError:
+    env = os.environ
 
 
 db_inserts, db_extended = database.init()
 j2m = Json2Mongo()
 
 
-#@app.route('/')
-#def index():
-#    return 'Under construction'
+@app.route("/")
+@app.route("/login")
+def home():
+    return render_template('iot-login-auth0.html', env=env)
 
-@app.route('/')
-@app.route('/login', methods=['POST', 'GET'])
+# Here we're using the /callback route.
+@app.route('/callback')
+def callback_handling():
+
+  code = request.args.get('code')
+
+  json_header = {'content-type': 'application/json'}
+
+  token_url = "https://{domain}/oauth/token".format(domain=env['AUTH0_DOMAIN'])
+
+  token_payload = {
+      'client_id': env['AUTH0_CLIENT_ID'], \
+      'client_secret': env['AUTH0_CLIENT_SECRET'], \
+      'redirect_uri': env['AUTH0_CALLBACK_URL'], \
+      'code': code, \
+      'grant_type': 'authorization_code' \
+      }
+
+  token_info = requests.post(token_url, data=json.dumps(token_payload), headers = json_header).json()
+
+  try:
+      user_url = "https://{domain}/userinfo?access_token={access_token}" \
+        .format(domain=env["AUTH0_DOMAIN"], access_token=token_info['access_token'])
+  except KeyError:
+      return redirect('/')
+
+
+  user_info = requests.get(user_url).json()
+
+  # We're saving all user information into the session
+  session['profile'] = user_info
+
+  # Redirect to the User logged in page that you want here
+  # In our case it's /dashboard
+  return redirect('/dashboard')
+
+@app.route('/oldLogin', methods=['POST', 'GET'])
 def login():
     error = None
     if request.args.get('next'):
@@ -39,7 +88,8 @@ def login():
         email = request.values['email']
         password = request.values['password']
         if db_extended.password_matches_email(email, password):
-            session['email'] = email
+            profile = {'email': email}
+            session['profile'] = profile
             if 'next' in session:
                 next = session.get('next')
                 session.pop('next')
@@ -94,7 +144,7 @@ def registration():
 
 
 @app.route('/heartrate', methods=['POST'])
-@login_required
+@requires_auth_api
 def show_measurement():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -107,6 +157,8 @@ def show_measurement():
         return json.dumps(r.heart_rate_special(user_id, start, end))
 
 @app.route('/get_correlations_list', methods=['GET'])
+@cross_origin()
+@requires_auth_api
 def get_correlations_list():
     to_reply = '[{"x_label": "Day of week", "y_label": "Sleep length", "next_day": false}, ' \
             '{"x_label": "Sleep length", "y_label": "Load", "next_day": false},' \
@@ -127,13 +179,14 @@ def get_correlations_list():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('iot-triathlon-activity.html', user=session['email'])
+    user = session['profile']
+    return render_template('iot-triathlon-activity.html', user=user, url=env['GLOBAL_URL'])
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
 @app.route('/sleepPoints', methods=['POST'])
-@login_required
+@requires_auth_api
 def sleep_data():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -165,10 +218,11 @@ def sleep_data():
 @app.route('/profile')
 @login_required
 def profile():
-    return render_template('iot-triathlon-profile.html', user=session['email'])
+    return render_template('iot-triathlon-profile.html', user=session['profile'])
 
 @app.route('/correlation', methods=['POST'])
-@login_required
+@cross_origin()
+@requires_auth_api
 def correlations():
     if request.method == 'POST':
         user_id = request.values['userId']
@@ -184,7 +238,7 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 
 
 @app.route('/post_json', methods=['POST'])
-#@requires_BASEAuth
+@requires_auth_api
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
@@ -211,7 +265,7 @@ def allowed_file(filename):
 @login_required
 def signout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect('/')
 
 
 if __name__ == '__main__':
