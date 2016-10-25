@@ -8,22 +8,28 @@ import re
 import numpy as np
 from scipy.optimize import minimize
 from pymongo import MongoClient
+import database
+
+
+db_inserts, db_extended = database.init()
+
 
 # functions to get daily values
 def Day(day, values, usr):
     result = {'Day of week':day.weekday()}
     return result
 
+
 def RestingHR(day, values, usr):
     
     result = {'Morning HR':None, 'Evening HR':None}
     
-    hrM = [val['val0'] for val in values if val['type'] == 21 and val['time_stamp'].hour < 11 ]
+    hrM = [val.val0 for val in values if val.type == 21 and val.time_stamp.hour < 11 ]
     
     if len(hrM) > 0:
         result['Morning HR'] = np.min(hrM)*1.0
 
-    hrE = [val['val0'] for val in values if val['type'] == 21 and val['time_stamp'].hour > 20 ]
+    hrE = [val.val0 for val in values if val.type == 21 and val.time_stamp.hour > 20 ]
     
     if len(hrE) > 0:
         result['Evening HR'] = np.min(hrE)*1.0
@@ -38,21 +44,21 @@ def FittedCurve(day, values, usr):
     if usr == '1024' and day < datetime.strptime("2016-02-04", "%Y-%m-%d"):
         return result
     else:
-        hr = [val for val in values if val['type'] == 21 ]
+        hr = [val for val in values if val.type == 21 ]
 
     if len(hr) < 2:
         return result
 
     # find max idx
-    mx, _ = max(enumerate(hr), key = lambda p: p[1]['val0'])
+    mx, _ = max(enumerate(hr), key = lambda p: p[1].val0)
     
-    if hr[mx]['val0'] < 110:
+    if hr[mx].val0 < 110:
         return result;
     
     cd = [hr[mx]]
     mx = mx + 1;
     
-    while ( (hr[mx]['time_stamp'] - hr[mx-1]['time_stamp']) < timedelta(minutes = 500) ):
+    while ( (hr[mx].time_stamp - hr[mx-1].time_stamp) < timedelta(minutes = 500) ):
         cd.append(hr[mx])
         mx += 1
         if mx >= len(hr):
@@ -65,12 +71,12 @@ def FittedCurve(day, values, usr):
     x = []
     y = []
     
-    start = cd[0]['time_stamp']
+    start = cd[0].time_stamp
     
     for h in cd:
-        diff = (h['time_stamp'] - start).seconds
+        diff = (h.time_stamp - start).seconds
         x.append(diff)
-        y.append(h['val0'])
+        y.append(h.val0)
 
     x = np.array(x)*1.0
     y = np.array(y)
@@ -96,19 +102,18 @@ def FittedCurve(day, values, usr):
     result['A'] = p[1]
     result['C'] = p[2]
     result['Load'] = sc
-
     return result
 
 def Activity(day, values, usr):
     result = {'Activity A':None, 'Activity G':None}
     
-    gyro = [[val['val0'],val['val1'],val['val2']] for val in values if val['type'] == 4 ]
+    gyro = [[val.val0, val.val1, val.val2] for val in values if val.type == 4 ]
     
     if len(gyro) > 0:
         df = np.abs(np.diff(gyro, axis = 0))
         result['Activity G'] = np.mean( np.mean(df, axis = 0) )
 
-    accel = [[val['val0'],val['val1'],val['val2']] for val in values if val['type'] == 1 ]
+    accel = [[val.val0, val.val1, val.val2] for val in values if val.type == 1 ]
     
     if len(accel) > 0:     
         df = np.abs(np.diff(accel, axis = 0))
@@ -119,18 +124,18 @@ def Activity(day, values, usr):
 def Feedback(day, values, usr):
     result = {'RPE':None, 'DALDA':None}
     
-    data = [val for val in values if val['type'] == 1024 ]
+    data = [val for val in values if val.type == 1024 ]
     
     if len(data) > 0:
         
         dalda = []
         
         for val in data:
-            if 'RPE' in val['tag']:
-                if val['val0'] > 0:
-                    result['RPE'] = val['val0']
+            if 'RPE' in val.tag:
+                if val.val0 > 0:
+                    result['RPE'] = val.val0
             else:
-                dalda.append(val['val0'])
+                dalda.append(val.val0)
         
         if len(dalda) > 0:
             result['DALDA'] = np.mean(dalda)
@@ -138,22 +143,22 @@ def Feedback(day, values, usr):
     return result
 
 def Sleep(day, values, usr):
-    result = {'Sleep length':None, 'Sleep start':None, 'Sleep end':None, 'Deep sleep':None}
+    result = {'Sleep length': None, 'Sleep start': None, 'Sleep end': None, 'Deep sleep': None}
     
-    vals = [val for val in values if val['type'] == 777 ]
+    vals = [val for val in values if val.type == 777 ]
     
     if len(vals) > 0:   
         val = vals[-1] 
-        if val['val0'] < 2.0 or val['val0'] > 12.0:
+        if val.val0 < 2.0 or val.val0 > 12.0:
             return result
-        result['Sleep length'] = val['val0']
-        result['Sleep start'] = (val['val1']).hour
+        result['Sleep length'] = val.val0
+        result['Sleep start'] = (val.val1).hour
         
         if result['Sleep start'] > 12:
             result['Sleep start'] = result['Sleep start']-24
         
-        result['Sleep end'] = val['time_stamp'].hour
-        result['Deep sleep'] = val['val2'] if val['val2'] > 0 else None
+        result['Sleep end'] = val.time_stamp.hour
+        result['Deep sleep'] = val.val2 if val.val2 > 0 else None
     
     return result
 
@@ -168,29 +173,29 @@ def run(user=None):
     '''
     ### choose here the features to be extracted
 
-    ff = [ Day, RestingHR, FittedCurve, Activity, Sleep, Feedback]
+    ff = [Day, RestingHR, FittedCurve, Activity, Sleep, Feedback]
 
     ###
-    client = MongoClient('localhost', 27017)
-    db = client['triathlon']
+    #client = MongoClient('localhost', 27017)
+    #db = client['triathlon']
     dct = {}
-    collections = db.collection_names()
+    #collections = db.collection_names()
     #find users to compute
     if user:
         dct[user] = []
     else:
-        for user in db.general_user.find():
-            dct[user['email']] = []
+        for user_elem in db_extended.get_all_users():
+            dct[user_elem['email']] = []
     #delete users _data-collections
-    for user in dct:
-        db.drop_collection('%s_data' % user)
+    for user_elem in dct:
+        db_extended.drop_correl(user_elem)
     #find all measuremtens and sort list by date
-    for user in dct:
+    for user_elem in dct:
         lst = []
-        for elem in db[user].find():
-            if isinstance(elem['time_stamp'], datetime) :
+        for elem in db_extended.find_data_user(user_elem):
+            if isinstance(elem.time_stamp, datetime) :
                 lst.append(elem)
-        dct[user] = sorted(lst, key=lambda date: date['time_stamp'] )
+        dct[user_elem] = sorted(lst, key=lambda date: date.time_stamp)
 
 
 
@@ -216,7 +221,7 @@ def run(user=None):
             dayend = dayend - oneday
 
             # get data in the range
-            values = [val for val in data if daystart <= val['time_stamp'] and val['time_stamp'] <= dayend ]
+            values = [val for val in data if daystart <= val.time_stamp and val.time_stamp <= dayend ]
 
             if len(values) < 1:
                 continue
@@ -225,7 +230,7 @@ def run(user=None):
 
             r = {'time_stamp':daystart}
             for fnc in ff :
-                r.update( fnc(daystart, values, usr) )
+                r.update(fnc(daystart, values, usr))
 
             # save them for the user
             all_feat.append(r)
@@ -234,7 +239,8 @@ def run(user=None):
         collection_name = ('%s_data' % (usr))
         if all_feat:
             for data in all_feat:
-                db[collection_name].insert(data)
+                db_inserts.insert_correl(usr, data)
+                #db[collection_name].insert(data)
         else:
             pass
 
