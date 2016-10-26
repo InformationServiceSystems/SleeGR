@@ -9,6 +9,7 @@ import numpy as np
 from scipy.optimize import minimize
 from pymongo import MongoClient
 import database
+from datawrapper import correl_wrapper
 
 
 db_inserts, db_extended = database.init()
@@ -233,7 +234,7 @@ def run(user=None):
                 r.update(fnc(daystart, values, usr))
 
             # save them for the user
-            all_feat.append(r)
+            all_feat.append(correl_wrapper.correl_wrapper_gen(r))
 
         #new save
         collection_name = ('%s_data' % (usr))
