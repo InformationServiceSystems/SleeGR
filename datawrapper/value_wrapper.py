@@ -21,38 +21,38 @@ def value_wrapper_gen(json):
 
 class ValueWrapper:
     def __init__(self, json):
-        self._json = json
+        self._value_json = json
 
     def __repr__(self):
-        return str(self._json)
+        return str(self._value_json)
 
     @property
     def val0(self):
-        return self._json['val0']
+        return self._value_json['val0']
 
     @property
     def val1(self):
-        return self._json['val1']
+        return self._value_json['val1']
 
     @property
     def val2(self):
-        return self._json['val2']
+        return self._value_json['val2']
 
     @property
     def email(self):
-        return self._json['email']
+        return self._value_json['email']
 
     @property
     def time_stamp(self):
-        return  self._json['time_stamp']
+        return  self._value_json['time_stamp']
 
     @property
     def tag(self):
-        return self._json['tag']
+        return self._value_json['tag']
 
     @property
     def type(self):
-        return self._json['type']
+        return self._value_json['type']
 
 
 if __name__ == '__main__':

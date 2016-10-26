@@ -9,6 +9,11 @@ class DbExtended:
     def __init__(self, database):
         self.db_base = database
 
+    def get_all_users(self):
+        asked_user = self.db_base._general_users_collection.find()
+
+    def drop_correl(self, user):
+        self.db_base.drop_collection('%s_data' % user)
 
     def get_user_id(self, email):
         asked_user = self.db_base._general_users_collection.find_one({names.email: email})
@@ -57,6 +62,14 @@ class DbExtended:
     #changed to wrapper, not checked
     def find_data_tag(self, user, measurement, tag=''):
         res_lst = self.db_base._db[user].find({'type': measurement, 'tag': tag}).sort('time_stamp', pymongo.ASCENDING)
+        ret_lst = []
+        for elem in res_lst:
+            ret_lst.append(value_wrapper.value_wrapper_gen(elem))
+        return ret_lst
+
+    #changed to wrapper, not checked
+    def find_data_user(self, user):
+        res_lst = self.db_base._db[user].find().sort('time_stamp', pymongo.ASCENDING)
         ret_lst = []
         for elem in res_lst:
             ret_lst.append(value_wrapper.value_wrapper_gen(elem))

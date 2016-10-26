@@ -22,6 +22,7 @@ from datareader import DataReader
 from json2mongo import Json2Mongo, reference
 import bcrypt
 
+from datawrapper import measure_wrapper, value_wrapper
 from dotenv import Dotenv
 import os
 
@@ -244,14 +245,22 @@ def receive_json():
         received_json = request.get_json()
         user_name = received_json['arrayOfMeasurements'][0]['values'][0]['email']
         try:
-            json_lst = []
-            for list_entry in received_json['arrayOfMeasurements']:
-                for le in list_entry['values']:
-                    json_lst.append(le)
-            if not j2m.check_and_commit_many(json_lst):
-                return json.dumps({'status': 'failure'})
+
+            for measurement in received_json['arrayOfMeasurements']:
+                for measured_value in measurement['values']:
+                    measured_value = j2m.check(measured_value)
+                    if not measured_value:
+                        return json.dumps({'status': 'failure'})
+            # json_lst = []
+            # for measurement in received_json['arrayOfMeasurements']:
+            #     for measured_value in measurement['values']:
+            #         json_lst.append(measured_value)
+            # if not j2m.check_and_commit_many(json_lst):
+            #     return json.dumps({'status': 'failure'})
         except KeyError:
             return json.dumps({'status': 'failure'})
+        mw = measure_wrapper.measure_value_generator(receive_json['arrayOfMeasurements'])
+        db_inserts.insert_measure(mw)
     S3_extract_dataset.run(user_name)
     return json.dumps({'status': 'success'})
 

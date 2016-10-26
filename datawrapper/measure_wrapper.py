@@ -54,6 +54,7 @@ value_validator = MappingValidator(reference)
 
 if __name__ == '__main__':
     date = datetime(2016, 1, 18, 11, 22, 55)
+    date2 = datetime(2016, 1, 19, 11, 22, 55)
     measurements = {
         'arrayOfMeasurements': [
             {
@@ -87,6 +88,39 @@ if __name__ == '__main__':
                         "val2": 0,
                         "val1": 0,
                         "val0": 1113
+                    }]
+            },
+            {
+                'Id': 2,
+                'Type': 'bal',
+                'Timestamp': '2016, 1, 19, 11, 22, 55',
+                'values': [
+                    {
+                        "type": 4,
+                        "email": "test@test.com",
+                        "tag": "Idle",
+                        "time_stamp": date2,
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1114
+                    },
+                    {
+                        "type": 4,
+                        "email": "test@test.com",
+                        "tag": "Idle",
+                        "time_stamp": date2,
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1115
+                    },
+                    {
+                        "type": 4,
+                        "email": "test@test.com",
+                        "tag": "Idle",
+                        "time_stamp": date2,
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1116
                     }]
             }
         ]

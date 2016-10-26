@@ -67,3 +67,23 @@ class Json2Mongo:
         new_json_lst = self.check_many(json_lst)
         if new_json_lst:
             return self._to_db_many(new_json_lst[0]['UserID'], new_json_lst)
+
+if __name__ == '__main__':
+    j2m = Json2Mongo()
+    date = datetime(2016, 1, 18, 11, 22, 55)
+    json = {
+        'Id': 'matthias',
+        'type': 1,
+        'Measurement_Id': 1,
+        'time': date.strftime('%H:%M:%S'),
+        'date': date.strftime('%Y.%m.%d'),
+        'tag': 'Cooldwon',
+        'val0': 1.0,
+        'val1': 1.0,
+        'val2': 1.0
+    }
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(json)
+    json = j2m.check_and_change(json)
+    pp.pprint(json)
