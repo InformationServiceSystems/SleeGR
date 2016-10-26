@@ -247,8 +247,8 @@ def receive_json():
         try:
 
             for measurement in received_json['arrayOfMeasurements']:
-                for measured_value in measurement['values']:
-                    measured_value = j2m.check(measured_value)
+                for index, measured_value in enumerate(measurement['values']):
+                    measurement['values'][index] = j2m.check(measured_value)
                     if not measured_value:
                         return json.dumps({'status': 'failure'})
             # json_lst = []

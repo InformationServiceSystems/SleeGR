@@ -71,19 +71,103 @@ class Json2Mongo:
 if __name__ == '__main__':
     j2m = Json2Mongo()
     date = datetime(2016, 1, 18, 11, 22, 55)
-    json = {
-        'Id': 'matthias',
-        'type': 1,
-        'Measurement_Id': 1,
-        'time': date.strftime('%H:%M:%S'),
-        'date': date.strftime('%Y.%m.%d'),
-        'tag': 'Cooldwon',
-        'val0': 1.0,
-        'val1': 1.0,
-        'val2': 1.0
+    date2 = datetime(2016, 1, 19, 11, 22, 55)
+    measurements = {
+        'arrayOfMeasurements': [
+            {
+                'Id': 1,
+                'Type': 'bal',
+                'Timestamp': '2016, 1, 18, 11, 22, 55',
+                'values': [
+                    {
+                        "type": 4,
+                        "Id": "test@test.com",
+                        "Measurement_Id": 1,
+                        "tag": "Idle",
+                        'time': date.strftime('%H:%M:%S'),
+                        'date': date.strftime('%Y.%m.%d'),
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1111
+                    },
+                    {
+                        "type": 4,
+                        "Id": "test@test.com",
+                        "Measurement_Id": 1,
+
+                        "tag": "Idle",
+                        'time': date.strftime('%H:%M:%S'),
+                        'date': date.strftime('%Y.%m.%d'),
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1112
+                    },
+                    {
+                        "type": 4,
+                        "Id": "test@test.com",
+                        "Measurement_Id": 1,
+
+                        "tag": "Idle",
+                        'time': date.strftime('%H:%M:%S'),
+                        'date': date.strftime('%Y.%m.%d'),
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1113
+                    }]
+            },
+            {
+                'Id': 2,
+                'Type': 'bal',
+                'Timestamp': '2016, 1, 19, 11, 22, 55',
+                'values': [
+                    {
+                        "type": 4,
+                        "Id": "test@test.com",
+                        "Measurement_Id": 2,
+                        "tag": "Idle",
+                        'time': date2.strftime('%H:%M:%S'),
+                        'date': date2.strftime('%Y.%m.%d'),
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1114
+                    },
+                    {
+                        "type": 4,
+                        "Id": "test@test.com",
+                        "Measurement_Id": 2,
+                        "tag": "Idle",
+                        'time': date2.strftime('%H:%M:%S'),
+                        'date': date2.strftime('%Y.%m.%d'),
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1115
+                    },
+                    {
+                        "type": 4,
+                        "Id": "test@test.com",
+                        "Measurement_Id": 2,
+                        "tag": "Idle",
+                        'time': date2.strftime('%H:%M:%S'),
+                        'date': date2.strftime('%Y.%m.%d'),
+                        "val2": 0,
+                        "val1": 0,
+                        "val0": 1116
+                    }]
+            }
+        ]
+
     }
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(json)
-    json = j2m.check_and_change(json)
-    pp.pprint(json)
+
+    pp.pprint(measurements)
+
+    for measurement in measurements['arrayOfMeasurements']:
+        for index, measured_value in enumerate(measurement['values']):
+            pp.pprint(measured_value)
+            measurement['values'][index] = j2m.check(measured_value)
+            pp.pprint(measured_value)
+    pp.pprint(measurements)
+
+
+
