@@ -3,6 +3,7 @@ import csv
 import re
 from datetime import datetime
 import database
+from datawrapper import value_wrapper
 
 from dateutil import rrule
 
@@ -15,8 +16,8 @@ class csv_2_reader():
 
     def to_mongo(self, user_id):
         lst = self.to_json(user_id)
-        for json in lst:
-            self.db_inserts.insert_csv_row(user_id, json)
+        for value in lst:
+            self.db_inserts.insert_csv_row(user_id, value)
 
     def to_json(self, user_id):
         ret_list = []
@@ -52,7 +53,7 @@ class csv_2_reader():
                             new_json['val0'] = float(value[5])
                             new_json['val1'] = datetime.strptime(value[2], '%d. %m. %Y %H:%M')
                             new_json['val2'] = float(value[12])
-                            ret_list.append(new_json)
+                            ret_list.append(value_wrapper.value_wrapper_gen(new_json))
             except Exception as e:
                 print('messed up', file_name)
         return ret_list
