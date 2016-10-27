@@ -85,7 +85,7 @@ class DataReader:
                                until=end_date):
             dates.append(day.strftime('%d.%m.%Y'))
         for day in dates:
-            data = list(filter(lambda entry : entry['time_stamp'].strftime('%d.%m.%Y') == day, cursors))
+            data = list(filter(lambda entry : entry.time_stamp.strftime('%d.%m.%Y') == day, cursors))
             if len(data) > 0:
                 data = data[0]
                 new_json = {}
@@ -108,7 +108,7 @@ class DataReader:
     def read_correlation_data(self, user_id, x_label, y_label, next_day):
         data_cursor = self._db_extended.find_correl_data(user_id)
         data = []
-        if data_cursor.count() == 0:
+        if len(data_cursor) == 0:
             return None
         if x_label == 'Sleep start':
             for d in data_cursor:

@@ -245,18 +245,11 @@ def receive_json():
         received_json = request.get_json()
         user_name = received_json['arrayOfMeasurements'][0]['values'][0]['email']
         try:
-
             for measurement in received_json['arrayOfMeasurements']:
                 for index, measured_value in enumerate(measurement['values']):
                     measurement['values'][index] = j2m.check(measured_value)
                     if not measured_value:
                         return json.dumps({'status': 'failure'})
-            # json_lst = []
-            # for measurement in received_json['arrayOfMeasurements']:
-            #     for measured_value in measurement['values']:
-            #         json_lst.append(measured_value)
-            # if not j2m.check_and_commit_many(json_lst):
-            #     return json.dumps({'status': 'failure'})
         except KeyError:
             return json.dumps({'status': 'failure'})
         mw = measure_wrapper.measure_value_generator(receive_json['arrayOfMeasurements'])

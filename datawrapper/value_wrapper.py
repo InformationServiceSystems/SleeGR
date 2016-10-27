@@ -2,11 +2,11 @@ from datetime import datetime
 from mapval import MappingValidator
 value_reference = {
         "type": int,
-        "email": str,
+        #"email": str,
         "tag": str,
         "time_stamp": datetime,
         "val2": lambda val: isinstance(val, float) or isinstance(val, int),
-        "val1": lambda val: isinstance(val, float) or isinstance(val, int),
+        "val1": lambda val: isinstance(val, float) or isinstance(val, int) or isinstance(val, datetime),
         "val0": lambda val: isinstance(val, float) or isinstance(val, int)
     }
 

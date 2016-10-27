@@ -64,6 +64,7 @@ class DbExtended:
         res_lst = self.db_base._db[user].find({'type': measurement, 'tag': tag}).sort('time_stamp', pymongo.ASCENDING)
         ret_lst = []
         for elem in res_lst:
+            del elem['_id']
             ret_lst.append(value_wrapper.value_wrapper_gen(elem))
         return ret_lst
 
@@ -72,21 +73,24 @@ class DbExtended:
         res_lst = self.db_base._db[user].find().sort('time_stamp', pymongo.ASCENDING)
         ret_lst = []
         for elem in res_lst:
+            del elem['_id']
             ret_lst.append(value_wrapper.value_wrapper_gen(elem))
         return ret_lst
 
     # changed to wrapper, not checked
     def find_data(self, user, time_stamp, measurement):
         ret_lst =[]
-        for data in self.db_base._db[user].find({'type': measurement}):
-            if data['time_stamp'].date() == time_stamp.date():
-                ret_lst.append(value_wrapper.value_wrapper_gen(data))
+        for elem in self.db_base._db[user].find({'type': measurement}):
+            if elem['time_stamp'].date() == time_stamp.date():
+                del elem['_id']
+                ret_lst.append(value_wrapper.value_wrapper_gen(elem))
         return ret_lst
 
     # changed to wrapper, not checked
     def find_data_no_date(self, user, measurement):
         ret_lst = []
         for elem in self.db_base._db[user].find({'type': measurement}):
+            del elem['_id']
             ret_lst.append(value_wrapper.value_wrapper_gen(elem))
         return ret_lst
 
@@ -95,8 +99,9 @@ class DbExtended:
         collection_name = ('%s_data' % user)
         jsons = self.db_base._db[collection_name].find()
         ret_lst = []
-        for json in jsons:
-            ret_lst.append(correl_wrapper.correl_wrapper_gen(json))
+        for elem in self.db_base._db[collection_name].find():
+            del elem['_id']
+            ret_lst.append(correl_wrapper.correl_wrapper_gen(elem))
         return ret_lst
 
     # changed to wrapper, not checked
