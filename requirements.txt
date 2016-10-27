@@ -6,4 +6,4 @@ flask-cors
 python-dateutil
 bcrypt
 dotenv
-jwt
+pyjwt
