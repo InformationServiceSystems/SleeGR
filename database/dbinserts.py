@@ -86,7 +86,7 @@ class DbInserts:
         return False
 
     def insert_correl(self, user, correl_wrapper):
-        self.db_base['%s_data' % (user)].insert(correl_wrapper._correlation_json)
+        self.db_base._db[('%s_data' % (user))].insert_one(correl_wrapper._correlation_json)
 
     def insert_measure(self, measure_wrapper):
         ids = []

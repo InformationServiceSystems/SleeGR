@@ -7,8 +7,13 @@ import re
 from scipy.optimize import minimize
 from datawrapper.correl_wrapper import CorrelWrapper
 
+import inspect
+
+def isprop(v):
+  return isinstance(v, property)
 
 def Comp1D(vals, x_label, y_label, regr=True, B_next_day=False):
+
     field_names = {
         'Day of week': CorrelWrapper.day_of_week,
         'Sleep length' : CorrelWrapper.sleep_length,

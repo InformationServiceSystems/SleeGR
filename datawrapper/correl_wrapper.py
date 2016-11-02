@@ -1,6 +1,7 @@
 from datetime import datetime
 from mapval import MappingValidator
 
+
 correl_reference = {
     'A': ...,
     'Evening HR': lambda value: isinstance(value, type(None)) or isinstance(value, float),
@@ -8,17 +9,19 @@ correl_reference = {
     'Load': lambda value: isinstance(value, type(None)) or isinstance(value, float),
     'time_stamp': datetime,
     'C': lambda value: isinstance(value, type(None)) or isinstance(value, float),
-    'RPE': lambda value: isinstance(value, type(None)) or isinstance(value, int),
+    'RPE': lambda value: isinstance(value, type(None)) or isinstance(value, int) or isinstance(value, float),
     'Deep sleep': lambda value: isinstance(value, type(None)) or isinstance(value, float),
     'Sleep length': lambda value: isinstance(value, type(None)) or isinstance(value, float),
     'T': lambda value: isinstance(value, type(None)) or isinstance(value, float),
-    'Morning HR': lambda value: isinstance(value, type(None)) or isinstance(value, int),
+    'Morning HR': lambda value: isinstance(value, type(None)) or isinstance(value, int) or isinstance(value, float),
     'Sleep start': lambda value: isinstance(value, type(None)) or isinstance(value, int),
     'Sleep end': lambda value: isinstance(value, type(None)) or isinstance(value, int),
     'DALDA': lambda value: isinstance(value, type(None)) or isinstance(value, float),
     'Activity G': lambda value: isinstance(value, type(None)) or isinstance(value, float),
     'Day of week': lambda value: isinstance(value, type(None)) or isinstance(value, int)
 }
+
+
 
 
 def correl_wrapper_gen(json):
@@ -30,74 +33,73 @@ def correl_wrapper_gen(json):
 
 
 class CorrelWrapper:
+    def __dir__(self):
+        return ['a',
+                'c',
+                'dalda',
+                'day_of_week',
+                'deep_sleep',
+                'evening_hr',
+                'load',
+                'morning_hr',
+                'rpe',
+                'sleep_end',
+                'sleep_length',
+                'sleep_start',
+                't',
+                'time_stamp']
+
     def __init__(self, json):
         self._correlation_json = json
 
-    @property
     def a(self):
         return self._correlation_json['A']
 
-    @property
     def dalda(self):
         return self._correlation_json['DALDA']
 
-    @property
     def sleep_end(self):
         return self._correlation_json['Sleep end']
 
-    @property
     def time_stamp(self):
         return self._correlation_json['time_stamp']
 
-    @property
     def day_of_week(self):
         return self._correlation_json['Day of week']
 
-    @property
     def sleep_length(self):
         return self._correlation_json['Sleep length']
 
-    @property
     def activit_a(self):
         return self._correlation_json['Activity A']
 
-    @property
     def activity_a(self):
         return self._correlation_json['Activity A']
 
-    @property
     def activity_g(self):
         return self._correlation_json['Activity G']
 
-    @property
     def t(self):
         return self._correlation_json['T']
 
-    @property
     def evening_hr(self):
         return self._correlation_json['Evening HR']
 
-    @property
     def rpe(self):
         return self._correlation_json['RPE']
 
-    @property
     def sleep_start(self):
         return self._correlation_json['Sleep start']
 
-    @property
     def morning_hr(self):
-        return self._correlation_json['morning HR']
+        return self._correlation_json['Morning HR']
 
-    @property
     def c(self):
         return self._correlation_json['C']
 
-    @property
     def deep_sleep(self):
         return self._correlation_json['Deep sleep']
 
-    @property
     def load(self):
         return self._correlation_json['Load']
 

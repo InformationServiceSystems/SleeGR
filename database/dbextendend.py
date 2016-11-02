@@ -11,9 +11,13 @@ class DbExtended:
 
     def get_all_users(self):
         asked_user = self.db_base._general_users_collection.find()
+        if asked_user:
+            return asked_user
+        else:
+            return None
 
     def drop_correl(self, user):
-        self.db_base.drop_collection('%s_data' % user)
+        self.db_base._db.drop_collection('%s_data' % user)
 
     def get_user_id(self, email):
         asked_user = self.db_base._general_users_collection.find_one({names.email: email})
@@ -70,7 +74,7 @@ class DbExtended:
 
     #changed to wrapper, not checked
     def find_data_user(self, user):
-        res_lst = self.db_base._db[user].find().sort('time_stamp', pymongo.ASCENDING)
+        res_lst = self.db_base._db[user].find()#.sort('time_stamp', pymongo.ASCENDING)
         ret_lst = []
         for elem in res_lst:
             del elem['_id']
@@ -100,8 +104,9 @@ class DbExtended:
         jsons = self.db_base._db[collection_name].find()
         ret_lst = []
         for elem in self.db_base._db[collection_name].find():
-            del elem['_id']
-            ret_lst.append(correl_wrapper.correl_wrapper_gen(elem))
+            if elem:
+                del elem['_id']
+                ret_lst.append(correl_wrapper.correl_wrapper_gen(elem))
         return ret_lst
 
     # changed to wrapper, not checked

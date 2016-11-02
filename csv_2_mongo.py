@@ -34,7 +34,7 @@ class csv_2_reader():
                             new_json = {'email': user_id, 'type': int(row['measurement_type']),
                                         'time_stamp': datetime.strptime(row['time_stamp'], "%Y.%m.%d_%H:%M:%S"), 'tag': row['Type_of_activity'],
                                         'val0': float(row['value_1']), 'val1': float(row['value_1']), 'val2': float(row['value_3'])}
-                            ret_list.append(new_json)
+                            ret_list.append(value_wrapper.value_wrapper_gen(new_json))
                     else:
                         csv_reader = csv.reader(csv_file)
                         is_value = False
@@ -47,6 +47,7 @@ class csv_2_reader():
                                 is_value = True
                         for value in value_list:
                             new_json = {}
+                            new_json['email'] = user_id
                             new_json['type'] = 777
                             new_json['time_stamp'] = datetime.strptime(value[3], '%d. %m. %Y %H:%M')
                             new_json['tag'] = ''

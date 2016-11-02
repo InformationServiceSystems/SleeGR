@@ -194,7 +194,7 @@ def run(user=None):
     for user_elem in dct:
         lst = []
         for elem in db_extended.find_data_user(user_elem):
-            if isinstance(elem.time_stamp, datetime) :
+            if isinstance(elem.time_stamp, datetime):
                 lst.append(elem)
         dct[user_elem] = sorted(lst, key=lambda date: date.time_stamp)
 
