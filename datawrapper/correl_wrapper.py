@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Dict, Optional, Union
+
 from mapval import MappingValidator
 
 
@@ -22,16 +24,6 @@ correl_reference = {
 }
 
 
-
-
-def correl_wrapper_gen(json):
-    validator = MappingValidator(correl_reference)
-    if validator.validate(json):
-        return CorrelWrapper(json)
-    else:
-        return None
-
-
 class CorrelWrapper:
     def __dir__(self):
         return ['a',
@@ -52,57 +44,64 @@ class CorrelWrapper:
     def __init__(self, json):
         self._correlation_json = json
 
-    def a(self):
+    def a(self) -> Optional[Union[int, float]]:
         return self._correlation_json['A']
 
-    def dalda(self):
+    def dalda(self) -> Optional[Union[int, float]]:
         return self._correlation_json['DALDA']
 
-    def sleep_end(self):
+    def sleep_end(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Sleep end']
 
-    def time_stamp(self):
+    def time_stamp(self) -> datetime:
         return self._correlation_json['time_stamp']
 
-    def day_of_week(self):
+    def day_of_week(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Day of week']
 
-    def sleep_length(self):
+    def sleep_length(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Sleep length']
 
-    def activit_a(self):
+    def activit_a(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Activity A']
 
-    def activity_a(self):
+    def activity_a(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Activity A']
 
-    def activity_g(self):
+    def activity_g(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Activity G']
 
-    def t(self):
+    def t(self) -> Optional[Union[int, float]]:
         return self._correlation_json['T']
 
-    def evening_hr(self):
+    def evening_hr(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Evening HR']
 
-    def rpe(self):
+    def rpe(self) -> Optional[Union[int, float]]:
         return self._correlation_json['RPE']
 
-    def sleep_start(self):
+    def sleep_start(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Sleep start']
 
-    def morning_hr(self):
+    def morning_hr(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Morning HR']
 
-    def c(self):
+    def c(self) -> Optional[Union[int, float]]:
         return self._correlation_json['C']
 
-    def deep_sleep(self):
+    def deep_sleep(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Deep sleep']
 
-    def load(self):
+    def load(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Load']
 
+
+def correl_wrapper_gen(json: Dict) -> Optional[CorrelWrapper]:
+    validator = MappingValidator(correl_reference)
+    if validator.validate(json):
+        return CorrelWrapper(json)
+    else:
+        return None
 
 if __name__ == '__main__':
     date = datetime(2016, 1, 18, 11, 22, 55)
@@ -126,4 +125,4 @@ if __name__ == '__main__':
         "Day of week": 2
     }
     res = correl_wrapper_gen(json)
-    print(res)
+    print(res.a())

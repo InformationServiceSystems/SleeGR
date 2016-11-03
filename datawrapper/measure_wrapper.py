@@ -1,10 +1,10 @@
 from datawrapper.value_wrapper import ValueWrapper, value_reference
 from mapval import MappingValidator
 from datetime import datetime
+from typing import Union, Optional, Dict, List
 
 
-
-def value_bla(lst):
+def value_list_validator(lst: List) -> bool:
     value_validator = MappingValidator(value_reference)
     result = True
     for value in lst:
@@ -15,15 +15,10 @@ reference= {
     'Id': int,
     'Type': str,
     'Timestamp': str,
-    'values': value_bla
+    'values': value_list_validator
 }
 
-def measure_value_generator(json):
-    validator = MappingValidator(reference)
-    if validator.validate(json):
-        return MeasureWrapper(json)
-    else:
-        return None
+
 
 
 
@@ -32,18 +27,18 @@ class MeasureWrapper:
         self._measuremet_json = measurement_json
 
     @property
-    def id(self):
+    def id(self) -> int:
         return self._measuremet_json['Id']
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self._measuremet_json['Type']
 
     @property
-    def time_stamp(self):
+    def time_stamp(self) -> datetime:
         return self._measuremet_json['Time_stamp']
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> ValueWrapper:
         if isinstance(key, int) and key >= 0:
             return ValueWrapper(self._measuremet_json['values'][key])
         else:
@@ -51,6 +46,13 @@ class MeasureWrapper:
 
 value_validator = MappingValidator(reference)
 
+
+def measure_value_generator(json: Dict) -> Optional[MeasureWrapper]:
+    validator = MappingValidator(reference)
+    if validator.validate(json):
+        return MeasureWrapper(json)
+    else:
+        return None
 
 if __name__ == '__main__':
     date = datetime(2016, 1, 18, 11, 22, 55)
@@ -86,7 +88,7 @@ if __name__ == '__main__':
                         "tag": "Idle",
                         "time_stamp": date,
                         "val2": 0,
-                        "val1": 0,
+                        "val1": date,
                         "val0": 1113
                     }]
             },

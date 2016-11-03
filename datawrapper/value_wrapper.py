@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, Union, Dict
 from mapval import MappingValidator
 value_reference = {
         "type": int,
@@ -11,12 +12,6 @@ value_reference = {
     }
 
 
-def value_wrapper_gen(json):
-    validator = MappingValidator(value_reference)
-    if validator.validate(json):
-        return ValueWrapper(json)
-    else:
-        return None
 
 
 class ValueWrapper:
@@ -27,32 +22,40 @@ class ValueWrapper:
         return str(self._value_json)
 
     @property
-    def val0(self):
+    def val0(self) -> Optional[Union[int, float]]:
         return self._value_json['val0']
 
     @property
-    def val1(self):
+    def val1(self) -> Optional[Union[int, float, datetime]]:
         return self._value_json['val1']
 
     @property
-    def val2(self):
+    def val2(self) -> Optional[Union[int, float]]:
         return self._value_json['val2']
 
     @property
-    def email(self):
+    def email(self) -> str:
         return self._value_json['email']
 
     @property
-    def time_stamp(self):
+    def time_stamp(self) -> datetime:
         return  self._value_json['time_stamp']
 
     @property
-    def tag(self):
+    def tag(self) -> str:
         return self._value_json['tag']
 
     @property
-    def type(self):
+    def type(self) -> int:
         return self._value_json['type']
+
+
+def value_wrapper_gen(json:Dict) -> Optional[ValueWrapper]:
+    validator = MappingValidator(value_reference)
+    if validator.validate(json):
+        return ValueWrapper(json)
+    else:
+        return None
 
 
 if __name__ == '__main__':
@@ -64,10 +67,10 @@ if __name__ == '__main__':
         "tag": "Idle",
         "time_stamp": date,
         "val2": 0,
-        "val1": 0,
+        "val1": date,
         "val0": 1111
     }
 
     vw = value_wrapper_gen(json)
 
-    print(vw.val0)
+    print(vw.val1)
