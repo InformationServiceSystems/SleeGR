@@ -1,6 +1,8 @@
 import os, glob
 import csv
 import re
+from typing import List, Optional, Dict
+
 from datetime import datetime
 import database
 from datawrapper import value_wrapper
@@ -14,12 +16,12 @@ class csv_2_reader():
         self.db_inserts, self.db_extended = database.init()
         self.folder_path = "/home/matthias/data"
 
-    def to_mongo(self, user_id):
+    def to_mongo(self, user_id: str):
         lst = self.to_json(user_id)
         for value in lst:
             self.db_inserts.insert_csv_row(user_id, value)
 
-    def to_json(self, user_id):
+    def to_json(self, user_id: str) ->List[Dict]:
         ret_list = []
         folder = ('%s/%s' % (self.folder_path, user_id))
         for file_name in os.listdir(folder):
