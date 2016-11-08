@@ -133,5 +133,5 @@ if __name__ == '__main__':
     for measure in measures:
         res = measure_value_generator(measure)
         for elem in res:
-            print(elem)
+            print(elem.time_stamp)
 

@@ -24,4 +24,3 @@ service_allowed_users = 'allowed_users'
 service_id = 'service_id'
 
 user_id = 'user_id'
-

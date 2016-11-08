@@ -170,14 +170,6 @@ class MappingValidator:
         """
         if validate_content:
             result = self._validate_structure(sample) and self._validate_values(sample)
-            if not result:
-                import pprint
-                pp = pprint.PrettyPrinter(indent=4)
-                print("sample:")
-                pp.pprint(sample)
-                print("--------------------------------")
-                pp.pprint(self._reference)
-                print()
             return result
         else:
             return self._validate_structure(sample)

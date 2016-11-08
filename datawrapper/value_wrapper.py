@@ -11,9 +11,6 @@ value_reference = {
         "val0": lambda val: isinstance(val, float) or isinstance(val, int)
     }
 
-
-
-
 class ValueWrapper:
     def __init__(self, json):
         self._value_json = json

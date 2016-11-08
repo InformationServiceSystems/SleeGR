@@ -5,6 +5,7 @@ import os
 from dateutil import rrule
 from datetime import datetime
 from datetime import timedelta
+from typing import Dict, List, Optional
 
 from matplotlib.dates import hours
 
@@ -24,8 +25,7 @@ class DataReader:
         '''
         self._db_inserts, self._db_extended = database.init()
 
-
-    def read_data(self, user_id, start_date, end_date, measurement_type):
+    def read_data(self, user_id: str, start_date: datetime, end_date: datetime, measurement_type) -> Dict:
         ret_json = {}
 
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
@@ -49,7 +49,7 @@ class DataReader:
                                   'value_3': row.val3}}
         return ret_json
 
-    def read_sleep_data(self, user_id, start_date, end_date):
+    def read_sleep_data(self, user_id: str, start_date: datetime, end_date: datetime) -> List[Dict]:
         ret_list = []
         dates = []
         data = []
@@ -73,7 +73,7 @@ class DataReader:
                      'y': deep_sleep})
         return ret_list
 
-    def heart_rate_special(self, user_id, start_date, end_date):
+    def heart_rate_special(self, user_id: str, start_date:datetime, end_date: datetime) -> List[Dict]:
         ret_list = []
         dates = []
         cursors = list(self._db_extended.find_correl_data(user_id))
@@ -105,7 +105,7 @@ class DataReader:
                 ret_list.append(new_json)
         return ret_list
 
-    def read_correlation_data(self, user_id, x_label, y_label, next_day):
+    def read_correlation_data(self, user_id: str, x_label: str, y_label: str, next_day: bool) -> Dict:
         data_cursor = self._db_extended.find_correl_data(user_id)
         data = []
         if len(data_cursor) == 0:

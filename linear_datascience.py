@@ -1,7 +1,7 @@
 """
 Contains code that prepares data to be sent to the
 """
-
+from typing import Dict, List
 import numpy as np
 import re
 from scipy.optimize import minimize
@@ -12,7 +12,7 @@ import inspect
 def isprop(v):
   return isinstance(v, property)
 
-def Comp1D(vals, x_label, y_label, regr=True, B_next_day=False):
+def Comp1D(vals: List[Dict], x_label: str, y_label: str, regr=True, B_next_day=False) -> Dict:
 
     field_names = {
         'Day of week': CorrelWrapper.day_of_week,

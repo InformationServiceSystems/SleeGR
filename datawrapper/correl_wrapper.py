@@ -62,9 +62,6 @@ class CorrelWrapper:
     def sleep_length(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Sleep length']
 
-    def activit_a(self) -> Optional[Union[int, float]]:
-        return self._correlation_json['Activity A']
-
     def activity_a(self) -> Optional[Union[int, float]]:
         return self._correlation_json['Activity A']
 
