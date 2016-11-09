@@ -243,18 +243,16 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
-        user_name = received_json['arrayOfMeasurements'][0]['values'][0]['email']
+        print(received_json)
+
         try:
-            for measurement in received_json['arrayOfMeasurements']:
-                for index, measured_value in enumerate(measurement['values']):
-                    measurement['values'][index] = j2m.check(measured_value)
-                    if not measured_value:
-                        return json.dumps({'status': 'failure'})
+            received_wrapper = measure_wrapper.measure_value_generator(received_json)
+            if not received_wrapper:
+                raise KeyError
         except KeyError:
             return json.dumps({'status': 'failure'})
-        mw = measure_wrapper.measure_value_generator(receive_json['arrayOfMeasurements'])
-        db_inserts.insert_measure(mw)
-    S3_extract_dataset.run(user_name)
+        db_inserts.insert_measure(received_wrapper)
+    S3_extract_dataset.run(received_wrapper) #TODO username
     return json.dumps({'status': 'success'})
 
 
