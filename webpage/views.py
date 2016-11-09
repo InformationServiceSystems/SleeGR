@@ -5,7 +5,7 @@ import math
 import S3_extract_dataset
 
 import os
-from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory
+from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory, make_response
 import requests
 from flask_cors import CORS, cross_origin
 
@@ -154,7 +154,9 @@ def show_measurement():
         r = DataReader()
         start = datetime.strptime(start_date, '%d.%m.%Y')
         end = datetime.strptime(end_date, '%d.%m.%Y')
-        return json.dumps(r.heart_rate_special(user_id, start, end))
+        response = make_response(json.dumps(r.heart_rate_special(user_id, start, end)))
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 @app.route('/get_correlations_list', methods=['GET'])
 @cross_origin()
@@ -206,13 +208,17 @@ def sleep_data():
             if len(average_list) > 1 and len(var_list) > 1:
                 mean_duration = mean(average_list)
                 variance_duration = variance(average_list)
-                return json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}])
+                response = make_response(json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}]))
+                response.headers['Content-Type'] = 'application/json'
+                return response
             else:
-                return json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}])
+                response =  make_response(json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}]))
+                response.headers['Content-Type'] = 'application/json'
+                return response
         else:
-            return json.dumps(r.read_sleep_data(user_id, start, end))
-
-
+            response =  make_response(json.dumps(r.read_sleep_data(user_id, start, end)))
+            response.headers['Content-Type'] = 'application/json'
+            return response
 
 
 @app.route('/profile')
@@ -230,7 +236,9 @@ def correlations():
         y_label = request.values['yAxis']
         next_day = request.values['nextDay']
         cr = DataReader()
-        return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))
+        response = make_response(json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day))))
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
