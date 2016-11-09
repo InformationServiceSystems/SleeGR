@@ -108,6 +108,8 @@ class DataReader:
     def read_correlation_data(self, user_id, x_label, y_label, next_day):
         data_cursor = self._db_extended.find_correl_data(user_id)
         data = []
+        if data_cursor.count() == 0:
+            return None
         if x_label == 'Sleep start':
             for d in data_cursor:
                 data.append(d)

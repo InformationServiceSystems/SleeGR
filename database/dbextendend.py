@@ -2,6 +2,7 @@ from database.database import DbBase
 import names
 import pymongo
 from datetime import datetime
+import bcrypt
 
 class DbExtended:
     def __init__(self, database):
@@ -25,7 +26,7 @@ class DbExtended:
     def password_matches_email(self, email, password):
         asked_user_json = self.db_base._general_users_collection.find_one({names.email: email})
         if asked_user_json is not None:
-            if asked_user_json[names.password] == password:
+            if bcrypt.hashpw(password.encode(), asked_user_json[names.password] )== asked_user_json[names.password]:
                 return True
         return False
 
