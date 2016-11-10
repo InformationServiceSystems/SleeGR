@@ -1,11 +1,12 @@
-from datawrapper.value_wrapper import ValueWrapper, value_reference
-from mapval import MappingValidator
+from datawrapper.value_wrapper import ValueWrapper
+#from mapval import MappingValidator
 from datetime import datetime
+import FHIR_objects
 from typing import Union, Optional, Dict, List
 
 
 def value_list_validator(lst: List) -> bool:
-    value_validator = MappingValidator(value_reference)
+    value_validator = FHIR_objects.MappingValidator(FHIR_objects.components_data)
     result = True
     for value in lst:
         result = result and value_validator.validate(value)
@@ -44,11 +45,12 @@ class MeasureWrapper:
         else:
             raise KeyError
 
-value_validator = MappingValidator(reference)
+value_validator = FHIR_objects.MappingValidator(reference)
+value_validator = FHIR_objects.MappingValidator(reference)
 
 
 def measure_value_generator(json: Dict) -> Optional[MeasureWrapper]:
-    validator = MappingValidator(reference)
+    validator = FHIR_objects.MappingValidator(FHIR_objects.observation)
     if validator.validate(json):
         return MeasureWrapper(json)
     else:

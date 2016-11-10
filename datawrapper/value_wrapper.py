@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, Union, Dict
-from mapval import MappingValidator
+#from mapval import MappingValidator
+import FHIR_objects
 value_reference = {
         "type": int,
         "email": str,
@@ -48,7 +49,7 @@ class ValueWrapper:
 
 
 def value_wrapper_gen(json:Dict) -> Optional[ValueWrapper]:
-    validator = MappingValidator(value_reference)
+    validator = FHIR_objects.MappingValidator(FHIR_objects.components_data)
     if validator.validate(json):
         return ValueWrapper(json)
     else:

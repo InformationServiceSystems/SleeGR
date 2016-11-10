@@ -24,6 +24,13 @@ coding = {
 }
 
 
+fhir_reference_reference = {
+    # from Element: extension
+    'reference': ...,  # C? Relative, internal or absolute URL reference
+    'display': 'string'  # Text alternative for the resource
+}
+
+
 quantity = {
     # from Element: extension
     'value': float,  # Numerical value (with implicit precision)
@@ -94,7 +101,7 @@ observation = {
     'effectiveDateTime': datetime,
     'effectivePeriod': period,
     'issued': ...,  # Date/Time this was made available
-    'performer': ['-- Reference(Practitioner|Organization|Patient|RelatedPerson) --'],#TODO Performer or subject as patient
+    'performer': ...,
     # Who is responsible for the observation
     # value[x]: Actual result. One of these 10:
     'valueQuantity':        ...,
