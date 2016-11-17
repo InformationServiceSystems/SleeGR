@@ -1,8 +1,10 @@
-from datawrapper.value_wrapper import ValueWrapper
-#from mapval import MappingValidator
 from datetime import datetime
-import FHIR_objects
-from typing import Union, Optional, Dict, List
+
+from typing import Optional, Dict, List
+
+from datawrapper import FHIR_objects
+from datawrapper.value_wrapper import ValueWrapper, value_wrapper
+from datawrapper.fhir_wrappers import observation_wrapper, ObservationWrapper
 
 
 def value_list_validator(lst: List) -> bool:
@@ -24,35 +26,35 @@ reference= {
 
 
 class MeasureWrapper:
-    def __init__(self, measurement_json):
-        self._measuremet_json = measurement_json
+    def __init__(self, observation_wrapper: ObservationWrapper):
+        self._observation_wrapper = observation_wrapper
+        #self._measuremet_json = measurement_json
 
     @property
     def id(self) -> int:
-        return self._measuremet_json['Id']
+        return self._observation_wrapper.identifier.value
 
     @property
     def type(self) -> str:
-        return self._measuremet_json['Type']
+        return self._observation_wrapper.code.coding.display
 
     @property
     def time_stamp(self) -> datetime:
-        return self._measuremet_json['Time_stamp']
+        return self._observation_wrapper.effectiveDateTime
 
     def __getitem__(self, key) -> ValueWrapper:
         if isinstance(key, int) and key >= 0:
-            return ValueWrapper(self._measuremet_json['values'][key])
+            return value_wrapper(self._observation_wrapper.component[key])
         else:
             raise KeyError
 
 value_validator = FHIR_objects.MappingValidator(reference)
-value_validator = FHIR_objects.MappingValidator(reference)
 
 
-def measure_value_generator(json: Dict) -> Optional[MeasureWrapper]:
-    validator = FHIR_objects.MappingValidator(FHIR_objects.observation)
+def measure_wrapper(json: Dict) -> Optional[MeasureWrapper]:
+    validator = FHIR_objects.MappingValidator(FHIR_objects.observation, FHIR_objects.ComparisonStyle.minimum)
     if validator.validate(json):
-        return MeasureWrapper(json)
+        return MeasureWrapper(observation_wrapper(json))
     else:
         return None
 
@@ -133,7 +135,7 @@ if __name__ == '__main__':
 
     measures = measurements['arrayOfMeasurements']
     for measure in measures:
-        res = measure_value_generator(measure)
+        res = measure_wrapper(measure)
         for elem in res:
             print(elem.time_stamp)
 

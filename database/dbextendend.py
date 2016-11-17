@@ -71,7 +71,7 @@ class DbExtended:
         ret_lst = []
         for elem in res_lst:
             del elem['_id']
-            ret_lst.append(value_wrapper.value_wrapper_gen(elem))
+            ret_lst.append(value_wrapper.value_wrapper(elem))
         return ret_lst
 
     #changed to wrapper, not checked
@@ -80,7 +80,7 @@ class DbExtended:
         ret_lst = []
         for elem in res_lst:
             del elem['_id']
-            ret_lst.append(value_wrapper.value_wrapper_gen(elem))
+            ret_lst.append(value_wrapper.value_wrapper(elem))
         return ret_lst
 
     # changed to wrapper, not checked
@@ -89,7 +89,7 @@ class DbExtended:
         for elem in self.db_base._db[user].find({'type': measurement}):
             if elem['time_stamp'].date() == time_stamp.date():
                 del elem['_id']
-                ret_lst.append(value_wrapper.value_wrapper_gen(elem))
+                ret_lst.append(value_wrapper.value_wrapper(elem))
         return ret_lst
 
     # changed to wrapper, not checked
@@ -97,7 +97,7 @@ class DbExtended:
         ret_lst = []
         for elem in self.db_base._db[user].find({'type': measurement}):
             del elem['_id']
-            ret_lst.append(value_wrapper.value_wrapper_gen(elem))
+            ret_lst.append(value_wrapper.value_wrapper(elem))
         return ret_lst
 
     # changed to wrapper, not checked
@@ -112,14 +112,14 @@ class DbExtended:
         return ret_lst
 
     # changed to wrapper, not checked
-    def find_one_correl_data_date(self, user: str, time_stamp: datetime)-> Optional[List[correl_wrapper.Correlwrapper]]:
-        tmp_lst = []
-        for data in self.find_correl_data(user):
-            if data.time_stamp == time_stamp.date():
-                tmp_lst.append(data)
-        for data in tmp_lst:
-            #TODO: THINK ABOUT THIS IF
-            if data.a is not None:
-                return data
-        return None
+    # def find_one_correl_data_date(self, user: str, time_stamp: datetime)-> Optional[List[correl_wrapper.Correlwrapper]]:
+    #     tmp_lst = []
+    #     for data in self.find_correl_data(user):
+    #         if data.time_stamp == time_stamp.date():
+    #             tmp_lst.append(data)
+    #     for data in tmp_lst:
+    #         #TODO: THINK ABOUT THIS IF
+    #         if data.a is not None:
+    #             return data
+    #     return None
 

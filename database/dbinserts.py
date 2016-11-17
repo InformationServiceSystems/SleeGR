@@ -92,7 +92,7 @@ class DbInserts:
         ids = []
         user = ''
         for value in measure_wrapper:
-            user = value.email
+            user = value.email # TODO:Value.email zu measure.email
             ids.append(self.insert_value(value.email, value).inserted_id)
         measure_json = dict(measure_wrapper._measuremet_json)
         measure_json['value_ids'] = ids

@@ -36,7 +36,7 @@ class csv_2_reader():
                             new_json = {'email': user_id, 'type': int(row['measurement_type']),
                                         'time_stamp': datetime.strptime(row['time_stamp'], "%Y.%m.%d_%H:%M:%S"), 'tag': row['Type_of_activity'],
                                         'val0': float(row['value_1']), 'val1': float(row['value_1']), 'val2': float(row['value_3'])}
-                            ret_list.append(value_wrapper.value_wrapper_gen(new_json))
+                            ret_list.append(value_wrapper.value_wrapper(new_json))
                     else:
                         csv_reader = csv.reader(csv_file)
                         is_value = False
@@ -56,7 +56,7 @@ class csv_2_reader():
                             new_json['val0'] = float(value[5])
                             new_json['val1'] = datetime.strptime(value[2], '%d. %m. %Y %H:%M')
                             new_json['val2'] = float(value[12])
-                            ret_list.append(value_wrapper.value_wrapper_gen(new_json))
+                            ret_list.append(value_wrapper.value_wrapper(new_json))
             except Exception as e:
                 print('messed up', file_name)
         return ret_list

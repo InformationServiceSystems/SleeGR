@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Dict, List
-from mapval import MappingValidator
+from mapval import MappingValidator, ComparisonStyle
 
 def word_in_list(string_comp:str, *str_lst) -> bool:
     for string in str_lst:
@@ -23,13 +23,11 @@ coding = {
     'userSelected': bool  # If this coding was chosen directly by the user
 }
 
-
 fhir_reference_reference = {
     # from Element: extension
     'reference': ...,  # C? Relative, internal or absolute URL reference
     'display': 'string'  # Text alternative for the resource
 }
-
 
 quantity = {
     # from Element: extension
@@ -51,7 +49,9 @@ codeable_concept = {
     'coding': coding,  # Code defined by a terminology system
     'text': str  # Plain text representation of the concept
 }
+
 identifier_use = ['usual', 'official', 'temp']
+
 identifier = {
     # from Element: extension
     'use': lambda code: word_in_list(code, identifier_use) ,  # usual | official | temp | secondary (If known)
@@ -79,7 +79,8 @@ components_data = {  # Component results
         'referenceRange': ...
     }
 
-def components_list_validator (components_list: List[Dict])-> bool:
+
+def components_validator (components_list: List[Dict])-> bool:
     value_validator = MappingValidator(components_data)
     result = True
     for value in components_list:
@@ -98,7 +99,7 @@ observation = {
     'subject': '-- Reference(Patient) --',  # Who and/or what this is about
     'encounter': ...,  # Healthcare event during which this observation is made
     # effective[x]: Clinically relevant time/time-period for observation. One of these 2:
-    'effectiveDateTime': datetime,
+    'effectiveDateTime': str,
     'effectivePeriod': period,
     'issued': ...,  # Date/Time this was made available
     'performer': ...,
@@ -120,12 +121,12 @@ observation = {
     'bodySite':             ..., # Observed body part
     'method':               ..., # How it was done
     'specimen':             ...,  # Specimen used for this observation
-    'device':               ..., # (Measurement) Device
-    'component': [components_data],
+    'device':               fhir_reference_reference, # (Measurement) Device
+    'component': components_validator,
     'referenceRange': ..., # Provides guide for interpretation
     'related': ..., # Resource related to this observation'
 }
-
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(observation)
+if __name__ == '__main__':
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(observation)
