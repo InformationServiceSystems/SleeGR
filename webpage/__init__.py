@@ -17,5 +17,5 @@ app.config.from_object('settings')
 import webpage.views
 
 app.debug = True
-app.run(host='0.0.0.0', port=int(env['PORT']))
+app.run(host='0.0.0.0', port=int(env['PORT']), threaded=True)
 #app.run()
