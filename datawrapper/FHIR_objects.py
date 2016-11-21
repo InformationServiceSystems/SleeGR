@@ -17,6 +17,7 @@ period = {
 coding = {
     # from Element: extension
     'system': str,  # Identity of the terminology system
+    'system': str,  # Identity of the terminology system
     'version': str,  # Version of the system - if relevant
     'code': str,  # Symbol in syntax defined by the system
     'display': str,  # Representation defined by the system
