@@ -66,6 +66,9 @@ class MappingValidator:
     def _validate_structure(self, mapping):
         """
         Controls the style of the structure-validation(min,max,eq)
+        ComparisonStyle.minimum: Are all paths of the reference included in the mapping?
+        ComparisonStyle.maximum: Are all paths of the mapping included in the reference?
+        ComparisonStyle.equity: Are the paths of the mapping and the reference equal?
         :param mapping: Mapping that is checked.
         :return: True if the structure matches, false otherwise.
         """
@@ -82,7 +85,7 @@ class MappingValidator:
     @staticmethod
     def _compare_structure(sample, reference):
         """
-        Checks if the structure of sample matches the structure of reference.
+        Checks if the structure of sample at most matches the structure of reference.
         :param sample: The mapping that is going to be validate
         :param reference: The mapping that specifies the structure
         :return: True if sample matches the structure of reference, false otherwise
@@ -91,6 +94,11 @@ class MappingValidator:
         result = True
         for path in paths:
             result = result and MappingValidator._validate_key(sample, path)
+            if not result:
+                print('refernce;', reference)
+                print('sample:', sample)
+                print('structure differs at:', path)
+                break
         return result
 
     @staticmethod
@@ -101,11 +109,15 @@ class MappingValidator:
         :return: True if path exists, false otherwise.
         """
         mapping_tmp = sample
-        try:
-            for key in path:
+        for key in path:
+            try:
                 mapping_tmp = mapping_tmp[key]
-        except KeyError:
-            return False
+            except KeyError:
+                print("Tried key::", key)
+                return False
+            except TypeError:
+                print("failed with field:", mapping_tmp)
+                return False
         return True
 
     def _validate_values(self, sample):
@@ -142,10 +154,12 @@ class MappingValidator:
                         break
                 result = result and list_contains_sample_val
             elif reference_value is Ellipsis:
-                result =result and True
-
+                result = result and True
             else:
-                return False
+                result = result and False
+            if not result:
+                print(mapping_value, "(mapping)", "does not match to", reference_value, "(reference)")
+                break
         return result
 
     @staticmethod

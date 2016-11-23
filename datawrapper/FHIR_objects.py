@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Union, Optional
+import re
 from mapval import MappingValidator, ComparisonStyle
 
-def word_in_list(string_comp:str, *str_lst) -> bool:
+def word_in_list(string_comp:str, str_lst:List[str]) -> bool:
     for string in str_lst:
         if string == string_comp:
             return True
@@ -17,7 +18,6 @@ period = {
 coding = {
     # from Element: extension
     'system': str,  # Identity of the terminology system
-    'system': str,  # Identity of the terminology system
     'version': str,  # Version of the system - if relevant
     'code': str,  # Symbol in syntax defined by the system
     'display': str,  # Representation defined by the system
@@ -27,16 +27,16 @@ coding = {
 fhir_reference_reference = {
     # from Element: extension
     'reference': ...,  # C? Relative, internal or absolute URL reference
-    'display': 'string'  # Text alternative for the resource
+    'display': str  # Text alternative for the resource
 }
 
 quantity = {
     # from Element: extension
-    'value': float,  # Numerical value (with implicit precision)
-    'comparator': '<code>',  # < | <= | >= | > - how to understand the value
-    'unit': lambda unit : unit == 'bpm',  #TODO insert other possible values # Unit representation
-    'system': '<uri>',  # C? System that defines coded unit form
-    'code': '<code>'  # Coded form of the unit
+    'value': lambda value: isinstance(value, float) or isinstance(value, int),  # Numerical value (with implicit precision)
+    'comparator': ...,  # < | <= | >= | > - how to understand the value
+    'unit': lambda unit: unit == 'bpm' or unit == 'm/s2' or unit == 'rad/s' or unit == 'Hz',  #TODO insert other possible values # Unit representation
+    'system': ...,  # C? System that defines coded unit form
+    'code': ...  # Coded form of the unit
 }
 
 ratio = {
@@ -63,6 +63,8 @@ identifier = {
     'assigner': '-- Reference(Organization) --'  # Organization that issued id (may be just text)
 }
 
+
+
 components_data = {  # Component results
         'code': codeable_concept,  # C? R!  Type of component observation (code / type)
         # value[x]: Actual component result. One of these 10:
@@ -74,7 +76,7 @@ components_data = {  # Component results
         'valueSampledData': ...,
         'valueAttachment': ...,
         'valueTime': ...,
-        'valueDateTime': datetime,
+        'valueDateTime': lambda val: isinstance(val, datetime) or re.search('\d\d.\d\d.\d\dT\d\d:\d\d:\d\d', val),
         'valuePeriod': ...,
         'dataAbsentReason': ...,  # C? Why the component result is missing
         'referenceRange': ...
@@ -82,7 +84,7 @@ components_data = {  # Component results
 
 
 def components_validator (components_list: List[Dict])-> bool:
-    value_validator = MappingValidator(components_data)
+    value_validator = MappingValidator(components_data, ComparisonStyle.maximum)
     result = True
     for value in components_list:
         result = result and value_validator.validate(value)
@@ -97,7 +99,7 @@ observation = {
     'status': lambda code: word_in_list(code, observation_code),  # R!  registered | preliminary | final | amended +
     'category': ...,  # Classification of  type of observation
     'code': codeable_concept,  # R!  Type of observation (code / type)
-    'subject': '-- Reference(Patient) --',  # Who and/or what this is about
+    'subject': fhir_reference_reference,  # Who and/or what this is about
     'encounter': ...,  # Healthcare event during which this observation is made
     # effective[x]: Clinically relevant time/time-period for observation. One of these 2:
     'effectiveDateTime': str,
@@ -128,6 +130,11 @@ observation = {
     'related': ..., # Resource related to this observation'
 }
 if __name__ == '__main__':
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(observation)
+    date = '2016.11.14TA3:59:38'
+    print(re.search('\d\d.\d\d.\d\dT\d\d:\d\d:\d\d', date))
+    print(datetime.strptime(date, '%Y.%m.%dT%H:%M:%S'))
+
+#
+   # import pprint
+ #   pp = pprint.PrettyPrinter(indent=4)
+  #  pp.pprint(observation)

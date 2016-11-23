@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional, Union, Dict
 
 from datawrapper import FHIR_objects
+from mapval import ComparisonStyle
 from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWrapper
 
 
@@ -17,44 +18,52 @@ from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWra
 #     }
 
 class ValueWrapper:
-    def __init__(self, json):
-        self._component_wrapper = components_data_wrapper(json)
+    def __init__(self, json: Dict):
+        self._component_wrapper = json
         #self._value_json = json
 
     def __repr__(self):
-        return str(self._value_json)
+        return str(self._component_wrapper)
 
     @property
     def val0(self) -> Optional[Union[int, float]]:
-        return self._value_json['val0']
+        return self._component_wrapper.valueQuantity.value
+        # return self._value_json['val0']
 
     @property
     def val1(self) -> Optional[Union[int, float, datetime]]:
-        return self._value_json['val1']
+        return self._component_wrapper.valueQuantity.value
+        # return self._value_json['val1']
 
     @property
     def val2(self) -> Optional[Union[int, float]]:
-        return self._value_json['val2']
+        return self._component_wrapper.valueQuantity.value
+        # return self._value_json['val2']
 
     @property
     def email(self) -> str:
-        return self._value_json['email']
+        raise NotImplementedError
+        # return self._value_json['email']
 
     @property
     def time_stamp(self) -> datetime:
-        return  self._value_json['time_stamp']
+        return self._component_wrapper.valueDateTime
+        # return  self._value_json['time_stamp']
 
     @property
     def tag(self) -> str:
-        return self._value_json['tag']
+        raise NotImplementedError
+        # return self._value_json['tag']
 
     @property
     def type(self) -> int:
-        return self._value_json['type']
+        raise NotImplementedError
+
+        # return self._value_json['type']
 
 
-def value_wrapper(json:Dict) -> Optional[ValueWrapper]:
-    validator = FHIR_objects.MappingValidator(FHIR_objects.components_data)
+def value_wrapper(json: Dict) -> Optional[ValueWrapper]:
+    validator = FHIR_objects.MappingValidator(FHIR_objects.components_data, comparison_style=ComparisonStyle.maximum)
     if validator.validate(json):
         return ValueWrapper(components_data_wrapper(json))
     else:
@@ -62,7 +71,7 @@ def value_wrapper(json:Dict) -> Optional[ValueWrapper]:
 
 
 if __name__ == '__main__':
-    date = datetime(2016,1,18,11,22,55)
+    date = datetime(2016, 1, 18, 11, 22, 55)
 
     json = {
         "type": 4,
