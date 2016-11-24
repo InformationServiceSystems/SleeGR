@@ -10,8 +10,10 @@ from matplotlib.dates import hours
 
 from linear_datascience import Comp1D
 
+import math
 import numpy
 import database
+import pprint
 
 
 
@@ -75,6 +77,7 @@ class DataReader:
 
     def heart_rate_special(self, user_id, start_date, end_date):
         ret_list = []
+        pp = pprint.PrettyPrinter(indent=4)
         dates = []
         cursors = list(self._db_extended.find_correl_data(user_id))
         hr_cursors = list(self._db_extended.find_data_tag(user_id, 21, 'Cooldown'))
@@ -102,8 +105,20 @@ class DataReader:
                 for data in hr_lst_current_day:
                     datapoints.append({'x': (data['time_stamp'] - base_time).seconds, 'y': data['val0']})
                 new_json['data_points'] = datapoints
+                new_json['rmse'] = self.calculate_rmse(new_json['data_points'], new_json['a'], new_json['t'], new_json['c'])
                 ret_list.append(new_json)
         return ret_list
+
+    def calculate_rmse(self, datapoints, a, t, c):
+        ret_value = 0
+        if a and t and c:
+            for data in datapoints:
+                function_value = (180-c)*math.exp(-(data['x']-t)/a)+c
+                ret_value = ret_value + math.pow(function_value-data['y'],2)
+            ret_value = math.sqrt(ret_value/len(datapoints))
+            return ret_value
+        else:
+            return None
 
     def read_correlation_data(self, user_id, x_label, y_label, next_day):
         data_cursor = self._db_extended.find_correl_data(user_id)
