@@ -111,6 +111,9 @@ class DbExtended:
                 ret_lst.append(correl_wrapper.correl_wrapper_gen(elem))
         return ret_lst
 
+    def find_measur(self, user, day):
+        pass
+
     # changed to wrapper, not checked
     # def find_one_correl_data_date(self, user: str, time_stamp: datetime)-> Optional[List[correl_wrapper.Correlwrapper]]:
     #     tmp_lst = []

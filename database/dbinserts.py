@@ -3,6 +3,7 @@ from database.database import DbBase
 from databasemodels.models import User
 import datawrapper.correl_wrapper as cw
 import datawrapper.measure_wrapper as mw
+from datawrapper.fhir_wrappers import observation_wrapper, components_data_wrapper
 import datawrapper.value_wrapper as vw
 
 class DbInserts:
@@ -71,8 +72,8 @@ class DbInserts:
 
     # newer
 
-    def insert_value(self, user, value_wrapper):
-        return self.db_base._db[user].insert_one(value_wrapper._value_json)
+    def insert_value(self, user, value_wrapper: vw.ValueWrapper):
+        return self.db_base._db[user].insert_one(value_wrapper._component_wrapper._components_data_json)
 
     def insert_csv_row(self, user, value_wrapper):
         if not self.insert_value(user, value_wrapper) is None:
@@ -88,12 +89,12 @@ class DbInserts:
     def insert_correl(self, user, correl_wrapper):
         self.db_base._db[('%s_data' % (user))].insert_one(correl_wrapper._correlation_json)
 
-    def insert_measure(self, measure_wrapper):
+    def insert_measure(self, measure_wrapper: mw.MeasureWrapper):
         ids = []
-        user = ''
+        user = measure_wrapper.observation_wrapper.subject.display
         for value in measure_wrapper:
-            user = value.email # TODO:Value.email zu measure.email
-            ids.append(self.insert_value(value.email, value).inserted_id)
-        measure_json = dict(measure_wrapper._measuremet_json)
+            ids.append(self.insert_value(user, value).inserted_id)
+        measure_json = dict(measure_wrapper.observation_wrapper._observation_json)
         measure_json['value_ids'] = ids
+        del measure_json['component']
         return self.db_base._db[('%s_measure' % user)].insert_one(measure_json)

@@ -245,19 +245,19 @@ def receive_json():
         received_json = request.get_json()
         import pprint
         pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(received_json)
-        received_json = received_json['arrayOfFhirObservations'][0]
-        print(type(received_json['effectiveDateTime']), received_json['effectiveDateTime'])
-
-        try:
-            received_wrapper = measure_wrapper.measure_wrapper(received_json)
-            print(received_wrapper)
-            if not received_wrapper:
-                raise KeyError
-        except KeyError:
-            return json.dumps({'status': 'failure'})
-        db_inserts.insert_measure(received_wrapper)
-    S3_extract_dataset.run(received_wrapper) #TODO username
+        #pp.pprint(received_json)
+        for received_json in received_json['arrayOfFhirObservations']:
+            #received_json = received_json['arrayOfFhirObservations'][0]
+            print(type(received_json['effectiveDateTime']), received_json['effectiveDateTime'])
+            try:
+                received_wrapper = measure_wrapper.measure_wrapper(received_json)
+                print(received_wrapper)
+                if not received_wrapper:
+                    raise KeyError
+                db_inserts.insert_measure(received_wrapper)
+            except KeyError:
+                return json.dumps({'status': 'failure'})
+    S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display) #TODO username
     return json.dumps({'status': 'failure'})
     #return json.dumps({'status': 'success'})
 

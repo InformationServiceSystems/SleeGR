@@ -30,6 +30,13 @@ class MeasureWrapper:
         self._components = self._observation_wrapper.component
         # self._measuremet_json = measurement_json
 
+    def __repr__(self):
+        return str(self.observation_wrapper._observation_json)
+
+    @property
+    def observation_wrapper(self):
+        return self._observation_wrapper
+
     @property
     def id(self) -> int:
         return self._observation_wrapper.identifier.value
@@ -67,5 +74,10 @@ if __name__ == '__main__':
     measures = observation_example['arrayOfObservations']
     for measure in measures:
         res = measure_wrapper(measure)
+        print(res.time_stamp)
+        print(res.id)
+        print(res.type)
         for elem in res:
             print(elem.time_stamp)
+            print(elem.val0)
+

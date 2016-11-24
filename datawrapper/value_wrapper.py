@@ -1,7 +1,5 @@
 from datetime import datetime
-
 from typing import Optional, Union, Dict
-
 from datawrapper import FHIR_objects
 from mapval import ComparisonStyle
 from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWrapper
@@ -18,8 +16,8 @@ from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWra
 #     }
 
 class ValueWrapper:
-    def __init__(self, json: Dict):
-        self._component_wrapper = json
+    def __init__(self, component_wrapper: ComponentsDataWrapper):
+        self._component_wrapper = component_wrapper
         #self._value_json = json
 
     def __repr__(self):

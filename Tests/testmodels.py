@@ -42,8 +42,7 @@ class TestUser(unittest.TestCase):
 
         user = User.decode(user_json)
 
-        self.assertEqual('test@mail.de', user.email,
-                         'wrong email after initialization')
+
         self.assertEqual('Max', user.first_name,
                          'wrong firist name after initialization')
         self.assertEqual('Mustermann', user.last_name,

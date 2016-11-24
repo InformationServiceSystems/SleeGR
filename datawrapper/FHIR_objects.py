@@ -45,13 +45,22 @@ ratio = {
     'denominator': quantity  # Denominator value
 }
 
+def coding_validator (components_list: List[Dict])-> bool:
+    validator = MappingValidator(coding, ComparisonStyle.maximum)
+    result = True
+    for value in components_list:
+        result = result and validator.validate(value)
+    return result
+
 codeable_concept = {
     # from Element: extension
-    'coding': coding,  # Code defined by a terminology system
+    'coding': coding_validator,  # Code defined by a terminology system
     'text': str  # Plain text representation of the concept
 }
 
 identifier_use = ['usual', 'official', 'temp']
+
+
 
 identifier = {
     # from Element: extension
@@ -62,7 +71,6 @@ identifier = {
     'period': period,  # Time period when id is/was valid for use
     'assigner': '-- Reference(Organization) --'  # Organization that issued id (may be just text)
 }
-
 
 
 components_data = {  # Component results
@@ -90,6 +98,7 @@ def components_validator (components_list: List[Dict])-> bool:
         result = result and value_validator.validate(value)
     return result
 
+
 observation_code = ['registered', 'preliminary', 'final', 'amended']
 observation = {
     'resourceType': lambda string: string == 'Observation',
@@ -97,7 +106,7 @@ observation = {
     # from DomainResource: text, contained, extension, and modifierExtension
     'identifier': identifier,  # Unique Id for this particular observation
     'status': lambda code: word_in_list(code, observation_code),  # R!  registered | preliminary | final | amended +
-    'category': ...,  # Classification of  type of observation
+    'category': codeable_concept,  # Classification of  type of observation
     'code': codeable_concept,  # R!  Type of observation (code / type)
     'subject': fhir_reference_reference,  # Who and/or what this is about
     'encounter': ...,  # Healthcare event during which this observation is made
@@ -127,7 +136,7 @@ observation = {
     'device':               fhir_reference_reference, # (Measurement) Device
     'component': components_validator,
     'referenceRange': ..., # Provides guide for interpretation
-    'related': ..., # Resource related to this observation'
+    'related': ... # Resource related to this observation'
 }
 if __name__ == '__main__':
     date = '2016.11.14TA3:59:38'
