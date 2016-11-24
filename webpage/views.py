@@ -5,7 +5,7 @@ import math
 import S3_extract_dataset
 
 import os
-from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory
+from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory, make_response
 import requests
 from flask_cors import CORS, cross_origin
 
@@ -148,14 +148,17 @@ def registration():
 @requires_auth_api
 def show_measurement():
     if request.method == 'POST':
-        user_id = request.values['userId']
-        type = request.values['type']
-        start_date = request.values['beginDate']
-        end_date = request.values['endDate']
+        request_json = request.get_json()
+        user_id = request_json['userId']
+        type = request_json['type']
+        start_date = request_json['beginDate']
+        end_date = request_json['endDate']
         r = DataReader()
         start = datetime.strptime(start_date, '%d.%m.%Y')
         end = datetime.strptime(end_date, '%d.%m.%Y')
-        return json.dumps(r.heart_rate_special(user_id, start, end))
+        response = make_response(json.dumps(r.heart_rate_special(user_id, start, end)))
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        return response
 
 @app.route('/get_correlations_list', methods=['GET'])
 @cross_origin()
@@ -190,10 +193,11 @@ def str2bool(v):
 @requires_auth_api
 def sleep_data():
     if request.method == 'POST':
-        user_id = request.values['userId']
-        start_date = request.values['beginDate']
-        end_date = request.values['endDate']
-        gaussian_settings = str2bool(request.values['gaussianSettings'])
+        request_json = request.get_json()
+        user_id = request_json['userId']
+        start_date = request_json['beginDate']
+        end_date = request_json['endDate']
+        gaussian_settings = request_json['gaussianSettings']
         r = DataReader()
         start = datetime.strptime(start_date, '%d.%m.%Y')
         end = datetime.strptime(end_date, '%d.%m.%Y')
@@ -207,13 +211,17 @@ def sleep_data():
             if len(average_list) > 1 and len(var_list) > 1:
                 mean_duration = mean(average_list)
                 variance_duration = variance(average_list)
-                return json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}])
+                response = make_response(json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}]))
+                response.headers['Content-Type'] = 'application/json; charset=utf-8'
+                return response
             else:
-                return json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}])
+                response =  make_response(json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}]))
+                response.headers['Content-Type'] = 'application/json; charset=utf-8'
+                return response
         else:
-            return json.dumps(r.read_sleep_data(user_id, start, end))
-
-
+            response = make_response(json.dumps(r.read_sleep_data(user_id, start, end)))
+            response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            return response
 
 
 @app.route('/profile')
@@ -226,12 +234,15 @@ def profile():
 @requires_auth_api
 def correlations():
     if request.method == 'POST':
-        user_id = request.values['userId']
-        x_label = request.values['xAxis']
-        y_label = request.values['yAxis']
-        next_day = request.values['nextDay']
+        request_json = request.get_json()
+        user_id = request_json['userId']
+        x_label = request_json['xAxis']
+        y_label = request_json['yAxis']
+        next_day =request_json['nextDay']
         cr = DataReader()
-        return json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day)))
+        response = make_response(json.dumps(cr.read_correlation_data(user_id, x_label, y_label, bool(next_day))))
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 UPLOAD_FOLDER = '/home/Flask/test1/uploads'
@@ -243,23 +254,26 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
-        import pprint
-        pp = pprint.PrettyPrinter(indent=4)
-        #pp.pprint(received_json)
-        for received_json in received_json['arrayOfFhirObservations']:
-            #received_json = received_json['arrayOfFhirObservations'][0]
-            print(type(received_json['effectiveDateTime']), received_json['effectiveDateTime'])
-            try:
-                received_wrapper = measure_wrapper.measure_wrapper(received_json)
-                print(received_wrapper)
-                if not received_wrapper:
-                    raise KeyError
-                db_inserts.insert_measure(received_wrapper)
-            except KeyError:
+<<<<<<<<< Temporary merge branch 1
+        try:
+            json_lst = []
+            for list_entry in received_json['arrayOfMeasurements']:
+                for le in list_entry['values']:
+                    json_lst.append(le)
+            if not j2m.check_and_commit_many(json_lst):
                 return json.dumps({'status': 'failure'})
-    S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display) #TODO username
+        except KeyError:
+            return json.dumps({'status': 'failure'})
+    S3_extract_dataset.run(received_json['arrayOfMeasurements'][0]['values'][0]['Id'])
+    return json.dumps({'status': 'success'})
+=========
+        for list_entry in received_json['arrayOfMeasurements']:
+            for le in list_entry['values']:
+                res =  j2m.check_and_commit(le)
+    if res:
+        return json.dumps({'status': 'success'})
     return json.dumps({'status': 'failure'})
-    #return json.dumps({'status': 'success'})
+>>>>>>>>> Temporary merge branch 2
 
 
 

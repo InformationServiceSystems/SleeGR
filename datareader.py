@@ -33,9 +33,9 @@ class DataReader:
 
             for row in self._db_extended.find_data(user_id, day, measurement_type):
                 if measurement_to_valuenumb[
-                    int(row.type)] == 1:
-                    ret_json[row.time_stamp] = {
-                        'value': row.val1}
+                    int(row['type'])] == 1:
+                    ret_json[row['time_stamp']] = {
+                        'value': row['val1']}
                 elif measurement_to_valuenumb[
                     int(row.type)] == 2:
                     ret_json[row.time_stamp] = {
@@ -102,8 +102,20 @@ class DataReader:
                 for data in hr_lst_current_day:
                     datapoints.append({'x': (data.time_stamp - base_time).seconds, 'y': data.val0})
                 new_json['data_points'] = datapoints
+                new_json['rmse'] = self.calculate_rmse(new_json['data_points'], new_json['a'], new_json['t'], new_json['c'])
                 ret_list.append(new_json)
         return ret_list
+
+    def calculate_rmse(self, datapoints, a, t, c):
+        ret_value = 0
+        if a and t and c:
+            for data in datapoints:
+                function_value = (180-c)*math.exp(-(data['x']-t)/a)+c
+                ret_value = ret_value + math.pow(function_value-data['y'],2)
+            ret_value = math.sqrt(ret_value/len(datapoints))
+            return ret_value
+        else:
+            return None
 
     def read_correlation_data(self, user_id: str, x_label: str, y_label: str, next_day: bool) -> Dict:
         data_cursor = self._db_extended.find_correl_data(user_id)
