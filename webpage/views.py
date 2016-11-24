@@ -254,26 +254,22 @@ ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
-<<<<<<<<< Temporary merge branch 1
-        try:
-            json_lst = []
-            for list_entry in received_json['arrayOfMeasurements']:
-                for le in list_entry['values']:
-                    json_lst.append(le)
-            if not j2m.check_and_commit_many(json_lst):
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        #pp.pprint(received_json)
+        for received_json in received_json['arrayOfFhirObservations']:
+            #received_json = received_json['arrayOfFhirObservations'][0]
+            print(type(received_json['effectiveDateTime']), received_json['effectiveDateTime'])
+            try:
+                received_wrapper = measure_wrapper.measure_wrapper(received_json)
+                print(received_wrapper)
+                if not received_wrapper:
+                    raise KeyError
+                db_inserts.insert_measure(received_wrapper)
+            except KeyError:
                 return json.dumps({'status': 'failure'})
-        except KeyError:
-            return json.dumps({'status': 'failure'})
-    S3_extract_dataset.run(received_json['arrayOfMeasurements'][0]['values'][0]['Id'])
-    return json.dumps({'status': 'success'})
-=========
-        for list_entry in received_json['arrayOfMeasurements']:
-            for le in list_entry['values']:
-                res =  j2m.check_and_commit(le)
-    if res:
-        return json.dumps({'status': 'success'})
+    S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display) #TODO username
     return json.dumps({'status': 'failure'})
->>>>>>>>> Temporary merge branch 2
 
 
 
