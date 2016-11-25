@@ -180,6 +180,33 @@ def get_correlations_list():
             '{"x_label": "Sleep length", "y_label": "RPE", "next_day": false}]'
     return to_reply
 
+@app.route('/get_device_code', methods=['POST', 'GET'])
+@cross_origin()
+@requires_auth_api
+def get_device_code():
+    # TODO get all codes
+    codes = {
+        "RHYTHM+184849": 1,
+        "68cc7cdd304a7d5a" : 2
+    }
+    if request.method == 'POST':
+        devices = request.get_json()
+        ret_object = {}
+        for device in devices:
+            try:
+                curr_code = codes[str(device)]
+                ret_object[str(device)] = curr_code
+            except KeyError:
+                continue
+        response = make_response(json.dumps(ret_object))
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        return response
+    elif request.method == 'GET':
+        response = make_response(json.dumps(codes))
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        return response
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
