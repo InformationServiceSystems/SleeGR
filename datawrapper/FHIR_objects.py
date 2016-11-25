@@ -111,7 +111,7 @@ observation = {
     'subject': fhir_reference_reference,  # Who and/or what this is about
     'encounter': ...,  # Healthcare event during which this observation is made
     # effective[x]: Clinically relevant time/time-period for observation. One of these 2:
-    'effectiveDateTime': str,
+    'effectiveDateTime': lambda date: isinstance(date, datetime) or isinstance(date, str),
     'effectivePeriod': period,
     'issued': ...,  # Date/Time this was made available
     'performer': ...,

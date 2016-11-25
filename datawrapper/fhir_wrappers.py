@@ -11,10 +11,16 @@ def _generator(sample, reference, cls):
         return None
 
 def iso_date2str(date_string: Union[str, datetime]) -> Optional[datetime]:
+    if isinstance(date_string, datetime):
+        return date_string
     try:
         return datetime.strptime(date_string, '%Y.%m.%dT%H:%M:%S')
     except ValueError:
-        return None
+        pass
+    try:
+        return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S GMT+01:00')
+    except ValueError:
+        pass
 
 
 class PeriodWrapper:
@@ -86,11 +92,15 @@ class CodeableConceptWrapper:
 
     @property
     def coding(self) -> Optional[CodingWrapper]:
-        return coding_wrapper(self._codeable_concept_json['text'])
+        coding_list = self._codeable_concept_json['coding']
+        result_list = []
+        for coding in coding_list:
+            result_list.append(coding_wrapper(coding))
+        return result_list
 
     @property
     def text(self) -> Optional[str]:
-        return self._codeable_concept_json['coding']
+        return self._codeable_concept_json['text']
 
 
 def codeable_concept_wrapper(json) -> Optional[CodeableConceptWrapper]:
@@ -306,8 +316,8 @@ class ObservationWrapper:
             return None
 
     @property
-    def category(self) -> None:
-        return self._observation_json['category']
+    def category(self) -> Optional[CodeableConceptWrapper]:
+        return codeable_concept_wrapper(self._observation_json['category'])
 
     @property
     def valueRange(self) -> None:

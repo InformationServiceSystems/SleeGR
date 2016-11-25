@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, Union, Dict
 from datawrapper import FHIR_objects
 from mapval import ComparisonStyle
-from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWrapper
+from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWrapper, ObservationWrapper
 
 
 # value_reference = {
@@ -16,7 +16,7 @@ from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWra
 #     }
 
 class ValueWrapper:
-    def __init__(self, component_wrapper: ComponentsDataWrapper):
+    def __init__(self, component_wrapper: ComponentsDataWrapper, observation_wrapper):
         self._component_wrapper = component_wrapper
         #self._value_json = json
 
@@ -64,6 +64,13 @@ def value_wrapper(json: Dict) -> Optional[ValueWrapper]:
     validator = FHIR_objects.MappingValidator(FHIR_objects.components_data, comparison_style=ComparisonStyle.maximum)
     if validator.validate(json):
         return ValueWrapper(components_data_wrapper(json))
+    else:
+        return None
+
+def value_wrapper(json: Dict, observation_warpper: ObservationWrapper) -> Optional[ValueWrapper]:
+    validator = FHIR_objects.MappingValidator(FHIR_objects.components_data, comparison_style=ComparisonStyle.maximum)
+    if validator.validate(json):
+        return ValueWrapper(components_data_wrapper(json), observation_warpper)
     else:
         return None
 

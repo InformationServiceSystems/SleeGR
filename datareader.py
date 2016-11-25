@@ -77,8 +77,8 @@ class DataReader:
         ret_list = []
         dates = []
         cursors = list(self._db_extended.find_correl_data(user_id))
-        hr_cursors = list(self._db_extended.find_data_tag(user_id, 21, 'Cooldown'))
-        hr_cursors_rec = list(self._db_extended.find_data_tag(user_id, 21, 'Recovery'))
+        hr_cursors = list(self._db_extended.find_data_tag(user_id, 'Heartrate', 'Cooldown'))
+        hr_cursors_rec = list(self._db_extended.find_data_tag(user_id, 'Heartrate', 'Recovery'))
         hr_cursors.extend(hr_cursors_rec)
         hr_cursors = hr_cursors[::10]
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,

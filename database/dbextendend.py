@@ -2,7 +2,7 @@ from database.database import DbBase
 import names
 import pymongo
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 import bcrypt
 from datawrapper import correl_wrapper, measure_wrapper, value_wrapper
 
@@ -66,16 +66,38 @@ class DbExtended:
 
     #changed to wrapper, not checked
     #TODO: type for tag
-    def find_data_tag(self, user: str, measurement: str, tag ='') -> List[Optional[value_wrapper.ValueWrapper]]:
-        res_lst = self.db_base._db[user].find({'type': measurement, 'tag': tag}).sort('time_stamp', pymongo.ASCENDING)
-        ret_lst = []
+    # def find_data_tag(self, user: str, measurement: str, tag='') -> List[Optional[value_wrapper.ValueWrapper]]:
+    #     res_lst = self.db_base._db[user].find({'type': measurement, 'tag': tag}).sort('time_stamp', pymongo.ASCENDING)
+    #     ret_lst = []
+    #     for elem in res_lst:
+    #         del elem['_id']
+    #         ret_lst.append(value_wrapper.value_wrapper(elem))
+    #     return ret_lst
+
+    def find_data_tag(self, user: str, measurement: str, tag='') -> List[Optional[value_wrapper.ValueWrapper]]:
+        res_lst = self.db_base._db[('%s_measure' % user)].find({'category.coding.display': tag}).sort('time_stamp', pymongo.ASCENDING)
+        res_lst = list(res_lst)
+        measure_list = []
         for elem in res_lst:
+            elem = dict(elem)
+            ids = elem['value_ids']
+            values = []
+            for value_id in ids:
+                for value in self.db_base._db[user].find({'_id': value_id}):
+                    del value['_id']
+                    values.append(dict(value))
             del elem['_id']
-            ret_lst.append(value_wrapper.value_wrapper(elem))
-        return ret_lst
+            del elem['value_ids']
+            elem['component'] = values
+            measure_list.append(measure_wrapper.measure_wrapper(elem))
+        return_list = []
+        for measurement in measure_list:
+            for value in measurement:
+                return_list.append(value)
+        return return_list
 
     #changed to wrapper, not checked
-    def find_data_user(self, user:str) -> List[Optional[value_wrapper.ValueWrapper]]:
+    def find_data_user(self, user: str) -> List[Optional[value_wrapper.ValueWrapper]]:
         res_lst = self.db_base._db[user].find()#.sort('time_stamp', pymongo.ASCENDING)
         ret_lst = []
         for elem in res_lst:
@@ -84,21 +106,50 @@ class DbExtended:
         return ret_lst
 
     # changed to wrapper, not checked
-    def find_data(self, user:str , time_stamp:datetime, measurement:str) -> List[Optional[value_wrapper.ValueWrapper]]:
-        ret_lst =[]
-        for elem in self.db_base._db[user].find({'type': measurement}):
-            if elem['time_stamp'].date() == time_stamp.date():
+    def find_data(self, user: str, time_stamp: datetime, measurement:str) -> List[Optional[value_wrapper.ValueWrapper]]:
+            min_date = time_stamp
+            max_date = min_date + timedelta(1)
+            res_lst = self.db_base._db[('%s_measure' % user)].find({'effectiveDateTime': {'$lte': max_date, '$gte': min_date}, 'category.coding.display': measurement})
+            measure_list = []
+            for elem in res_lst:
+                elem = dict(elem)
+                ids = elem['value_ids']
+                values = []
+                for value_id in ids:
+                    for value in self.db_base._db[user].find({'_id': value_id}):
+                        del value['_id']
+                        values.append(dict(value))
                 del elem['_id']
-                ret_lst.append(value_wrapper.value_wrapper(elem))
-        return ret_lst
+                del elem['value_ids']
+                elem['component'] = values
+                measure_list.append(measure_wrapper.measure_wrapper(elem))
+            return_list = []
+            for measurement in measure_list:
+                for value in measurement:
+                    return_list.append(value)
+            return return_list
 
     # changed to wrapper, not checked
     def find_data_no_date(self, user, measurement)-> List[Optional[value_wrapper.ValueWrapper]]:
-        ret_lst = []
-        for elem in self.db_base._db[user].find({'type': measurement}):
+        res_lst = self.db_base._db[('%s_measure' % user)].find({'category.coding.display': measurement})
+        measure_list = []
+        for elem in res_lst:
+            elem = dict(elem)
+            ids = elem['value_ids']
+            values = []
+            for value_id in ids:
+                for value in self.db_base._db[user].find({'_id': value_id}):
+                    del value['_id']
+                    values.append(dict(value))
             del elem['_id']
-            ret_lst.append(value_wrapper.value_wrapper(elem))
-        return ret_lst
+            del elem['value_ids']
+            elem['component'] = values
+            measure_list.append(measure_wrapper.measure_wrapper(elem))
+        return_list = []
+        for measurement in measure_list:
+            for value in measurement:
+                return_list.append(value)
+        return return_list
 
     # changed to wrapper, not checked
     def find_correl_data(self, user: str) -> List[correl_wrapper.CorrelWrapper]:

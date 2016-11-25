@@ -1,11 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing import Optional, Dict, List
 
 from datawrapper import FHIR_objects
 from datawrapper.value_wrapper import ValueWrapper, value_wrapper
-from datawrapper.fhir_wrappers import observation_wrapper, ObservationWrapper
+from datawrapper.fhir_wrappers import *
 from datawrapper.test_fhir_obj import observation_example
+
+import S3_extract_dataset
 
 
 def value_list_validator(lst: List) -> bool:
@@ -43,7 +45,7 @@ class MeasureWrapper:
 
     @property
     def type(self) -> str:
-        return self._observation_wrapper.code.coding.display
+        return self._observation_wrapper.category.coding.pop().display
 
     @property
     def time_stamp(self) -> datetime:
@@ -51,7 +53,7 @@ class MeasureWrapper:
 
     def __getitem__(self, key) -> ValueWrapper:
         if isinstance(key, int) and key >= 0:
-            return value_wrapper(self._components[key]._components_data_json)
+            return value_wrapper(self._components[key]._components_data_json, self.observation_wrapper)
         else:
             raise KeyError
 
@@ -62,6 +64,7 @@ value_validator = FHIR_objects.MappingValidator(reference)
 def measure_wrapper(json: Dict) -> Optional[MeasureWrapper]:
     validator = FHIR_objects.MappingValidator(FHIR_objects.observation, FHIR_objects.ComparisonStyle.maximum)
     if validator.validate(json):
+        json['effectiveDateTime'] = iso_date2str(json['effectiveDateTime'])
         return MeasureWrapper(observation_wrapper(json))
     else:
         return None
@@ -74,10 +77,19 @@ if __name__ == '__main__':
     measures = observation_example['arrayOfObservations']
     for measure in measures:
         res = measure_wrapper(measure)
-        print(res.time_stamp)
-        print(res.id)
-        print(res.type)
-        for elem in res:
-            print(elem.time_stamp)
-            print(elem.val0)
+
+        import database
+
+        db_inserts, db_extended = database.init()
+        dct = {}
+        db_inserts.insert_measure(res)
+        date = datetime(2016, 11, 14)
+        res_bal = db_extended.find_data(res.observation_wrapper.subject.display, date,  'TrainingHR')
+        print(res_bal)
+        date = datetime(2016, 11, 12)
+        res_blui = db_extended.find_data(res.observation_wrapper.subject.display, date,  'TrainingHR')
+        print(res_blui)
+
+
+
 

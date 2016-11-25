@@ -256,8 +256,8 @@ def receive_json():
         received_json = request.get_json()
         import pprint
         pp = pprint.PrettyPrinter(indent=4)
-        #pp.pprint(received_json)
         for received_json in received_json['arrayOfFhirObservations']:
+            pp.pprint(received_json)
             #received_json = received_json['arrayOfFhirObservations'][0]
             print(type(received_json['effectiveDateTime']), received_json['effectiveDateTime'])
             try:
@@ -268,7 +268,7 @@ def receive_json():
                 db_inserts.insert_measure(received_wrapper)
             except KeyError:
                 return json.dumps({'status': 'failure'})
-    S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display) #TODO username
+    S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
     return json.dumps({'status': 'failure'})
 
 
