@@ -305,6 +305,39 @@ def signout():
     session.clear()
     return redirect('/')
 
+@app.route('/logout', methods=['POST'])
+@cross_origin()
+@requires_auth_api
+def logout_handling():
+    req_data = request.get_json()
+    try:
+        user_id = req_data['userID']
+        clientID = env['AUTH0_CLIENT_ID']
+        device_id = req_data['deviceID']
+    except KeyError:
+        response = make_response(json.dumps('{"status" : "failure"}'))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    data = {
+        'type' : 'refresh_token',
+        'client_id' : str(clientID),
+        'user_id' : str(user_id)
+    }
+
+    json_header = {
+        'authorization' : 'Bearer ' + env['AUTH0_KEY'],
+        'content-type': 'application/json'
+    }
+
+    token_url = "https://{domain}/api/v2/device-credentials".format(domain=env['AUTH0_DOMAIN'])
+    devices = requests.get(token_url, params=json.dumps(data), headers=json_header).json()
+    for device in devices:
+        if device['device_name'] == device_id:
+            requests.delete(token_url+'/'+device['id'], headers=json_header)
+    response = make_response(json.dumps('{"status" : "success"}'))
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
+
 
 if __name__ == '__main__':
     app.debug = True
