@@ -3,6 +3,8 @@ from statistics import mean, variance
 import re
 import math
 import S3_extract_dataset
+import jwt
+import base64
 
 import os
 from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory, make_response
@@ -310,8 +312,16 @@ def signout():
 @requires_auth_api
 def logout_handling():
     req_data = request.get_json()
+    auth = request.headers.get('Authorization', None)
+    parts = auth.split()
+    token = parts[1]
+    payload = jwt.decode(
+        token,
+        base64.b64decode(env['AUTH0_CLIENT_SECRET'].replace("_", "/").replace("-", "+")),
+        audience=env['AUTH0_CLIENT_ID']
+    )
     try:
-        user_id = req_data['userID']
+        user_id = payload['sub']
         clientID = env['AUTH0_CLIENT_ID']
         device_id = req_data['deviceID']
     except KeyError:
