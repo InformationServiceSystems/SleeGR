@@ -183,15 +183,16 @@ def get_correlations_list():
 
 @app.route('/get_device_code', methods=['POST', 'GET'])
 @cross_origin()
-@requires_auth_api
 def get_device_code():
     # TODO get all codes
     codes = {
         "RHYTHM+184849": 1,
-        "68cc7cdd304a7d5a" : 2
+        "68cc7cdd304a7d5a" : 2,
+        "cca49c26da465463": 3
     }
     if request.method == 'POST':
         devices = request.get_json()
+        print(devices)
         ret_object = {}
         for device in devices:
             try:
