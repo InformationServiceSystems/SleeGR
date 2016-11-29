@@ -3,6 +3,8 @@ from statistics import mean, variance
 import re
 import math
 import S3_extract_dataset
+import jwt
+import base64
 
 import os
 from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory, make_response
@@ -182,15 +184,16 @@ def get_correlations_list():
 
 @app.route('/get_device_code', methods=['POST', 'GET'])
 @cross_origin()
-@requires_auth_api
 def get_device_code():
     # TODO get all codes
     codes = {
         "RHYTHM+184849": 1,
-        "68cc7cdd304a7d5a" : 2
+        "68cc7cdd304a7d5a" : 2,
+        "cca49c26da465463": 3
     }
     if request.method == 'POST':
         devices = request.get_json()
+        print(devices)
         ret_object = {}
         for device in devices:
             try:
@@ -312,6 +315,47 @@ def allowed_file(filename):
 def signout():
     session.clear()
     return redirect('/')
+
+@app.route('/logout', methods=['POST'])
+@cross_origin()
+@requires_auth_api
+def logout_handling():
+    req_data = request.get_json()
+    auth = request.headers.get('Authorization', None)
+    parts = auth.split()
+    token = parts[1]
+    payload = jwt.decode(
+        token,
+        base64.b64decode(env['AUTH0_CLIENT_SECRET'].replace("_", "/").replace("-", "+")),
+        audience=env['AUTH0_CLIENT_ID']
+    )
+    try:
+        user_id = payload['sub']
+        clientID = env['AUTH0_CLIENT_ID']
+        device_id = req_data['deviceID']
+    except KeyError:
+        response = make_response(json.dumps('{"status" : "failure"}'))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    data = {
+        'type' : 'refresh_token',
+        'client_id' : str(clientID),
+        'user_id' : str(user_id)
+    }
+
+    json_header = {
+        'authorization' : 'Bearer ' + env['AUTH0_KEY'],
+        'content-type': 'application/json'
+    }
+
+    token_url = "https://{domain}/api/v2/device-credentials".format(domain=env['AUTH0_DOMAIN'])
+    devices = requests.get(token_url, params=json.dumps(data), headers=json_header).json()
+    for device in devices:
+        if device['device_name'] == device_id:
+            requests.delete(token_url+'/'+device['id'], headers=json_header)
+    response = make_response(json.dumps('{"status" : "success"}'))
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
 
 
 if __name__ == '__main__':
