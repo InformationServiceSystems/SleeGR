@@ -295,8 +295,11 @@ def receive_json():
                 db_inserts.insert_measure(received_wrapper)
             except KeyError:
                 return json.dumps({'status': 'failure'})
-    S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
-    return json.dumps({'status': 'failure'})
+    try:
+        S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
+    except:
+        return json.dumps({'status': 'failure'})
+    return json.dumps({'status': 'success'})
 
 
 

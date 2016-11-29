@@ -16,7 +16,8 @@ from datawrapper.fhir_wrappers import components_data_wrapper, ComponentsDataWra
 #     }
 
 class ValueWrapper:
-    def __init__(self, component_wrapper: ComponentsDataWrapper, observation_wrapper):
+    def __init__(self, component_wrapper: ComponentsDataWrapper, observation_wrapper: ObservationWrapper):
+        self._observation = observation_wrapper
         self._component_wrapper = component_wrapper
         #self._value_json = json
 
@@ -40,8 +41,7 @@ class ValueWrapper:
 
     @property
     def email(self) -> str:
-        raise NotImplementedError
-        # return self._value_json['email']
+        return  self._observation.subject.display
 
     @property
     def time_stamp(self) -> datetime:
@@ -50,14 +50,11 @@ class ValueWrapper:
 
     @property
     def tag(self) -> str:
-        raise NotImplementedError
-        # return self._value_json['tag']
+        return self._component_wrapper.code.coding[0].display
 
     @property
-    def type(self) -> int:
-        raise NotImplementedError
-
-        # return self._value_json['type']
+    def type(self) -> str:
+        return self._observation.category.coding[0].display
 
 
 def value_wrapper(json: Dict) -> Optional[ValueWrapper]:

@@ -53,7 +53,7 @@ class DataReader:
         ret_list = []
         dates = []
         data = []
-        cursors = self._db_extended.find_data_no_date(user_id, 777)
+        cursors = self._db_extended.find_data_no_date(user_id, 777) #TODO: 777 to sleep
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
             dates.append(day.strftime('%d.%m.%Y'))

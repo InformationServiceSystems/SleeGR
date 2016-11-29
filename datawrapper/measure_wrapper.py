@@ -84,11 +84,10 @@ if __name__ == '__main__':
         dct = {}
         db_inserts.insert_measure(res)
         date = datetime(2016, 11, 14)
-        res_bal = db_extended.find_data(res.observation_wrapper.subject.display, date,  'TrainingHR')
+        res_bal = db_extended.find_data_tag(res.observation_wrapper.subject.display, 'Accelerometer', 'TrainingHR')
+        S3_extract_dataset.run(res.observation_wrapper.subject.display)
         print(res_bal)
-        date = datetime(2016, 11, 12)
-        res_blui = db_extended.find_data(res.observation_wrapper.subject.display, date,  'TrainingHR')
-        print(res_blui)
+
 
 
 

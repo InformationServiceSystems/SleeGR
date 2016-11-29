@@ -91,7 +91,7 @@ class CodeableConceptWrapper:
         self._codeable_concept_json = json
 
     @property
-    def coding(self) -> Optional[CodingWrapper]:
+    def coding(self) -> Optional[List[CodingWrapper]]:
         coding_list = self._codeable_concept_json['coding']
         result_list = []
         for coding in coding_list:
@@ -190,7 +190,7 @@ class ComponentsDataWrapper:
         self._components_data_json = json
 
     @property
-    def code(self) -> str:
+    def code(self) -> CodeableConceptWrapper:
         return codeable_concept_wrapper(self._components_data_json['code'])
 
     @property
