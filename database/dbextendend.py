@@ -81,3 +81,13 @@ class DbExtended:
                 return data
         return None
 
+    def get_device_code(self, device_name=None):
+        if device_name:
+            return self.db_base._devices_db.devices_collection.find_one({'_id': device_name})
+        else:
+            return self.db_base._devices_db.devices_collection.find()
+
+    def get_next_sequence(self, sequence_name):
+        res = self.db_base._devices_db.counters.find_one_and_update({'_id':sequence_name}, {'$inc':{'seq': 1}})
+        return res['seq']
+
