@@ -86,16 +86,16 @@ class DataReader:
                                until=end_date):
             dates.append(day.date())
         for day in dates:
-            data = list(filter(lambda entry : entry.date() == day, correl_data_wrappers))
+            data = list(filter(lambda entry: entry.time_stamp().date() == day, correl_data_wrappers))
             if len(data) > 0:
                 data = data[0]
                 new_json = {}
                 new_json['user_id'] = user_id
-                new_json['date'] = day
+                new_json['date'] = day.strftime('%d.%m.%Y')
                 new_json['a'] = data.a()
                 new_json['t'] = data.t()
                 new_json['c'] = data.c()
-                hr_lst_current_day = list(filter(lambda entry: entry.time_stamp.strftime('%d.%m.%Y') == day, values))
+                hr_lst_current_day = list(filter(lambda entry: entry.time_stamp.date() == day, values))
                 if len(hr_lst_current_day) < 1:
                     continue
                 base_time = hr_lst_current_day[0].time_stamp
