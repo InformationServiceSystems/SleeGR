@@ -50,11 +50,11 @@ class ValueWrapper:
 
     @property
     def tag(self) -> str:
-        return self._component_wrapper.code.coding[0].display
+        return self._observation.category.coding[0].display
 
     @property
     def type(self) -> str:
-        return self._observation.category.coding[0].display
+        return self._component_wrapper.code.coding[0].display
 
 
 def value_wrapper(json: Dict) -> Optional[ValueWrapper]:
@@ -73,18 +73,4 @@ def value_wrapper(json: Dict, observation_warpper: ObservationWrapper) -> Option
 
 
 if __name__ == '__main__':
-    date = datetime(2016, 1, 18, 11, 22, 55)
-
-    json = {
-        "type": 4,
-        "email": "test@test.com",
-        "tag": "Idle",
-        "time_stamp": date,
-        "val2": 0,
-        "val1": date,
-        "val0": 1111
-    }
-
-    vw = value_wrapper(json)
-
-    print(vw.val1)
+    pass

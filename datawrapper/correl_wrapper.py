@@ -101,25 +101,4 @@ def correl_wrapper_gen(json: Dict) -> Optional[CorrelWrapper]:
         return None
 
 if __name__ == '__main__':
-    date = datetime(2016, 1, 18, 11, 22, 55)
-
-    json = {
-        "A": 208.0867079039359,
-        "Evening HR": None,
-        "Activity A": 0.7630895933590968,
-        "Load": 14300.577839859636,
-        "time_stamp": date,
-        "C": 68.72412939735467,
-        "RPE": 5,
-        "Deep sleep": 0.42857143,
-        "Sleep length": 7.61,
-        "T": -79.44353847749991,
-        "Morning HR": 47,
-        "Sleep start": -1,
-        "Sleep end": 7,
-        "DALDA": 1.5833333333333333,
-        "Activity G": 0.049056262570958464,
-        "Day of week": 2
-    }
-    res = correl_wrapper_gen(json)
-    print(res.a())
+    pass

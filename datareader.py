@@ -13,6 +13,7 @@ from linear_datascience import Comp1D
 from datawrapper.value_wrapper import ValueWrapper
 import numpy
 import database
+import math
 
 
 
@@ -76,16 +77,16 @@ class DataReader:
     def heart_rate_special(self, user_id: str, start_date:datetime, end_date: datetime) -> List[Dict]:
         ret_list = []
         dates = []
-        cursors = list(self._db_extended.find_correl_data(user_id))
-        hr_cursors = list(self._db_extended.find_data_tag(user_id, 'Heartrate', 'Cooldown'))
-        hr_cursors_rec = list(self._db_extended.find_data_tag(user_id, 'Heartrate', 'Recovery'))
-        hr_cursors.extend(hr_cursors_rec)
-        hr_cursors = hr_cursors[::10]
+        correl_data_wrappers = self._db_extended.find_correl_data(user_id)
+        values = []
+        values.extend(self._db_extended.find_data_tag(user_id, 'Heart rate', 'Cooldown'))
+        values.extend(self._db_extended.find_data_tag(user_id, 'Heart rate', 'Recovery'))
+        values = values[::10]
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
-            dates.append(day.strftime('%d.%m.%Y'))
+            dates.append(day.date())
         for day in dates:
-            data = list(filter(lambda entry : entry.time_stamp().strftime('%d.%m.%Y') == day, cursors))
+            data = list(filter(lambda entry : entry.date() == day, correl_data_wrappers))
             if len(data) > 0:
                 data = data[0]
                 new_json = {}
@@ -94,7 +95,7 @@ class DataReader:
                 new_json['a'] = data.a()
                 new_json['t'] = data.t()
                 new_json['c'] = data.c()
-                hr_lst_current_day = list(filter(lambda entry: entry.time_stamp.strftime('%d.%m.%Y') == day, hr_cursors))
+                hr_lst_current_day = list(filter(lambda entry: entry.time_stamp.strftime('%d.%m.%Y') == day, values))
                 if len(hr_lst_current_day) < 1:
                     continue
                 base_time = hr_lst_current_day[0].time_stamp
@@ -193,5 +194,5 @@ measurement_to_valuenumb = {
 
 
 if __name__ == '__main__':
-    s = DataReader()
-    s.get_timedelta(-1.0)
+    pass
+

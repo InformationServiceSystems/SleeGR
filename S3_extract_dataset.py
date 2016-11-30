@@ -25,12 +25,12 @@ def RestingHR(day, values, usr):
     
     result = {'Morning HR':None, 'Evening HR':None}
     
-    hrM = [val.val0 for val in values if val.type == 21 and val.time_stamp.hour < 11 ]
+    hrM = [val.val0 for val in values if val.type == 'Heart rate' and val.time_stamp.hour < 11 ]
     
     if len(hrM) > 0:
         result['Morning HR'] = np.min(hrM)*1.0
 
-    hrE = [val.val0 for val in values if val.type == 21 and val.time_stamp.hour > 20 ]
+    hrE = [val.val0 for val in values if val.type == 'Heart rate' and val.time_stamp.hour > 20 ]
     
     if len(hrE) > 0:
         result['Evening HR'] = np.min(hrE)*1.0
@@ -45,7 +45,7 @@ def FittedCurve(day, values, usr):
     if usr == '1024' and day < datetime.strptime("2016-02-04", "%Y-%m-%d"):
         return result
     else:
-        hr = [val for val in values if val.type == 21 ]
+        hr = [val for val in values if val.type == 'Heart rate' ]
 
     if len(hr) < 2:
         return result
@@ -53,7 +53,7 @@ def FittedCurve(day, values, usr):
     # find max idx
     mx, _ = max(enumerate(hr), key = lambda p: p[1].val0)
     
-    if hr[mx].val0 < 110:
+    if hr[mx].val0 < 10:
         return result;
     
     cd = [hr[mx]]
@@ -125,7 +125,7 @@ def Activity(day, values, usr):
 def Feedback(day, values, usr):
     result = {'RPE':None, 'DALDA':None}
     
-    data = [val for val in values if val.type == 1024 ]
+    data = [val for val in values if val.type == 'feedback' ]
     
     if len(data) > 0:
         
@@ -146,7 +146,7 @@ def Feedback(day, values, usr):
 def Sleep(day, values, usr):
     result = {'Sleep length': None, 'Sleep start': None, 'Sleep end': None, 'Deep sleep': None}
     
-    vals = [val for val in values if val.type == 777 ]
+    vals = [val for val in values if val.type == 'Sleep' ]
     
     if len(vals) > 0:   
         val = vals[-1] 
@@ -218,11 +218,13 @@ def run(user=None):
 
         for i in range(300):
 
-            daystart = daystart - oneday
-            dayend = dayend - oneday
+            #daystart = daystart - oneday
+            #dayend = dayend - oneday
 
             # get data in the range
             values = [val for val in data if daystart <= val.time_stamp and val.time_stamp <= dayend ]
+
+
 
             if len(values) < 1:
                 continue
@@ -235,6 +237,9 @@ def run(user=None):
 
             # save them for the user
             all_feat.append(correl_wrapper.correl_wrapper_gen(r))
+
+            daystart = daystart - oneday
+            dayend = dayend - oneday
 
         #new save
         collection_name = ('%s_data' % (usr))
@@ -250,4 +255,4 @@ def run(user=None):
 
 
 if __name__ == '__main__':
-    run()
+    run('daniel.steinbach@web.de')

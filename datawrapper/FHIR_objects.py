@@ -139,11 +139,4 @@ observation = {
     'related': ... # Resource related to this observation'
 }
 if __name__ == '__main__':
-    date = '2016.11.14TA3:59:38'
-    print(re.search('\d\d.\d\d.\d\dT\d\d:\d\d:\d\d', date))
-    print(datetime.strptime(date, '%Y.%m.%dT%H:%M:%S'))
-
-#
-   # import pprint
- #   pp = pprint.PrettyPrinter(indent=4)
-  #  pp.pprint(observation)
+    pass

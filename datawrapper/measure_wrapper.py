@@ -7,7 +7,6 @@ from datawrapper.value_wrapper import ValueWrapper, value_wrapper
 from datawrapper.fhir_wrappers import *
 from datawrapper.test_fhir_obj import observation_example
 
-import S3_extract_dataset
 
 
 def value_list_validator(lst: List) -> bool:
@@ -71,22 +70,7 @@ def measure_wrapper(json: Dict) -> Optional[MeasureWrapper]:
 
 
 if __name__ == '__main__':
-    date = datetime(2016, 1, 18, 11, 22, 55)
-    date2 = datetime(2016, 1, 19, 11, 22, 55)
-
-    measures = observation_example['arrayOfObservations']
-    for measure in measures:
-        res = measure_wrapper(measure)
-
-        import database
-
-        db_inserts, db_extended = database.init()
-        dct = {}
-        db_inserts.insert_measure(res)
-        date = datetime(2016, 11, 14)
-        res_bal = db_extended.find_data_tag(res.observation_wrapper.subject.display, 'Accelerometer', 'TrainingHR')
-        S3_extract_dataset.run(res.observation_wrapper.subject.display)
-        print(res_bal)
+    pass
 
 
 

@@ -95,9 +95,6 @@ class MappingValidator:
         for path in paths:
             result = result and MappingValidator._validate_key(sample, path)
             if not result:
-                print('refernce;', reference)
-                print('sample:', sample)
-                print('structure differs at:', path)
                 break
         return result
 
@@ -113,10 +110,8 @@ class MappingValidator:
             try:
                 mapping_tmp = mapping_tmp[key]
             except KeyError:
-                print("Tried key::", key)
                 return False
             except TypeError:
-                print("failed with field:", mapping_tmp)
                 return False
         return True
 
@@ -158,7 +153,6 @@ class MappingValidator:
             else:
                 result = result and False
             if not result:
-                print(mapping_value, "(mapping)", "does not match to", reference_value, "(reference)")
                 break
         return result
 

@@ -216,8 +216,6 @@ def dashboard():
     user = session['profile']
     return render_template('iot-triathlon-activity.html', user=user, url=env['GLOBAL_URL'])
 
-def str2bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
 
 @app.route('/sleepPoints', methods=['POST'])
 @requires_auth_api
@@ -259,6 +257,7 @@ def sleep_data():
 def profile():
     return render_template('iot-triathlon-profile.html', user=session['profile'])
 
+
 @app.route('/correlation', methods=['POST'])
 @cross_origin()
 @requires_auth_api
@@ -275,21 +274,12 @@ def correlations():
         return response
 
 
-UPLOAD_FOLDER = '/home/Flask/test1/uploads'
-ALLOWED_EXTENSIONS = set(['bin', 'dat', 'csv', 'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
-
 @app.route('/post_json', methods=['POST'])
 @requires_auth_api
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
-        import pprint
-        pp = pprint.PrettyPrinter(indent=4)
         for received_json in received_json['arrayOfFhirObservations']:
-            pp.pprint(received_json)
-            #received_json = received_json['arrayOfFhirObservations'][0]
-            print(type(received_json['effectiveDateTime']), received_json['effectiveDateTime'])
             try:
                 received_wrapper = measure_wrapper.measure_wrapper(received_json)
                 print(received_wrapper)
@@ -298,23 +288,9 @@ def receive_json():
                 db_inserts.insert_measure(received_wrapper)
             except KeyError:
                 return json.dumps({'status': 'failure'})
-    try:
         S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
-    except:
-        return json.dumps({'status': 'failure'})
     return json.dumps({'status': 'success'})
 
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-@app.route('/signout')
-@login_required
-def signout():
-    session.clear()
-    return redirect('/')
 
 @app.route('/logout', methods=['POST'])
 @cross_origin()
