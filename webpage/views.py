@@ -185,27 +185,24 @@ def get_correlations_list():
 @app.route('/get_device_code', methods=['POST', 'GET'])
 @cross_origin()
 def get_device_code():
-    # TODO get all codes
-    codes = {
-        "RHYTHM+184849": 1,
-        "68cc7cdd304a7d5a" : 2,
-        "cca49c26da465463": 3
-    }
     if request.method == 'POST':
         devices = request.get_json()
-        print(devices)
         ret_object = {}
         for device in devices:
-            try:
-                curr_code = codes[str(device)]
-                ret_object[str(device)] = curr_code
-            except KeyError:
-                continue
+            temp = db_extended.get_device_code(str(device))
+            if temp:
+                current_code = temp['code']
+                ret_object[temp['_id']] = int(current_code)
+            else:
+                db_inserts.register_new_device(str(device), db_extended.get_next_sequence('devices_collection'))
+                temp = db_extended.get_device_code(str(device))
+                current_code = temp['code']
+                ret_object[temp['_id']] = int(current_code)
         response = make_response(json.dumps(ret_object))
         response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return response
     elif request.method == 'GET':
-        response = make_response(json.dumps(codes))
+        response = make_response(json.dumps(list(db_extended.get_device_code())))
         response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return response
 
@@ -282,7 +279,6 @@ def receive_json():
         for received_json in received_json['arrayOfFhirObservations']:
             try:
                 received_wrapper = measure_wrapper.measure_wrapper(received_json)
-                print(received_wrapper)
                 if not received_wrapper:
                     raise KeyError
                 db_inserts.insert_measure(received_wrapper)

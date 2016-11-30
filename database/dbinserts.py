@@ -86,6 +86,9 @@ class DbInserts:
             return True
         return False
 
+    def register_new_device(self, device_name, code):
+        self.db_base._devices_db.devices_collection.insert_one({'_id':device_name, 'code': code})
+
     def insert_correl(self, user, correl_wrapper):
         self.db_base._db[('%s_data' % (user))].insert_one(correl_wrapper._correlation_json)
 
