@@ -1,28 +1,20 @@
 from datetime import datetime
 from statistics import mean, variance
-import re
 import math
 import S3_extract_dataset
 import jwt
 import base64
 
-import os
-from flask import Flask, request, redirect, url_for, json, jsonify, session, render_template, send_from_directory, make_response
+from flask import request, redirect, json, session, make_response
 import requests
-from flask_cors import CORS, cross_origin
+from flask_cors import cross_origin
 
-from linear_datascience import Comp1D
 
 import database
-from databasemodels.models import User
-from exceptions import InputError
 from webpage import app
-import names
-from decorators import login_required
-from authentification import requires_BASEAuth, requires_auth_api
+from authentification import requires_auth_api
 from datareader import DataReader
-from json2mongo import Json2Mongo, reference
-import bcrypt
+from json2mongo import Json2Mongo
 
 from datawrapper import measure_wrapper, value_wrapper
 from dotenv import Dotenv
@@ -40,11 +32,6 @@ except IOError:
 db_inserts, db_extended = database.init()
 j2m = Json2Mongo()
 
-
-@app.route("/")
-@app.route("/login")
-def home():
-    return render_template('iot-login-auth0.html', env=env)
 
 # Here we're using the /callback route.
 @app.route('/callback')
@@ -81,69 +68,6 @@ def callback_handling():
   # Redirect to the User logged in page that you want here
   # In our case it's /dashboard
   return redirect('/dashboard')
-
-@app.route('/oldLogin', methods=['POST', 'GET'])
-def login():
-    error = None
-    if request.args.get('next'):
-        session['next'] = request.args.get('next', None)
-    if request.method == 'POST':
-        email = request.values['email']
-        password = request.values['password']
-        if db_extended.password_matches_email(email, password):
-            profile = {'email': email}
-            session['profile'] = profile
-            if 'next' in session:
-                next = session.get('next')
-                session.pop('next')
-                return redirect(next)
-            return redirect(url_for("dashboard"))
-    return app.send_static_file('iot-login.html')
-
-
-@app.route('/sign_rest', methods=['POST'])
-def sign():
-    if request.method == 'POST':
-        json_new_user = request.get_json()
-        json_new_user[names.type] = names.user_type_names.user_generals
-        if not db_inserts.find_user(json_new_user[names.email]) == None:
-            return jsonify(success=False, error_in='user', error_msg='user already exists')
-        try:
-            new_user = User.decode(json_new_user)
-        except InputError as err:
-            return jsonify(success=False, error_in=err.expression, error_msg=err.message)
-        db_inserts.insert_user(new_user)
-        return jsonify(success=True)
-    return jsonify(success=False, error_in='request', error_msg='No post request sent')
-
-
-@app.route('/registration', methods=['POST', 'GET'])
-def registration():
-    if request.method == 'POST':
-        email = request.values['email']
-        password = bcrypt.hashpw(request.values['password'].encode(), bcrypt.gensalt())
-        fullname = request.values['name']
-        import re
-        name_list = re.split(' ', fullname)
-        firstname = ''
-        lastname = ''
-        if len(name_list) == 0:
-            lastname = None
-            firstname = None
-        elif len(name_list) == 1:
-            firstname = None
-            if not name_list[0]:
-                lastname = name_list[0]
-            else:
-                lastname = None
-        else:
-            lastname = name_list[-1]
-            del (name_list[-1])
-            firstname = ' '.join(name_list)
-        new_user = User(email, password, first_name=firstname, last_name=lastname)
-        db_inserts.insert_user(new_user)
-        return redirect(url_for("login"))
-    return app.send_static_file('iot-register.html')
 
 
 @app.route('/heartrate', methods=['POST'])
@@ -207,13 +131,6 @@ def get_device_code():
         return response
 
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    user = session['profile']
-    return render_template('iot-triathlon-activity.html', user=user, url=env['GLOBAL_URL'])
-
-
 @app.route('/sleepPoints', methods=['POST'])
 @requires_auth_api
 def sleep_data():
@@ -247,12 +164,6 @@ def sleep_data():
             response = make_response(json.dumps(r.read_sleep_data(user_id, start, end)))
             response.headers['Content-Type'] = 'application/json; charset=utf-8'
             return response
-
-
-@app.route('/profile')
-@login_required
-def profile():
-    return render_template('iot-triathlon-profile.html', user=session['profile'])
 
 
 @app.route('/correlation', methods=['POST'])
