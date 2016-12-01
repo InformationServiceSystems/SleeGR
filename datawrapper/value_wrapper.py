@@ -19,29 +19,41 @@ class ValueWrapper:
     def __init__(self, component_wrapper: ComponentsDataWrapper, observation_wrapper: ObservationWrapper):
         self._observation = observation_wrapper
         self._component_wrapper = component_wrapper
-        #self._value_json = json
+        # self._value_json = json
 
     def __repr__(self):
         return str(self._component_wrapper)
 
     @property
     def val0(self) -> Optional[Union[int, float]]:
-        return self._component_wrapper.valueQuantity.value
-        # return self._value_json['val0']
+        if self.type == 'Accelerometer':
+            res = self._component_wrapper.valueQuantity.value % 100
+            return round(res, 2)
+        else:
+            return self._component_wrapper.valueQuantity.value
+            # return self._value_json['val0']
 
     @property
     def val1(self) -> Optional[Union[int, float, datetime]]:
-        return self._component_wrapper.valueQuantity.value
-        # return self._value_json['val1']
+        if self.type == 'Accelerometer':
+            res = (self._component_wrapper.valueQuantity.value - self.val0) / 10000 % 100
+            return round(res, 2)
+
+        else:
+            return self._component_wrapper.valueQuantity.value
 
     @property
     def val2(self) -> Optional[Union[int, float]]:
-        return self._component_wrapper.valueQuantity.value
-        # return self._value_json['val2']
+        if self.type == 'Accelerometer':
+            res = (self._component_wrapper.valueQuantity.value - self.val1 * 10000 - self.val0) / 100000000 % 100
+            return round(res, 2)
+
+        else:
+            return self._component_wrapper.valueQuantity.value
 
     @property
     def email(self) -> str:
-        return  self._observation.subject.display
+        return self._observation.subject.display
 
     @property
     def time_stamp(self) -> datetime:
@@ -64,13 +76,10 @@ def value_wrapper(json: Dict) -> Optional[ValueWrapper]:
     else:
         return None
 
+
 def value_wrapper(json: Dict, observation_warpper: ObservationWrapper) -> Optional[ValueWrapper]:
     validator = FHIR_objects.MappingValidator(FHIR_objects.components_data, comparison_style=ComparisonStyle.maximum)
     if validator.validate(json):
         return ValueWrapper(components_data_wrapper(json), observation_warpper)
     else:
         return None
-
-
-if __name__ == '__main__':
-    pass
