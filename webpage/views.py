@@ -4,8 +4,6 @@ import math
 import S3_extract_dataset
 import jwt
 import base64
-
-from flask import request, redirect, json, session, make_response
 import requests
 from flask_cors import cross_origin
 
@@ -206,6 +204,7 @@ def receive_json():
             except KeyError:
                 return json.dumps({'status': 'failure'})
         S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
+        print('received json from:', received_wrapper.observation_wrapper.subject.display, datetime.now())
     return json.dumps({'status': 'success'})
 
 
