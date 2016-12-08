@@ -195,14 +195,15 @@ def correlations():
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
-        for received_json in received_json['arrayOfFhirObservations']:
-            try:
-                received_wrapper = measure_wrapper.measure_wrapper(received_json)
-                if not received_wrapper:
-                    raise KeyError
-                db_inserts.insert_measure(received_wrapper)
-            except KeyError:
-                return json.dumps({'status': 'failure'})
+        for array_of_something in received_json:
+            for received_json in array_of_something:
+                try:
+                    received_wrapper = measure_wrapper.measure_wrapper(received_json)
+                    if not received_wrapper:
+                        raise KeyError
+                    db_inserts.insert_measure(received_wrapper)
+                except KeyError:
+                    return json.dumps({'status': 'failure'})
         S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
         print('received json from:', received_wrapper.observation_wrapper.subject.display, datetime.now())
     return json.dumps({'status': 'success'})

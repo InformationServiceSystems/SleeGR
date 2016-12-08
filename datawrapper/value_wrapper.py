@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Union, Dict
 from datawrapper import FHIR_objects
 from mapval import ComparisonStyle
@@ -38,7 +38,11 @@ class ValueWrapper:
         if self.type == 'Accelerometer':
             res = (self._component_wrapper.valueQuantity.value - self.val0) / 10000 % 100
             return round(res, 2)
+        elif self.type == 'Sleep':
 
+            time_delta = timedelta(seconds=int(self._component_wrapper.valueQuantity.value))
+            print(time_delta)
+            return time_delta
         else:
             return self._component_wrapper.valueQuantity.value
 
