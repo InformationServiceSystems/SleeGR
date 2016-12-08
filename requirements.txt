@@ -4,6 +4,6 @@ flask-recaptcha
 validate_email
 flask-cors
 python-dateutil
-bcrypt
-dotenv
+py-bcrypt
+python-dotenv
 pyjwt

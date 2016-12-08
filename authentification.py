@@ -5,15 +5,16 @@ from werkzeug.local import LocalProxy
 import base64
 import jwt
 import os
-from dotenv import Dotenv
+from dotenv import load_dotenv
 
 db_inserts, db_extended = database.init()
 env = None
 
 try:
-    env = Dotenv(os.path.dirname(os.path.realpath(__file__)) + '/webpage/.env')
-    client_id = env["AUTH0_CLIENT_ID"]
-    client_secret = env["AUTH0_CLIENT_SECRET"]
+    load_dotenv(os.path.dirname(os.path.realpath(__file__)) + '/webpage/.env')
+    env = os.environ
+    client_id = env['AUTH0_CLIENT_ID']
+    client_secret = env['AUTH0_CLIENT_SECRET']
 except IOError:
   env = os.environ
 

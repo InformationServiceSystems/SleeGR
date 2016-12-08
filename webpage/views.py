@@ -17,17 +17,27 @@ from datareader import DataReader
 from json2mongo import Json2Mongo
 
 from datawrapper import measure_wrapper, value_wrapper
-from dotenv import Dotenv
+from dotenv import load_dotenv
 import os
 
 
 
 env = None
 try:
-    env = Dotenv(os.path.dirname(os.path.realpath(__file__)) + '/.env')
+    load_dotenv(os.path.dirname(os.path.realpath(__file__)) + '/.env')
+    env = os.environ
 except IOError:
     env = os.environ
+try:
+    proxy = env['PROXY']
+except KeyError:
+    proxy=None
 
+proxyDict = {
+    'http': proxy,
+    'https': proxy,
+    'ftp': proxy
+}
 
 db_inserts, db_extended = database.init()
 j2m = Json2Mongo()
@@ -51,16 +61,16 @@ def callback_handling():
       'grant_type': 'authorization_code' \
       }
 
-  token_info = requests.post(token_url, data=json.dumps(token_payload), headers = json_header).json()
+  token_info = requests.post(token_url, data=json.dumps(token_payload), headers = json_header, proxies=proxyDict).json()
 
   try:
       user_url = "https://{domain}/userinfo?access_token={access_token}" \
-        .format(domain=env["AUTH0_DOMAIN"], access_token=token_info['access_token'])
+        .format(domain=env['AUTH0_DOMAIN'], access_token=token_info['access_token'])
   except KeyError:
       return redirect('/')
 
 
-  user_info = requests.get(user_url).json()
+  user_info = requests.get(user_url, proxies=proxyDict).json()
 
   # We're saving all user information into the session
   session['profile'] = user_info
@@ -231,11 +241,12 @@ def logout_handling():
         'content-type': 'application/json'
     }
 
+
     token_url = "https://{domain}/api/v2/device-credentials".format(domain=env['AUTH0_DOMAIN'])
-    devices = requests.get(token_url, params=json.dumps(data), headers=json_header).json()
+    devices = requests.get(token_url, params=json.dumps(data), headers=json_header, proxies=proxyDict).json()
     for device in devices:
         if device['device_name'] == device_id:
-            requests.delete(token_url+'/'+device['id'], headers=json_header)
+            requests.delete(token_url+'/'+device['id'], headers=json_header, proxies=proxyDict)
     response = make_response(json.dumps('{"status" : "success"}'))
     response.headers['Content-Type'] = 'application/json; charset=utf-8'
     return response
