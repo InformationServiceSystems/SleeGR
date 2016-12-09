@@ -10,7 +10,8 @@ from scipy.optimize import minimize
 from pymongo import MongoClient
 import database
 from datawrapper import correl_wrapper
-
+from datawrapper.value_wrapper import ValueWrapper
+from typing import Iterable, Dict
 
 db_inserts, db_extended = database.init()
 
@@ -143,7 +144,7 @@ def Feedback(day, values, usr):
         
     return result
 
-def Sleep(day, values, usr):
+def Sleep(day, values:Iterable[ValueWrapper], usr):
     result = {'Sleep length': None, 'Sleep start': None, 'Sleep end': None, 'Deep sleep': None}
     
     vals = [val for val in values if val.type == 'Sleep' ]
@@ -152,13 +153,13 @@ def Sleep(day, values, usr):
         val = vals[-1] 
         if val.val0 < 2.0 or val.val0 > 12.0:
             return result
-        result['Sleep length'] = val.val0
-        result['Sleep start'] = (val.val1).hour
-        
+        result['Sleep length'] = val.val0 / 3600
+        result['Sleep start'] = (val.time_stamp).hour
+
         if result['Sleep start'] > 12:
             result['Sleep start'] = result['Sleep start']-24
         
-        result['Sleep end'] = val.time_stamp.hour
+        result['Sleep end'] = (val.time_stamp + timedelta(seconds=val.val0)).hour
         result['Deep sleep'] = val.val2 if val.val2 > 0 else None
     
     return result
@@ -245,7 +246,9 @@ def run(user=None):
         collection_name = ('%s_data' % (usr))
         if all_feat:
             for data in all_feat:
-                db_inserts.insert_correl(usr, data)
+                if data:
+                    print(data)
+                    db_inserts.insert_correl(usr, data)
                 #db[collection_name].insert(data)
         else:
             pass

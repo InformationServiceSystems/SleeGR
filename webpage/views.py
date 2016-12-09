@@ -197,17 +197,26 @@ def correlations():
 def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
+        name= ''
         for array_of_something in received_json:
-            for received_json in array_of_something:
+            import pprint
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(received_json.keys())
+            pp.pprint(received_json[array_of_something])
+            for received_measure in received_json[array_of_something]:
                 try:
-                    received_wrapper = measure_wrapper.measure_wrapper(received_json)
+                    received_wrapper = measure_wrapper.measure_wrapper(received_measure)
                     if not received_wrapper:
+                        print('failed a', array_of_something)
                         raise KeyError
-                    db_inserts.insert_measure(received_wrapper)
+                    else:
+                        db_inserts.insert_measure(received_wrapper)
+                        name = received_wrapper.observation_wrapper.subject.display
+
                 except KeyError:
                     return json.dumps({'status': 'failure'})
-        S3_extract_dataset.run(received_wrapper.observation_wrapper.subject.display)
-        print('received json from:', received_wrapper.observation_wrapper.subject.display, datetime.now())
+        print('received json from:', name, datetime.now())
+        S3_extract_dataset.run(name)
     return json.dumps({'status': 'success'})
 
 

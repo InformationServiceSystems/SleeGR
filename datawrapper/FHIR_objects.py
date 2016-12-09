@@ -34,7 +34,7 @@ quantity = {
     # from Element: extension
     'value': lambda value: isinstance(value, float) or isinstance(value, int),  # Numerical value (with implicit precision)
     'comparator': ...,  # < | <= | >= | > - how to understand the value
-    'unit': lambda unit: unit == 'bpm' or unit == 'm/s2' or unit == 'rad/s' or unit == 'Hz',  #TODO insert other possible values # Unit representation
+    'unit': lambda unit: unit == 'bpm' or unit == 'm/s2' or unit == 'rad/s' or unit == 'Hz' or unit == 'seconds' or unit == 'none',  #TODO insert other possible values # Unit representation
     'system': ...,  # C? System that defines coded unit form
     'code': ...  # Coded form of the unit
 }
@@ -69,7 +69,7 @@ identifier = {
     'system': str,  # The namespace for the identifier
     'value': str,  # The value that is unique
     'period': period,  # Time period when id is/was valid for use
-    'assigner': '-- Reference(Organization) --'  # Organization that issued id (may be just text)
+    'assigner': ... # Organization that issued id (may be just text)
 }
 
 

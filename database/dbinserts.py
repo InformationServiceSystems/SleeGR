@@ -96,7 +96,8 @@ class DbInserts:
         ids = []
         user = measure_wrapper.observation_wrapper.subject.display
         for value in measure_wrapper:
-            ids.append(self.insert_value(user, value).inserted_id)
+            if value:
+                ids.append(self.insert_value(user, value).inserted_id)
         measure_json = dict(measure_wrapper.observation_wrapper._observation_json)
         measure_json['value_ids'] = ids
         del measure_json['component']
