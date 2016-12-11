@@ -95,11 +95,12 @@ class DataReader:
                 new_json['a'] = data.a()
                 new_json['t'] = data.t()
                 new_json['c'] = data.c()
-                hr_lst_current_day = list(filter(lambda entry: entry.time_stamp.date() == day, values))
+                hr_lst_current_day = filter(lambda entry: entry.time_stamp.date() == day, values)
+                hr_lst_current_day = sorted(hr_lst_current_day, key=lambda entry: entry.time_stamp)
                 if len(hr_lst_current_day) < 1:
                     continue
                 base_time = hr_lst_current_day[0].time_stamp
-                datapoints = []
+                datapoints = []6
                 for data in hr_lst_current_day:
                     datapoints.append({'x': (data.time_stamp - base_time).seconds, 'y': data.val0})
                 new_json['data_points'] = datapoints
