@@ -199,10 +199,6 @@ def receive_json():
         received_json = request.get_json()
         name= ''
         for array_of_something in received_json:
-            import pprint
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(received_json.keys())
-            pp.pprint(received_json[array_of_something])
             for received_measure in received_json[array_of_something]:
                 try:
                     received_wrapper = measure_wrapper.measure_wrapper(received_measure)
@@ -215,7 +211,7 @@ def receive_json():
 
                 except KeyError:
                     return json.dumps({'status': 'failure'})
-        print('received json from:', name, datetime.now())
+        print('received json from:', name, "at:", datetime.now())
         S3_extract_dataset.run(name)
     return json.dumps({'status': 'success'})
 
