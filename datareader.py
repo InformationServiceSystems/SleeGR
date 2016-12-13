@@ -161,6 +161,19 @@ class DataReader:
                     reply[key] = int(val)
             return reply
 
+    def read_step_counter(self, user_id: str, start_date:datetime, end_date: datetime) -> List[Dict]:
+        dates = {}
+        for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
+                               until=end_date):
+            dates[day.date()] = []
+        value_list = self._db_extended.find_data_tag(user_id, 'Step Tracking', 'Steps')
+        for step_value in value_list:
+            if step_value.time_stamp.date() in dates:
+                dates[step_value.time_stamp.date()].append(step_value.val0)
+        for key in dates:
+            dates[key] = sum(dates[key])
+        return dates
+
     def convert_from_numpy(self, value):
         if type(value) == numpy.float64:
             return float(value)
