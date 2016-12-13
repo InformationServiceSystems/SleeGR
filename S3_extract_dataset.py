@@ -226,28 +226,28 @@ def run(user=None):
             values = [val for val in data if daystart <= val.time_stamp and val.time_stamp <= dayend ]
 
 
+            daystart = daystart - oneday
+            dayend = dayend - oneday
 
             if len(values) < 1:
                 continue
 
             # extract features from the data
 
-            r = {'time_stamp':daystart}
+            r = {'time_stamp':dayend}
             for fnc in ff :
-                r.update(fnc(daystart, values, usr))
+                r.update(fnc(dayend, values, usr))
 
             # save them for the user
             all_feat.append(correl_wrapper.correl_wrapper_gen(r))
 
-            daystart = daystart - oneday
-            dayend = dayend - oneday
+
 
         #new save
         collection_name = ('%s_data' % (usr))
         if all_feat:
             for data in all_feat:
                 if data:
-                    print(data)
                     db_inserts.insert_correl(usr, data)
                 #db[collection_name].insert(data)
         else:
@@ -258,4 +258,4 @@ def run(user=None):
 
 
 if __name__ == '__main__':
-    run('daniel.steinbach@web.de')
+    run('mirco.pyrtek@gmail.com')

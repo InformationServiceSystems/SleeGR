@@ -92,6 +92,9 @@ class DbExtended:
             del elem['_id']
             del elem['value_ids']
             elem['component'] = values
+            temp = measure_wrapper.measure_wrapper(elem)
+            if not temp:
+                continue
             measure_list.append(measure_wrapper.measure_wrapper(elem))
         return_list = []
         for measurement in measure_list:
