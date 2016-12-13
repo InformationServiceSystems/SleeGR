@@ -34,7 +34,7 @@ quantity = {
     # from Element: extension
     'value': lambda value: isinstance(value, float) or isinstance(value, int),  # Numerical value (with implicit precision)
     'comparator': ...,  # < | <= | >= | > - how to understand the value
-    'unit': lambda unit: unit == 'bpm' or unit == 'm/s2' or unit == 'rad/s' or unit == 'Hz' or unit == 'seconds' or unit == 'none',  #TODO insert other possible values # Unit representation
+    'unit': lambda unit: unit == 'bpm' or unit == 'm/s2' or unit == 'rad/s' or unit == 'Hz' or unit == 'seconds' or unit == 'none' or unit == 'Step' ,  #TODO insert other possible values # Unit representation
     'system': ...,  # C? System that defines coded unit form
     'code': ...  # Coded form of the unit
 }

@@ -79,8 +79,8 @@ class DataReader:
         dates = []
         correl_data_wrappers = self._db_extended.find_correl_data(user_id)
         values = []
-        values.extend(self._db_extended.find_data_tag(user_id, 'Heart rate', 'Cooldown'))
-        values.extend(self._db_extended.find_data_tag(user_id, 'Heart rate', 'Recovery'))
+        values.extend(self._db_extended.find_data_tag(user_id, 'Cooldown', 'Heart rate'))
+        values.extend(self._db_extended.find_data_tag(user_id, 'Recovery', 'Heart rate'))
         values = values[::10]
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
@@ -100,7 +100,7 @@ class DataReader:
                 if len(hr_lst_current_day) < 1:
                     continue
                 base_time = hr_lst_current_day[0].time_stamp
-                datapoints = []6
+                datapoints = []
                 for data in hr_lst_current_day:
                     datapoints.append({'x': (data.time_stamp - base_time).seconds, 'y': data.val0})
                 new_json['data_points'] = datapoints
@@ -160,6 +160,9 @@ class DataReader:
                 elif type(val) == numpy.int64:
                     reply[key] = int(val)
             return reply
+
+    def step_counter(self, user_id: str, start_date:datetime, end_date: datetime) -> List[Dict]:
+        value_list = self._db_extended.find_data()
 
     def convert_from_numpy(self, value):
         if type(value) == numpy.float64:

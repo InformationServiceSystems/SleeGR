@@ -50,7 +50,7 @@ class DbExtended:
         self.db_base._db[user].find_one()
 
 
-    def find_data_tag(self, user: str, measurement: str, tag=None) -> List[Optional[value_wrapper.ValueWrapper]]:
+    def find_data_tag(self, user: str, tag: str, measurement=None) -> List[Optional[value_wrapper.ValueWrapper]]:
         res_lst = self.db_base._db[('%s_measure' % user)].find({'category.coding.display': tag})
         res_lst = list(res_lst)
         measure_list = []
@@ -60,7 +60,7 @@ class DbExtended:
             values = []
             for value_id in ids:
                 value_list = []
-                if tag:
+                if measurement:
                     value_list = self.db_base._db[user].find({'_id': value_id, 'code.coding.display': measurement})
                 else:
                     value_list = self.db_base._db[user].find({'_id': value_id})

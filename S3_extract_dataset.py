@@ -194,7 +194,7 @@ def run(user=None):
     #find all measuremtens and sort list by date
     for user_elem in dct:
         lst = []
-        for elem in db_extended.find_data_user(user_elem):
+        for elem in db_extended.find_data_tag(user_elem, 'Cooldown', ):
             if isinstance(elem.time_stamp, datetime):
                 lst.append(elem)
         dct[user_elem] = sorted(lst, key=lambda date: date.time_stamp)
@@ -259,3 +259,4 @@ def run(user=None):
 
 if __name__ == '__main__':
     run('daniel.steinbach@web.de')
+    lst = []

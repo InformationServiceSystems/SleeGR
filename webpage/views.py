@@ -20,6 +20,11 @@ from datawrapper import measure_wrapper, value_wrapper
 from dotenv import load_dotenv
 import os
 
+import threading
+import time
+from queue import Queue
+
+user_queue = Queue()
 
 
 env = None
@@ -28,6 +33,7 @@ try:
     env = os.environ
 except IOError:
     env = os.environ
+
 try:
     proxy = env['PROXY']
 except KeyError:
@@ -38,12 +44,29 @@ proxyDict = {
     'https': proxy,
     'ftp': proxy
 }
-
 db_inserts, db_extended = database.init()
+
 j2m = Json2Mongo()
 
+def worker():
+    while True:
+        time.sleep(10)
+        computed_names = []
+        current_name = ""
+        while not user_queue.empty():
+            current_name = user_queue.pop()
+            if current_name in computed_names:
+                continue
+            S3_extract_dataset.run(current_name)
+            print('computed:', current_name)
+            computed_names.append(current_name)
 
+
+
+threading.Thread(target=worker)
 # Here we're using the /callback route.
+
+
 @app.route('/callback')
 def callback_handling():
 
@@ -78,7 +101,6 @@ def callback_handling():
   # Redirect to the User logged in page that you want here
   # In our case it's /dashboard
   return redirect('/dashboard')
-
 
 @app.route('/heartrate', methods=['POST'])
 @requires_auth_api
@@ -115,6 +137,7 @@ def get_correlations_list():
             '{"x_label": "Sleep end", "y_label": "RPE", "next_day": false},' \
             '{"x_label": "Sleep length", "y_label": "RPE", "next_day": false}]'
     return to_reply
+
 
 @app.route('/get_device_code', methods=['POST', 'GET'])
 @cross_origin()
@@ -192,6 +215,7 @@ def correlations():
         return response
 
 
+
 @app.route('/post_json', methods=['POST'])
 @requires_auth_api
 def receive_json():
@@ -212,8 +236,9 @@ def receive_json():
                 except KeyError:
                     return json.dumps({'status': 'failure'})
         print('received json from:', name, "at:", datetime.now())
-        S3_extract_dataset.run(name)
+        user_queue.put(name)
     return json.dumps({'status': 'success'})
+
 
 
 @app.route('/logout', methods=['POST'])
