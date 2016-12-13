@@ -50,11 +50,11 @@ j2m = Json2Mongo()
 
 def worker():
     while True:
-        time.sleep(10)
+        time.sleep(60 * 15)
         computed_names = []
         current_name = ""
         while not user_queue.empty():
-            current_name = user_queue.pop()
+            current_name = user_queue.get()
             if current_name in computed_names:
                 continue
             S3_extract_dataset.run(current_name)
@@ -63,7 +63,9 @@ def worker():
 
 
 
-threading.Thread(target=worker)
+worker_thread = threading.Thread(target=worker)
+worker_thread.start()
+
 # Here we're using the /callback route.
 
 

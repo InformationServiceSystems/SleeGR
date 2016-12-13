@@ -161,9 +161,6 @@ class DataReader:
                     reply[key] = int(val)
             return reply
 
-    def step_counter(self, user_id: str, start_date:datetime, end_date: datetime) -> List[Dict]:
-        value_list = self._db_extended.find_data()
-
     def convert_from_numpy(self, value):
         if type(value) == numpy.float64:
             return float(value)

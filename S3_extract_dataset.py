@@ -76,10 +76,10 @@ def FittedCurve(day, values, usr):
     start = cd[0].time_stamp
     
     for h in cd:
+        print(h.type, h.time_stamp, h.val0)
         diff = (h.time_stamp - start).seconds
         x.append(diff)
         y.append(h.val0)
-
     x = np.array(x)*1.0
     y = np.array(y)
 
@@ -258,4 +258,4 @@ def run(user=None):
 
 
 if __name__ == '__main__':
-    run('mirco.pyrtek@gmail.com')
+    run('')
