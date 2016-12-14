@@ -1,5 +1,6 @@
 import database
 import pprint
+import S3_extract_dataset
 
 db_inserts, db_extended = database.init()
 
@@ -90,14 +91,37 @@ def delete_measure (measure_id, username):
         counter += 1
     db_extended.db_base._db['%s_measure' % username].delete_one({'_id': measure_id})
     counter +=1
-    print('Deleted %s entries' % str(counter), 'of', measure['category']['coding'][0]['display'])
+    # print('Deleted %s entries' % str(counter), 'of', measure['category']['coding'][0]['display'])
     return counter
 
+def validateEmail( email ):
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+    try:
+        validate_email( email )
+        return True
+    except ValidationError:
+        return False
+
 if __name__ == '__main__':
-    run('pathmate2.p13@gmail.com')
-    print('Length of dynamic values:', len(dynamic_programming))
-    printer.pprint(res)
-    for measure_id in to_delete:
-        curr_cunter=delete_measure(measure_id, 'pathmate2.p13@gmail.com')
-        global_counter+=curr_cunter
-    print('Successfully deleted %s entries overall' % str(global_counter))
+    names = db_extended.db_base._db.collection_names()
+    users = []
+    for name in names:
+        if validateEmail(name):
+            users.append(name)
+    for name in users:
+        dynamic_programming.clear()
+        res.clear()
+        del to_delete[:]
+        global_counter = 0
+        print('Currently filtering:', name)
+        run(name)
+        # printer.pprint(res)
+        for measure_id in to_delete:
+            curr_cunter=delete_measure(measure_id, name)
+            global_counter+=curr_cunter
+        print('Successfully deleted %s entries overall' % str(global_counter))
+        if global_counter>0:
+            print('Start running S3 data aggregation for user', name)
+            S3_extract_dataset.run(name)
+            print('Finished data aggregation for user', name)
