@@ -230,19 +230,16 @@ def receive_json():
             for received_measure in received_json[array_of_something]:
                 try:
                     name = received_measure['subject']['display']
-                    print(name)
-                    if name=='default':
+                    if name == 'default':
                         auth = request.headers.get('Authorization', None)
-                        utils.handle_deafult(received_measure, auth)
-                        raise KeyError
+                        name = utils.get_user_info(auth)
+                        received_measure['subject']['display'] = name
                     received_wrapper = measure_wrapper.measure_wrapper(received_measure)
                     if not received_wrapper:
                         print('failed a', array_of_something)
                         raise KeyError
                     else:
-                        name = received_wrapper.observation_wrapper.subject.display
                         db_inserts.insert_measure(received_wrapper)
-
                 except KeyError:
                     return json.dumps({'status': 'failure'})
         print('received json from:', name, "at:", datetime.now())
