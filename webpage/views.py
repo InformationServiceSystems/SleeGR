@@ -19,6 +19,7 @@ from json2mongo import Json2Mongo
 from datawrapper import measure_wrapper, value_wrapper
 from dotenv import load_dotenv
 import os
+import utils
 
 import threading
 import time
@@ -227,13 +228,19 @@ def receive_json():
         for array_of_something in received_json:
             for received_measure in received_json[array_of_something]:
                 try:
+                    name = received_measure['subject']['display']
+                    print(name)
+                    if name=='default':
+                        auth = request.headers.get('Authorization', None)
+                        utils.handle_deafult(received_measure, auth)
+                        raise KeyError
                     received_wrapper = measure_wrapper.measure_wrapper(received_measure)
                     if not received_wrapper:
                         print('failed a', array_of_something)
                         raise KeyError
                     else:
-                        db_inserts.insert_measure(received_wrapper)
                         name = received_wrapper.observation_wrapper.subject.display
+                        db_inserts.insert_measure(received_wrapper)
 
                 except KeyError:
                     return json.dumps({'status': 'failure'})
