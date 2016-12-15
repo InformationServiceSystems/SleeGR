@@ -40,6 +40,6 @@ def get_user_info(auth):
         'authorization' : 'Bearer ' + env['AUTH0_KEY'],
         'content-type': 'application/json'
     }
-    devices = requests.get(token_url, params=json.dumps(data), headers=json_header, proxies=proxyDict).json()
+    user = requests.get(token_url, params=json.dumps(data), headers=json_header, proxies=proxyDict).json()
 
-    return devices['email']
+    return user
