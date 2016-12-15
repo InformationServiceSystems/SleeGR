@@ -50,6 +50,7 @@ j2m = Json2Mongo()
 
 def worker():
     while True:
+        print('Look for users to extract their data', '(', datetime.now(),')')
         time.sleep(60 * 15)
         computed_names = []
         current_name = ""
@@ -58,7 +59,7 @@ def worker():
             if current_name in computed_names:
                 continue
             S3_extract_dataset.run(current_name)
-            print('computed:', current_name)
+            print('computed:', current_name, 'at', datetime.now())
             computed_names.append(current_name)
 
 
