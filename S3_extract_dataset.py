@@ -76,7 +76,6 @@ def FittedCurve(day, values, usr):
     start = cd[0].time_stamp
     
     for h in cd:
-        print(h.type, h.time_stamp, h.val0)
         diff = (h.time_stamp - start).seconds
         x.append(diff)
         y.append(h.val0)
@@ -95,8 +94,8 @@ def FittedCurve(day, values, usr):
     sol = minimize(obj, p0)
     p = sol.x
 
-
     sc = p[1]*p[2]
+    print(p[1], '*',p[2], '=', sc )
     if sc > 25000 or sc < 0.0:
         return result;
     
@@ -258,4 +257,6 @@ def run(user=None):
 
 
 if __name__ == '__main__':
-    run('')
+    names = ['pathmate2.p11@gmail.com']
+    for name in names:
+        run(name)
