@@ -7,3 +7,4 @@ python-dateutil
 py-bcrypt
 python-dotenv
 pyjwt
+Django
