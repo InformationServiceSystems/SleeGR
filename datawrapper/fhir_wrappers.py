@@ -18,7 +18,8 @@ def iso_date2str(date_string: Union[str, datetime]) -> Optional[datetime]:
     except ValueError:
         pass
     try:
-        return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S GMT+01:00')
+        parts = date_string.split(' ')
+        return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S ' + parts[1])
     except ValueError:
         pass
 

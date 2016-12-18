@@ -249,7 +249,7 @@ def receive_json():
                         raise KeyError
                     else:
                         db_inserts.insert_measure(received_wrapper)
-                except KeyError:
+                except KeyError and AttributeError:
                     return json.dumps({'status': 'failure'})
         print('received json from:', name, "at:", datetime.now())
         user_queue.put(name)
