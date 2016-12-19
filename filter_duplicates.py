@@ -20,6 +20,7 @@ def run(username):
         print('Currently analysing:', measures)
         idx_glob = 1
         clusters = []
+        sorted_measures[measures] = sorted(sorted_measures[measures], key=lambda entry: entry['effectiveDateTime'])
         while len(sorted_measures[measures])>0:
             measure_one = sorted_measures[measures][0]
             dct = {str(idx_glob) + '_cluster' : [{'head' : {'amount' : len(measure_one['value_ids']), '_id' : measure_one['_id'], 'uploaded at' : measure_one['effectiveDateTime'].strftime("%d.%m.%Y_%H:%M:%S")}}]}
