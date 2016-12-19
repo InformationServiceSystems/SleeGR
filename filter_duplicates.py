@@ -14,8 +14,7 @@ to_delete = []
 global_counter = 0
 
 def run(username):
-    measures = db_extended.db_base._db['%s_measure' % username].find()
-    tags = ['TrainingHR', 'Cooldown', 'Step Tracking']
+     tags = ['TrainingHR', 'Cooldown', 'Step Tracking']
     sorted_measures = filter_measures_by_tag(measures)
     for measures in sorted_measures:
         print('Currently analysing:', measures)

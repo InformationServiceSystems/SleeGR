@@ -77,6 +77,33 @@ class DbExtended:
                 return_list.append(value)
         return return_list
 
+    def find_data_full(self, user: str, day:datetime,tag: str, measurement=None) -> List[Optional[value_wrapper.ValueWrapper]]:
+        res_lst = self.db_base._db[('%s_measure' % user)].find({'category.coding.display': tag, 'effectiveDateTime': {'$lte' : day + timedelta(1), '$gte': day}})
+        res_lst = list(res_lst)
+        measure_list = []
+        for elem in res_lst:
+            elem = dict(elem)
+            ids = elem['value_ids']
+            values = []
+            for value_id in ids:
+                value_list = []
+                if measurement:
+                    value_list = self.db_base._db[user].find({'_id': value_id, 'code.coding.display': measurement})
+                else:
+                    value_list = self.db_base._db[user].find({'_id': value_id})
+                for value in value_list:
+                    del value['_id']
+                    values.append(dict(value))
+            del elem['_id']
+            del elem['value_ids']
+            elem['component'] = values
+            measure_list.append(measure_wrapper.measure_wrapper(elem))
+        return_list = []
+        for measurement in measure_list:
+            for value in measurement:
+                return_list.append(value)
+        return return_list
+
     #changed to wrapper, not checked
     def find_data_user(self, user: str) -> List[Optional[value_wrapper.ValueWrapper]]:
         res_lst = self.db_base._db[('%s_measure' % user)].find()
