@@ -82,6 +82,7 @@ class DataReader:
         values.extend(self._db_extended.find_data_tag(user_id, 'Cooldown', 'Heart rate'))
         values.extend(self._db_extended.find_data_tag(user_id, 'Recovery', 'Heart rate'))
         values = values[::10]
+
         for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
                                until=end_date):
             dates.append(day.date())
