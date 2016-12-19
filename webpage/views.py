@@ -19,6 +19,7 @@ from json2mongo import Json2Mongo
 from datawrapper import measure_wrapper, value_wrapper
 from dotenv import load_dotenv
 import os
+import utils
 
 import threading
 import time
@@ -166,6 +167,15 @@ def get_device_code():
         response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return response
 
+@app.route('/get_user_credentials', methods=['GET'])
+@cross_origin()
+@requires_auth_api
+def get_user_credetials():
+    auth = request.headers.get('Authorization', None)
+    response = make_response(json.dumps(utils.get_user_info(auth)))
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
+
 
 @app.route('/sleepPoints', methods=['POST'])
 @requires_auth_api
@@ -228,15 +238,18 @@ def receive_json():
         for array_of_something in received_json:
             for received_measure in received_json[array_of_something]:
                 try:
+                    name = received_measure['subject']['display']
+                    if name == 'default':
+                        auth = request.headers.get('Authorization', None)
+                        name = utils.get_user_info(auth)['email']
+                        received_measure['subject']['display'] = name
                     received_wrapper = measure_wrapper.measure_wrapper(received_measure)
                     if not received_wrapper:
                         print('failed a', array_of_something)
                         raise KeyError
                     else:
                         db_inserts.insert_measure(received_wrapper)
-                        name = received_wrapper.observation_wrapper.subject.display
-
-                except KeyError:
+                except KeyError and AttributeError:
                     return json.dumps({'status': 'failure'})
         print('received json from:', name, "at:", datetime.now())
         user_queue.put(name)
