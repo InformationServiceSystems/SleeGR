@@ -40,7 +40,7 @@ def analyse(user: str, day: datetime):
     plt.show()
     plt.xlabel('seconds')
     plt.ylabel('BPM')
-    plt.savefig(('%s.png' % user), dpi=600)
+    plt.savefig(('%s_%s.png' % (user, day.date())), dpi=600)
     plt.clf()
     print('\n\n\n----------------------------------------------------------------------')
     print('For user', user)
