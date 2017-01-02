@@ -235,24 +235,27 @@ def receive_json():
     if request.method == 'POST':
         received_json = request.get_json()
         name= ''
-        for array_of_something in received_json:
-            for received_measure in received_json[array_of_something]:
-                try:
-                    name = received_measure['subject']['display']
-                    if name == 'default':
-                        auth = request.headers.get('Authorization', None)
-                        name = utils.get_user_info(auth)['email']
-                        received_measure['subject']['display'] = name
-                    received_wrapper = measure_wrapper.measure_wrapper(received_measure)
-                    if not received_wrapper:
-                        print('failed a', array_of_something)
-                        raise KeyError
-                    else:
-                        db_inserts.insert_measure(received_wrapper)
-                except KeyError and AttributeError:
-                    return json.dumps({'status': 'failure'})
-        print('received json from:', name, "at:", datetime.now())
-        user_queue.put(name)
+        if received_json:
+            for array_of_something in received_json:
+                for received_measure in received_json[array_of_something]:
+
+                    try:
+                        name = received_measure['subject']['display']
+                        if name == 'default' or name == '':
+                            auth = request.headers.get('Authorization', None)
+                            name = utils.get_user_info(auth)['email']
+                            received_measure['subject']['display'] = name
+                        received_wrapper = measure_wrapper.measure_wrapper(received_measure)
+                        if not received_wrapper:
+                            print('failed a', array_of_something)
+                            raise KeyError
+                        else:
+
+                            db_inserts.insert_measure(received_wrapper)
+                    except KeyError or AttributeError:
+                        return json.dumps({'status': 'failure'})
+            print('received json from:', name, "at:", datetime.now())
+            user_queue.put(name)
     return json.dumps({'status': 'success'})
 
 
