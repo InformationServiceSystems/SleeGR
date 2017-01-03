@@ -62,10 +62,14 @@ value_validator = FHIR_objects.MappingValidator(reference)
 
 def measure_wrapper(json: Dict) -> Optional[MeasureWrapper]:
     validator = FHIR_objects.MappingValidator(FHIR_objects.observation, FHIR_objects.ComparisonStyle.maximum)
-    if validator.validate(json):
+    try:
         json['effectiveDateTime'] = iso_date2str(json['effectiveDateTime'])
-        return MeasureWrapper(observation_wrapper(json))
-    else:
+        observation = observation_wrapper(json)
+        if observation:
+            return MeasureWrapper(observation)
+        else:
+            return None
+    except KeyError:
         return None
 
 
