@@ -5,6 +5,7 @@ from dateutil import rrule
 from datetime import datetime
 from datetime import timedelta
 import pymongo
+import pprint
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -78,30 +79,29 @@ def analyse_patients ():
         analyse(user[0], user[1])
 
 def analyse_data_all_days ():
-    user = 'wmaass@gmail.com'
-    tags = ['Cooldown', 'TrainingHR', 'Step Tracking', 'Sleep Tracking']
-    start_date = db_extends.db_base._db['%s_measure' % user].find().sort('effectiveDateTime', pymongo.ASCENDING).limit(1)[0]['effectiveDateTime']
-    end_date = db_extends.db_base._db['%s_measure' % user].find().sort('effectiveDateTime', pymongo.DESCENDING).limit(1)[0]['effectiveDateTime']
-    dates = []
-    print(start_date)
-    print(end_date)
-    for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
-                           until=end_date):
-        dates.append(day.date())
-    all_data = list(db_extends.db_base._db['%s_measure' % user].find())
-    print(len(all_data))
-    res = []
-    for day in dates:
-        temp = {}
-        for tag in tags:
-            data_size = len(list(filter(lambda entry: entry['effectiveDateTime'].date() == day and entry['category']['coding'][0]['display'] == tag, all_data)))
-            if data_size > 0:
-                temp[tag] = data_size
-        if len(temp) > 0:
-            res.append({day.strftime('%d.%m.%Y') :temp })
-    import pprint
-    pprint.pprint(res, indent=4)
+    users = ['s9mhpaul@stud.uni-saarland.de', 'ralfbleymehl@gmail.com']
+    for user in users:
+        tags = ['Cooldown', 'TrainingHR', 'Step Tracking', 'Sleep Tracking']
+        start_date = db_extends.db_base._db['%s_measure' % user].find().sort('effectiveDateTime', pymongo.ASCENDING).limit(1)[0]['effectiveDateTime']
+        end_date = db_extends.db_base._db['%s_measure' % user].find().sort('effectiveDateTime', pymongo.DESCENDING).limit(1)[0]['effectiveDateTime']
+        dates = []
+        for day in rrule.rrule(rrule.DAILY, dtstart=start_date,
+                               until=end_date):
+            dates.append(day.date())
+        all_data = list(db_extends.db_base._db['%s_measure' % user].find())
+        print(len(all_data))
+        res = []
+        for day in dates:
+            temp = {}
+            for tag in tags:
+                data_size = len(list(filter(lambda entry: entry['effectiveDateTime'].date() == day and entry['category']['coding'][0]['display'] == tag, all_data)))
+                if data_size > 0:
+                    temp[tag] = data_size
+            if len(temp) > 0:
+                res.append({day.strftime('%d.%m.%Y') :temp })
+        res = {user : res}
+        pprint.pprint(res, indent=4)
 
 
 if __name__ == '__main__':
-    analyse_patients()
+    analyse_data_all_days()

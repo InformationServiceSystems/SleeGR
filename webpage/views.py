@@ -20,6 +20,7 @@ from datawrapper import measure_wrapper, value_wrapper
 from dotenv import load_dotenv
 import os
 import utils
+import pprint
 
 import threading
 import time
@@ -236,6 +237,9 @@ def receive_json():
         received_json = request.get_json()
         name= ''
         if received_json:
+            if 'test' in received_json:
+                print(type(received_json['test']))
+                return json.dumps(received_json)
             for array_of_something in received_json:
                 for received_measure in received_json[array_of_something]:
 
@@ -247,6 +251,7 @@ def receive_json():
                             received_measure['subject']['display'] = name
                         received_wrapper = measure_wrapper.measure_wrapper(received_measure)
                         if not received_wrapper:
+                            pprint.pprint(received_measure)
                             print('failed a', array_of_something)
                             raise KeyError
                         else:
@@ -257,6 +262,36 @@ def receive_json():
             print('received json from:', name, "at:", datetime.now())
             user_queue.put(name)
     return json.dumps({'status': 'success'})
+
+@app.route('/post_tiny', methods=['POST'])
+@requires_auth_api
+def receive_tiny_json():
+    if request.method == 'POST':
+        received_json = request.get_json()
+        name= ''
+        if received_json:
+            for arrayOfSmth in received_json:
+                for received_measure in received_json[arrayOfSmth]:
+                    try:
+                        name = received_measure['userID']
+                        if name == 'default' or name == '':
+                            auth = request.headers.get('Authorization', None)
+                            name = utils.get_user_info(auth)['email']
+                            received_measure['userID'] = name
+                        transformed_measure = utils.transform_tiny_to_FHIR(received_measure)
+                        if not transformed_measure:
+                            raise KeyError
+                        else:
+                            received_wrapper = measure_wrapper.measure_wrapper(transformed_measure)
+                            if not received_wrapper:
+                                print('failed', arrayOfSmth)
+                                raise KeyError
+                            else:
+                                db_inserts.insert_measure(received_wrapper)
+                    except KeyError or AttributeError:
+                        return json.dumps({'status': 'failure'})
+            print('received json from:', name, "at:", datetime.now())
+        return json.dumps({'status': 'success'})
 
 
 
