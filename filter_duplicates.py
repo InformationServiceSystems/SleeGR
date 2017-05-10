@@ -1,6 +1,8 @@
 import database
 import pprint
 import S3_extract_dataset
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 db_inserts, db_extended = database.init()
 
@@ -96,8 +98,6 @@ def delete_measure (measure_id, username):
     return counter
 
 def validateEmail( email ):
-    from django.core.validators import validate_email
-    from django.core.exceptions import ValidationError
     try:
         validate_email( email )
         return True
