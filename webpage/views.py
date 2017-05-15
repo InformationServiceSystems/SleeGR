@@ -191,24 +191,30 @@ def sleep_data():
         start = datetime.strptime(start_date, '%d.%m.%Y')
         end = datetime.strptime(end_date, '%d.%m.%Y')
         if gaussian_settings:
-            sleep_data = r.read_sleep_data(user_id, start, end)
-            average_list = []
-            var_list = []
-            for data in sleep_data:
-                average_list.append(data['x'])
-                var_list.append(data['y'])
-            if len(average_list) > 1 and len(var_list) > 1:
-                mean_duration = mean(average_list)
-                variance_duration = variance(average_list)
-                response = make_response(json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}]))
-                response.headers['Content-Type'] = 'application/json; charset=utf-8'
-                return response
-            else:
-                response =  make_response(json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}]))
-                response.headers['Content-Type'] = 'application/json; charset=utf-8'
-                return response
+            # sleep_data = r.read_sleep_data(user_id, start, end)
+            # average_list = []
+            # var_list = []
+            # for data in sleep_data:
+            #     average_list.append(data['x'])
+            #     var_list.append(data['y'])
+            # if len(average_list) > 1 and len(var_list) > 1:
+            #     mean_duration = mean(average_list)
+            #     variance_duration = variance(average_list)
+            #     response = make_response(json.dumps([{'user_id': user_id, 'avg': mean_duration, 'std': math.sqrt(variance_duration)}]))
+            #     response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            #     return response
+            # else:
+            #     response =  make_response(json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}]))
+            #     response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            #     return response
+            response = make_response(json.dumps([{'user_id': user_id, 'avg': -1000, 'std': 1}]))
+            response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            return response
         else:
-            response = make_response(json.dumps(r.read_sleep_data(user_id, start, end)))
+            # response = make_response(json.dumps(r.read_sleep_data(user_id, start, end)))
+            # response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            # return response
+            response = make_response(json.dumps([]))
             response.headers['Content-Type'] = 'application/json; charset=utf-8'
             return response
 
